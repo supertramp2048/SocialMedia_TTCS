@@ -9,12 +9,23 @@ export const useAuthStore = defineStore('auth', {
     actions:{
         async login(email, password){
             try {
-                const res = await api.post('/auth/login', {email,password});
+                const res = await api.post('/api/login', {email,password});
+                Cookies.set('token', res.data.token,{
+                    expires: 7,            // thời hạn 7 ngày
+                    secure: false,          // true nếu chạy HTTPS
+                    sameSite: 'lax'         // tránh lỗi CORS
+                })
+                localStorage.setItem('user',JSON.stringify(res.data.user))
                 this.user = res.data.user
-                this.token = res.data.token
             } catch (error) {
                 alert("Email hoặc mật khẩu sai")
             }
         },
+        async logout(){
+            this.user = null,
+            this.token = null,
+            Cookies.remove('token')
+            localStorage.removeItem('user')
+        }
     }
 })

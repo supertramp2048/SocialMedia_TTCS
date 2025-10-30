@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/client/Home/index.vue'
-
+import { useCategoryStore } from '@/stores/categories'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -18,6 +18,11 @@ const router = createRouter({
       path: '/login',
       name: 'Đăng nhập',
       component: () => import('../views/client/login/index.vue'),
+    },
+    {
+      path: '/posts',
+      name: 'Tất cả bài viết',
+      component: () => import('../views/client/AllPosts/index.vue'),
     },
   ],
 })

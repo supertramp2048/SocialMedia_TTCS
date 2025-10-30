@@ -7,9 +7,14 @@ import { createPinia } from 'pinia'
 import App from './App.vue'
 import router from './router'
 
+import { useCategoryStore } from '@/stores/categories'
 const app = createApp(App)
 
 app.use(createPinia())
+
+const categoryStore = useCategoryStore()
+await categoryStore.ensureLoaded()
+
 app.use(router)
 
 app.mount('#app')

@@ -134,43 +134,68 @@
   "posts": [
     {
       "id": 1,
-      "user_id": 1,
-      "title": "Khám phá miền Tây mùa nước nổi",
-      "content_html": "<h2>Miền Tây</h2><p>Sông nước hữu tình.</p>",
-      "created_at": "2025-09-01T02:00:00Z",
-      "updated_at": "2025-09-01T02:00:00Z"
+      "title": "Học Vue 3 cơ bản",
+      "author": {
+        "id": 101,
+        "name": "Nguyễn Văn Huy",
+        "avatar": "https://i.pravatar.cc/150?img=1"
+      },
+      "comments_count": 5,
+      "vote_score": 10,
+      "user_vote": 1,
+      "createdAt": "2025-10-20T09:00:00Z"
     },
     {
       "id": 2,
-      "user_id": 2,
-      "title": "Lễ hội hoa anh đào Nhật Bản",
-      "content_html": "<h2>Sakura</h2><p>Mùa xuân rực rỡ.</p>",
-      "created_at": "2025-09-05T08:30:00Z",
-      "updated_at": "2025-09-05T08:30:00Z"
+      "title": "Giới thiệu về Pinia trong Vue",
+      "author": {
+        "id": 102,
+        "name": "Trần Minh Quân",
+        "avatar": "https://i.pravatar.cc/150?img=2"
+      },
+      "comments_count": 2,
+      "vote_score": 4,
+      "user_vote": 0,
+      "createdAt": "2025-10-22T13:30:00Z"
     },
     {
       "id": 3,
-      "user_id": 3,
-      "title": "Cà phê Sài Gòn",
-      "content_html": "<p>Gu đậm đà nơi góc phố.</p>",
-      "created_at": "2025-09-10T07:10:00Z",
-      "updated_at": "2025-09-10T07:10:00Z"
+      "title": "Cách sử dụng Axios trong Vue",
+      "author": {
+        "id": 103,
+        "name": "Phạm Đức Huy",
+        "avatar": "https://i.pravatar.cc/150?img=3"
+      },
+      "comments_count": 8,
+      "vote_score": 15,
+      "user_vote": 1,
+      "createdAt": "2025-10-25T17:45:00Z"
     },
     {
       "id": 4,
-      "user_id": 4,
-      "title": "Đà Lạt mùa sương",
-      "content_html": "<p>Lãng đãng mây trời.</p>",
-      "created_at": "2025-09-12T05:00:00Z",
-      "updated_at": "2025-09-12T05:00:00Z"
+      "title": "Sử dụng Composition API hiệu quả",
+      "author": {
+        "id": 104,
+        "name": "Lê Thị Mai",
+        "avatar": "https://i.pravatar.cc/150?img=4"
+      },
+      "comments_count": 3,
+      "vote_score": 7,
+      "user_vote": 0,
+      "createdAt": "2025-10-26T11:10:00Z"
     },
     {
       "id": 5,
-      "user_id": 5,
-      "title": "Ẩm thực miền Trung",
-      "content_html": "<p>Mì Quảng, bún bò, cao lầu…</p>",
-      "created_at": "2025-09-14T03:30:00Z",
-      "updated_at": "2025-09-14T03:30:00Z"
+      "title": "Hiểu về Reactive và Ref trong Vue",
+      "author": {
+        "id": 105,
+        "name": "Đỗ Thành Long",
+        "avatar": "https://i.pravatar.cc/150?img=5"
+      },
+      "comments_count": 6,
+      "vote_score": 12,
+      "user_vote": 1,
+      "createdAt": "2025-10-27T15:20:00Z"
     }
   ],
   "comments": [
@@ -356,6 +381,68 @@
       "message_id": 5,
       "reader_id": 4,
       "read_at": "2025-09-12T06:12:00Z"
+    }
+  ],
+  "categories": [
+    {
+      "id": 1,
+      "name": "Công nghệ",
+      "slug": "cong-nghe",
+      "description": "Các bài viết về xu hướng và tin tức công nghệ."
+    },
+    {
+      "id": 2,
+      "name": "Lập trình",
+      "slug": "lap-trinh",
+      "description": "Chia sẻ kiến thức và kinh nghiệm lập trình."
+    },
+    {
+      "id": 3,
+      "name": "Khoa học",
+      "slug": "khoa-hoc",
+      "description": "Khám phá các phát minh, nghiên cứu và ứng dụng khoa học."
+    },
+    {
+      "id": 4,
+      "name": "Đời sống",
+      "slug": "doi-song",
+      "description": "Những câu chuyện, mẹo hay trong cuộc sống hằng ngày."
+    },
+    {
+      "id": 5,
+      "name": "Giáo dục",
+      "slug": "giao-duc",
+      "description": "Tin tức, bài học và chia sẻ trong lĩnh vực giáo dục."
+    },
+    {
+      "id": 6,
+      "name": "Kinh doanh",
+      "slug": "kinh-doanh",
+      "description": "Bài viết về khởi nghiệp, đầu tư và quản lý."
+    },
+    {
+      "id": 7,
+      "name": "Thể thao",
+      "slug": "the-thao",
+      "description": "Tin tức, sự kiện và phân tích thể thao."
+    },
+    {
+      "id": 8,
+      "name": "Giải trí",
+      "slug": "giai-tri",
+      "description": "Phim ảnh, âm nhạc, game và văn hóa giải trí."
+    },
+    {
+      "id": 9,
+      "name": "Sức khỏe",
+      "slug": "suc-khoe",
+      "description": "Kiến thức y học, dinh dưỡng và lối sống lành mạnh."
+    },
+    {
+      "id": 10,
+      "name": "Du lịch",
+      "slug": "du-lich",
+      "description": "Khám phá các điểm đến, kinh nghiệm và văn hóa du lịch."
     }
   ],
   "notifications": [

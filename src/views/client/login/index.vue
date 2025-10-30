@@ -55,8 +55,8 @@ async function onSubmit() {
   error.value = ''
   console.log(email.value);
   try {
-    await auth.login(email.value, password.value)
-    if(auth.token){
+    const res = await auth.login(email.value, password.value)
+    if(res!=error){
       router.push("/")
     }
     else{
