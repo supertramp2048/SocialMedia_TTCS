@@ -24,9 +24,9 @@ const router = createRouter({
       component: () => import('../views/client/login/index.vue'),
     },
     {
-      path: '/posts',
-      name: 'Tất cả bài viết',
-      component: () => import('../views/client/AllPosts/index.vue'),
+      path: '/bai-dang',
+      name: 'Chi tiết bài đăng',
+      component: () => import('../views/client/postDetail/index.vue'),
       meta: { requiresAuth: true } 
     },
   ],
@@ -34,15 +34,11 @@ const router = createRouter({
 router.beforeEach(async (to, from, next)=>{
   console.log('Đi từ:', from.fullPath, '-> tới:', to.fullPath)
   if (to.meta.requiresAuth){
-  let token = Cookies.get('token')
-  console.log('token ben route', token);
-  
+  let token = Cookies.get('token')  
   if(token){
     const auth = useAuthStore()
-    console.log("token",token);
     let res = await auth.fetchUser()
     console.log(res);
-    
   }
 }
   next()

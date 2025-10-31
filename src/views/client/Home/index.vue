@@ -1,12 +1,7 @@
-<script setup lang="js">
-import Layout from '../layout/layout.vue'
-import { ref } from 'vue'
-
-</script>
-
 
 <template>
-  <Layout v-slot="{ posts, latestPost, featuredPosts, pagination, updatePagination, totalPages, loading }">
+  <Layout>
+    <loader :show="globalLoading" />
     <!-- Hero Section -->
     <section class="relative bg-gradient-to-br from-sky-50 via-blue-50 to-sky-100 overflow-hidden">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
@@ -88,8 +83,11 @@ import { ref } from 'vue'
             </div>
             
             <div class="space-y-6">
-              <div v-for="post in latestPost.data" :key="post.id" 
-                   class="flex flex-col sm:flex-row gap-4 pb-6 border-b border-gray-200 hover:bg-gray-50 transition-colors rounded-lg p-2 -m-2">
+              <router-link
+                  v-for="post in latestPost.data" :key="post.id" 
+                  class="flex flex-col sm:flex-row gap-4 pb-6 border-b border-gray-200 hover:bg-gray-50 transition-colors rounded-lg p-2 -m-2"
+                  :to="{ path: '/bai-dang/', query: { id:post.id } }"
+                  >
                 <img :src="post.image" :alt="post.title" 
                      class="w-full sm:w-48 h-40 object-cover rounded-lg flex-shrink-0"/>
                 <div class="flex-1 space-y-2">
@@ -118,7 +116,7 @@ import { ref } from 'vue'
                     </span>
                   </div>
                 </div>
-              </div>
+              </router-link>
             </div>
           </section>
 
@@ -138,8 +136,11 @@ import { ref } from 'vue'
             </div>
             
             <div class="grid sm:grid-cols-2 gap-6">
-              <div v-for="article in featuredPosts.data" :key="article.id" 
-                   class="group cursor-pointer">
+              <router-link 
+                  v-for="article in featuredPosts.data" :key="article.id" 
+                  class="group cursor-pointer"
+                  :to="{ path: '/bai-dang/', query: { id:article.id } }"
+                  >
                 <div class="mb-3 rounded-lg overflow-hidden">
                   <img :src="article.image" :alt="article.title" 
                        class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"/>
@@ -163,7 +164,7 @@ import { ref } from 'vue'
                       {{ article.vote_score}}
                   </span>
                 </div>
-              </div>
+              </router-link>
             </div>
             <div class="bg-gradient-to-r from-orange-400 to-pink-500 rounded-lg overflow-hidden">
             <div class="p-8 text-center text-white">
@@ -181,7 +182,8 @@ import { ref } from 'vue'
                 <button
                   type="button"
                   class="px-3 py-2 text-sm text-gray-700 hover:text-sky-700 hover:bg-sky-50 rounded-md transition-colors"
-                  @click="updatePagination({ sort:'newest', page:1 })"
+                  @click="updatePagination('newest')"
+                  :class="{'bg-sky-300': sortSetting == 'newest'}"
                 >
                   Mới nhất
                 </button>
@@ -189,7 +191,8 @@ import { ref } from 'vue'
                 <button
                   type="button"
                   class="px-3 py-2 text-sm text-gray-700 hover:text-sky-700 hover:bg-sky-50 rounded-md transition-colors"
-                  @click="updatePagination({ sort:'hot', page:1 })"
+                  @click="updatePagination('hot')"
+                  :class="{'bg-sky-300': sortSetting == 'hot'}"
                 >
                   Thịnh hành
                 </button>
@@ -198,7 +201,8 @@ import { ref } from 'vue'
           </div>
           <!-- // tất cả post có phân trang -->
           <div class="grid sm:grid-cols-2 gap-6">
-              <div v-for="article in posts.data" :key="article.id" 
+              <router-link v-for="article in posts.data" :key="article.id" 
+                  :to="{ path: '/bai-dang/', query: { id:article.id } }"
                    class="group cursor-pointer">
                 <div class="mb-3 rounded-lg overflow-hidden">
                   <img :src="article.image" :alt="article.title" 
@@ -207,7 +211,9 @@ import { ref } from 'vue'
                 <h3 class="font-semibold text-gray-900 group-hover:text-sky-600 line-clamp-2 mb-2">
                   {{ article.title }}
                 </h3>
-                <div class="flex items-center gap-3 text-sm text-gray-500">
+                <div
+                class="flex items-center gap-3 text-sm text-gray-500"
+                >
                   <img
                         :src="article.author?.avatar || AVATAR_FALLBACK"
                         alt="avatar"
@@ -223,9 +229,49 @@ import { ref } from 'vue'
                       {{ article.vote_score}}
                   </span>
                 </div>
-              </div>
+              </router-link>
             </div>
-           
+            <!-- phan trang -->
+           <form
+              class="sticky bottom-0 z-30 bg-white border-t shadow-md 
+                    flex justify-center items-center gap-4 px-6 py-3
+                    max-w-2xl mx-auto rounded-t-lg"
+              @submit.prevent="goPage"
+            >
+              <!-- Nút bên trái -->
+              <button
+                type="button"
+                class="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md text-sm font-medium text-gray-700"
+                :disabled="inputPage <= 1 || loading"
+                @click="inputPage--; goPage()"
+              >
+                Trước
+              </button>
+
+              <!-- Ô nhập ở giữa -->
+              <label class="flex items-center gap-2 text-sm text-gray-700">
+                Trang:
+                <input
+                  type="number"
+                  v-model.number="inputPage"
+                  min="1"
+                  :max="totalPages"
+                  class="w-16 px-2 py-1 border rounded-md text-center"
+                />
+                / {{ totalPages }}
+              </label>
+
+              <!-- Nút bên phải -->
+              <button
+                type="button"
+                class="px-4 py-2 bg-sky-500 hover:bg-sky-600 rounded-md text-sm font-medium text-white disabled:opacity-60"
+                :disabled="inputPage >= totalPages || loading"
+                @click="inputPage++; goPage()"
+              >
+                Tiếp
+              </button>
+            </form>
+
           </section>
 
         </div>
@@ -298,6 +344,127 @@ import { ref } from 'vue'
     </div>
   </Layout>
 </template>
+<script setup lang="js">
+import Layout from '../layout/layout.vue'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import api from "../../../../API/axios"
+// loader cho trang
+import { globalLoading } from '../../../../API/axios'
+import loader from '../../../components/loader.vue'
+
+const router = useRouter()
+const route = useRoute()
+const apiUrl = import.meta.env.VITE_API_BASE
+// du lieu cac posts
+const posts = ref({ data: [] })
+const latestPost = ref({ data: [] })
+const featuredPosts = ref({ data: [] })
+// Phân trang
+const objPagination = ref({ page: 1, limit: 2, sort: 'hot' })
+const inputPage = ref(objPagination.value.page) // <--- thêm biến nhập tạm
+const numberOfPost = ref(0)
+const totalPages = computed(() => Math.max(1, Math.ceil(numberOfPost.value / objPagination.value.limit)))
+// che do sap xep bai viet
+const loading = ref(false)
+const sortSetting = ref('hot')
+function updatePagination(patch) {
+  const next = { ...route.query }
+    if (patch == null || patch === '')
+      delete next.category
+    else{
+      next.sort = patch
+    }
+  router.replace({ query: next })   // 👉 KHÔNG đụng objPagination ở đây
+}
+
+// Hàm lấy bài viết
+async function fetchPosts() {
+  console.log(objPagination.value);
+  
+  loading.value = true
+  try {
+    const res = await api.get(`${apiUrl}/api/posts`, { params: objPagination.value })
+    posts.value = res.data
+    numberOfPost.value = res.data?.meta?.total ?? res.data?.total ?? 0
+  } catch (error) {
+    console.error('Lỗi tải posts:', error)
+  } finally {
+    loading.value = false
+  }
+}
+function goPage() {
+  let p = Number(inputPage.value) || 1
+  p = Math.min(Math.max(1, p), totalPages.value)
+  objPagination.value.page = p
+  inputPage.value = p
+  // set URL (giữ lại các query khác nếu có)
+  const next = { ...route.query, page: p }
+  if (objPagination.value.category == null) {
+    delete next.category
+  } else {
+    next.category = objPagination.value.category
+    next.sort = objPagination.value.sort
+  }
+  router.replace({ query: next })
+}
+
+// Kiểm tra giới hạn trang
+function clampPage() {
+  const p = Number(objPagination.value.page) || 1
+  objPagination.value.page = Math.min(Math.max(1, p), totalPages.value)
+}
+
+// Nút phân trang
+function nextPage() {
+  if (objPagination.value.page < totalPages.value) objPagination.value.page++
+}
+function prevPage() {
+  if (objPagination.value.page > 1) objPagination.value.page--
+}
+
+// Đọc params từ URL → gán vào state
+watch(() => route.query, (q) => {
+  const page = q.page ? Number(q.page) : 1
+  const cat = (q.category === undefined || q.category === '') ? null : Number(q.category)
+  const sort = (typeof q.sort === 'string' && q.sort !== '') ? q.sort : 'hot'
+  sortSetting.value= sort
+  objPagination.value.page = Number.isNaN(page) ? 1 : page
+  inputPage.value = objPagination.value.page
+  objPagination.value.category = Number.isNaN(cat) ? null : cat
+  objPagination.value.sort = sort
+}, { immediate: true })
+
+// Tự reload khi đổi category/page
+watch(() => objPagination.value, () => {
+  clampPage()
+  fetchPosts()
+  fetchExtras()
+}, { deep: true })
+
+// --- Bài mới & nổi bật ---
+async function fetchExtras() {
+  loading.value = true
+  try {
+    const res1 = await api.get(`${apiUrl}/api/posts`, { params: { limit: 1, sort: 'newest', category: objPagination.value.category } })
+    latestPost.value = res1.data
+
+    const res2 = await api.get(`${apiUrl}/api/posts`, { params: { limit: 4, sort: 'hot', category: objPagination.value.category } })
+    featuredPosts.value = res2.data
+  } catch (error) {
+    console.error('Lỗi lấy bài nổi bật:', error)
+  } finally {
+    loading.value = false
+  }
+}
+
+// --- Mounted ---
+onMounted(async () => {
+  await fetchPosts()
+  await fetchExtras()
+})
+</script>
+
 
 <style scoped>
 .line-clamp-2 {
