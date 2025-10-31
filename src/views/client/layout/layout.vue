@@ -1,4 +1,5 @@
 <template>
+  <loader :show="globalLoading" />
   <div class="min-h-screen bg-white">
     <!-- Header & Category bar (giữ nguyên phần của bạn) -->
     <!-- Header -->
@@ -71,6 +72,7 @@
         <button
           type="button"
           class="px-3 py-2 text-sm text-gray-700 hover:text-sky-700 hover:bg-sky-50 rounded-md transition-colors"
+          :class="{'bg-sky-300': chossenCate == null}"
           @click="goCategory(null,null)"
         >
           Tất cả
@@ -80,6 +82,7 @@
           :key="category.id ?? idx"
           type="button"
           class="px-3 py-2 text-sm text-gray-700 hover:text-sky-700 hover:bg-sky-50 rounded-md transition-colors"
+          :class="{'bg-sky-300': chossenCate == category.id}"
           @click="goCategory(category.id,category.slug)"
         >
           {{ category.name }}
@@ -112,6 +115,7 @@
               :key="category.id ?? `more-${idx}`"
               type="button"
               class="w-full text-left px-3 py-2 text-sm text-gray-700 hover:text-sky-700 hover:bg-sky-50 rounded-md"
+              :class="{'bg-sky-300': chossenCate == category.id}"
               @click="goCategory(category.id,category.slug)"
             >
               {{ category.name }}
@@ -182,20 +186,26 @@
 
 <script setup lang="js">
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '../../../stores/auth'
 import { useCategoryStore } from '../../../stores/categories'
 import api from "../../../../API/axios"
-
+// loader cho trang
+import { globalLoading } from '../../../../API/axios'
+import loader from '../../../components/loader.vue'
+//-------------
 const auth = useAuthStore()
 const categoriesStore = useCategoryStore()
 const router = useRouter()
+const route = useRoute()
 const apiUrl = import.meta.env.VITE_API_BASE
+const chossenCate = ref(null)
 
-// Dữ liệu hiển thị
+// Dữ liệu hiển thị gồm toàn bộ post toàn bộ số post theo category 1 post gần nhất theo cate và 4 post hot nhất theo cate
 const posts = ref({ data: [] })
 const latestPost = ref({ data: [] })
 const featuredPosts = ref({ data: [] })
+
 // Phân trang
 const objPagination = ref({ page: 1, limit: 2, sort: 'hot' })
 const inputPage = ref(objPagination.value.page) // <--- thêm biến nhập tạm
@@ -205,6 +215,8 @@ const loading = ref(false)
 
 // Hàm lấy bài viết
 async function fetchPosts() {
+  console.log(objPagination.value);
+  
   loading.value = true
   try {
     const res = await api.get(`${apiUrl}/api/posts`, { params: objPagination.value })
@@ -217,15 +229,38 @@ async function fetchPosts() {
   }
 }
 function updatePagination(patch) {
-  objPagination.value = { ...objPagination.value, ...patch }
+  const next = { ...route.query }
+
+  if (patch.page != null) next.page = patch.page
+
+  if ('category' in patch) {
+    if (patch.category == null || patch.category === '')
+      delete next.category
+    else
+      next.category = patch.category
+  }
+
+  if (patch.sort) next.sort = patch.sort
+
+  router.replace({ query: next })   // 👉 KHÔNG đụng objPagination ở đây
 }
+
 function goPage() {
   let p = Number(inputPage.value) || 1
   p = Math.min(Math.max(1, p), totalPages.value)
   objPagination.value.page = p
   inputPage.value = p
-  fetchPosts()
+  // set URL (giữ lại các query khác nếu có)
+  const next = { ...route.query, page: p }
+  if (objPagination.value.category == null) {
+    delete next.category
+  } else {
+    next.category = objPagination.value.category
+    next.sort = objPagination.value.sort
+  }
+  router.replace({ query: next })
 }
+
 // Kiểm tra giới hạn trang
 function clampPage() {
   const p = Number(objPagination.value.page) || 1
@@ -240,25 +275,38 @@ function prevPage() {
   if (objPagination.value.page > 1) objPagination.value.page--
 }
 
-// Tự reload khi đổi category
- watch(() => objPagination.value, () => {
+// Đọc params từ URL → gán vào state
+watch(() => route.query, (q) => {
+  const page = q.page ? Number(q.page) : 1
+  const cat = (q.category === undefined || q.category === '') ? null : Number(q.category)
+  const sort = (typeof q.sort === 'string' && q.sort !== '') ? q.sort : 'hot'
+  objPagination.value.page = Number.isNaN(page) ? 1 : page
+  inputPage.value = objPagination.value.page
+  objPagination.value.category = Number.isNaN(cat) ? null : cat
+  chossenCate.value = objPagination.value.category
+  objPagination.value.sort = sort
+}, { immediate: true })
+
+// Tự reload khi đổi category/page
+watch(() => objPagination.value, () => {
   clampPage()
   fetchPosts()
   fetchExtras()
- },
- { deep: true }
- )
+}, { deep: true })
 
 // --- Bài mới & nổi bật ---
 async function fetchExtras() {
+  loading.value = true
   try {
-    const res1 = await api.get(`${apiUrl}/api/posts`, { params: { limit: 1, sort: 'newest', category:objPagination.value.category } })
+    const res1 = await api.get(`${apiUrl}/api/posts`, { params: { limit: 1, sort: 'newest', category: objPagination.value.category } })
     latestPost.value = res1.data
 
-    const res2 = await api.get(`${apiUrl}/api/posts`, { params: { limit: 4, sort: 'hot', category:objPagination.value.category } })
+    const res2 = await api.get(`${apiUrl}/api/posts`, { params: { limit: 4, sort: 'hot', category: objPagination.value.category } })
     featuredPosts.value = res2.data
   } catch (error) {
     console.error('Lỗi lấy bài nổi bật:', error)
+  } finally {
+    loading.value = false
   }
 }
 
@@ -292,14 +340,22 @@ onMounted(() => document.addEventListener('click', handleClickOutside))
 onUnmounted(() => document.removeEventListener('click', handleClickOutside))
 
 function goCategory(id, slug) {
-  // tuỳ route app: chuyển bằng query
-  console.log(id);
-  console.log(slug);
-  objPagination.value.category=id
+  chossenCate.value = id
+  objPagination.value.category = id
   objPagination.value.page = 1
-  console.log(objPagination.value);
-  
+  objPagination.value.sort = 'hot'
+
+
+  // set URL (page=1 khi đổi category)
+  const next = { ...route.query, page: 1 }
+  if (id == null || id === '') {
+    delete next.category
+    delete next.slug
+  } else {
+    next.category = id
+    next.slug = slug
+    next.sort = objPagination.value.sort
+  }
+  router.replace({ query: next })
 }
-
-
 </script>

@@ -1,28 +1,12 @@
 <script setup lang="js">
 import Layout from '../layout/layout.vue'
-import { ref, watch, onMounted } from 'vue'
-import api from "../../../../API/axios"
-import { useRouter } from 'vue-router'
-import { defineEmits, defineProps } from 'vue'
-
-const router = useRouter()
-const apiUrl = import.meta.env.VITE_API_BASE
-// const props = defineProps({
-//   pagination: Object // nhận obj từ cha
-// })
-
- // sự kiện gửi lên cha
-// function sortNewest(){
-//   emit('update:pagination',{...props.pagination, sort:'newest'})
-// }
-// function sortHot(){
-//   emit('update:pagination',{...props.pagination, sort:'hot'})
-// }
+import { ref } from 'vue'
 
 </script>
 
+
 <template>
-  <Layout v-slot="{ posts, latestPost, featuredPosts, pagination, updatePagination }">
+  <Layout v-slot="{ posts, latestPost, featuredPosts, pagination, updatePagination, totalPages, loading }">
     <!-- Hero Section -->
     <section class="relative bg-gradient-to-br from-sky-50 via-blue-50 to-sky-100 overflow-hidden">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
@@ -189,11 +173,11 @@ const apiUrl = import.meta.env.VITE_API_BASE
             </div>
           </div>
 
-          <!-- lua chon sap xep -->
+          <!-- lua chon sap xep post -->
           <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex flex-row-reverse justify-between h-12">
               <nav class="hidden md:flex gap-3">
-                <!-- 3 mục đầu -->
+                <!-- 2 mục Sap xep -->
                 <button
                   type="button"
                   class="px-3 py-2 text-sm text-gray-700 hover:text-sky-700 hover:bg-sky-50 rounded-md transition-colors"
@@ -241,6 +225,7 @@ const apiUrl = import.meta.env.VITE_API_BASE
                 </div>
               </div>
             </div>
+           
           </section>
 
         </div>

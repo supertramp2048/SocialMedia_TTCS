@@ -26,6 +26,15 @@ export const useAuthStore = defineStore('auth', {
             this.token = null,
             Cookies.remove('token')
             localStorage.removeItem('user')
+        },
+        async fetchUser(){
+            try {
+                const res = await api.get('/api/user')
+                //this.user = res.data.user
+                this.user = res.data
+            } catch (error) {
+                
+            }
         }
     }
 })
