@@ -69,24 +69,25 @@
     <div class="flex items-center justify-between h-12">
       <nav class="hidden md:flex items-center gap-3">
         <!-- 3 mục đầu -->
-        <button
+        <router-link
           type="button"
           class="px-3 py-2 text-sm text-gray-700 hover:text-sky-700 hover:bg-sky-50 rounded-md transition-colors"
           :class="{'bg-sky-300': chossenCate == null}"
-          @click="goCategory(null,null)"
+          :to="{ path: '/', query: { page:1 } }"
         >
           Tất cả
-        </button>
-        <button
+        </router-link>
+        <router-link
           v-for="(category, idx) in visibleCategories"
           :key="category.id ?? idx"
           type="button"
           class="px-3 py-2 text-sm text-gray-700 hover:text-sky-700 hover:bg-sky-50 rounded-md transition-colors"
           :class="{'bg-sky-300': chossenCate == category.id}"
-          @click="goCategory(category.id,category.slug)"
+         
+          :to="{ path: '/', query: { page:1, category:category.id, slug: category.slug, sort: 'hot' } }"
         >
           {{ category.name }}
-        </button>
+        </router-link>
 
         <!-- Dropdown 'Thêm' nếu còn dư -->
         <div v-if="overflowCategories.length" class="relative" ref="moreMenuRef">
@@ -129,7 +130,16 @@
 
     <!-- Main -->
     <main>
-      <slot :posts="posts" :latestPost="latestPost" :featuredPosts="featuredPosts" :pagination="objPagination" :updatePagination="updatePagination" />
+
+        <slot
+          :posts="posts"
+          :latestPost="latestPost"
+          :featuredPosts="featuredPosts"
+          :pagination="objPagination"
+          :updatePagination="updatePagination"
+          :totalPages="totalPages"
+          :loading="loading"
+        />
 
       <!-- Pagination Sticky -->
       <!-- Pagination Sticky -->
@@ -241,7 +251,7 @@ function updatePagination(patch) {
   }
 
   if (patch.sort) next.sort = patch.sort
-
+  if(patch.page) next.page = patch.page
   router.replace({ query: next })   // 👉 KHÔNG đụng objPagination ở đây
 }
 
