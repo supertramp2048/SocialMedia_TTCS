@@ -179,118 +179,84 @@ function toggle(id) {
 }
 const content_reply_comment = ref("")
 // gui comment
-// Khai báo biến reloadKey ở đầu script
-const reloadKey = ref({}) // Dùng để ép ChildComments render lại
-
-// Gửi reply comment
-async function sendReplyComment(content, postId, parent_id) {
+async function sendReplyComment(content, postId, parent_id){
   if (!content?.trim()) return;
-
+  console.log(props.post.id);
+  
   try {
     const res = await api.post(`${apiUrl}/api/comments`, {
-      content,
+      content: content,
       post_id: postId,
       parent_id
-    });
+    })
 
     if (res.status === 201) {
-      // ✅ 1. Refetch lại danh sách replies của component hiện tại
-      await fetchReplies(props.parent_id);
+      // Cập nhật UI nhanh: thêm vào ngay replies nếu API /replies trả về đúng cấu trúc
+      // replies.value.unshift(res.data.data) // nếu muốn optimistic cho list con
 
-      // ✅ 2. Nếu thread con chưa mở -> tự động mở ra để người dùng thấy ngay reply mới
-      if (!show.value.includes(parent_id)) {
-        show.value.push(parent_id);
-      }
+      // Hoặc refetch lại replies của parent
+      await fetchReplies(parent_id)
 
-      // ✅ 3. Cập nhật tăng replies_count tạm thời (hiển thị ngay)
-      const idx = replies.value.findIndex(c => c.id === parent_id);
-      if (idx !== -1) {
-        replies.value[idx].replies_count = (replies.value[idx].replies_count || 0) + 1;
-      }
-
-      // ✅ 4. Ép remount lại ChildComments của comment vừa được reply
-      reloadKey.value[parent_id] = (reloadKey.value[parent_id] || 0) + 1;
-
-      // ✅ 5. Xoá nội dung input và đóng form reply
-      content_reply_comment.value = "";
-      const i = showReply.value.indexOf(parent_id);
-      if (i !== -1) showReply.value.splice(i, 1);
+      content_reply_comment.value = ""
+      const i = showReply.value.indexOf(parent_id)
+      if (i !== -1) showReply.value.splice(i, 1)
     }
   } catch (error) {
-    const status = error?.response?.status;
+    const status = error?.response?.status
     if (status === 401) {
-      alert("Bạn cần đăng nhập");
-      return;
+      alert('Bạn cần đăng nhập'); return
     }
     if (status === 422) {
-      const errs = error.response.data?.errors || {};
-      const firstErr =
-        Object.values(errs).flat?.()[0] ||
-        "Dữ liệu không hợp lệ (thiếu content / post_id / parent_id).";
-      alert(firstErr);
-      return;
+      const errs = error.response.data?.errors || {}
+      const firstErr = Object.values(errs).flat?.()[0] ||
+        'Dữ liệu không hợp lệ (thiếu content / post_id / parent_id).'
+      alert(firstErr); return
     }
-    console.error(error);
-    alert("Có lỗi xảy ra, vui lòng thử lại sau.");
+    console.error(error)
+    alert('Có lỗi xảy ra, vui lòng thử lại sau.')
   }
 }
-
 // sua comment
 
 async function sendFixedComment(content, id, parent_id){
   if (!content?.trim()) return;
-
+  console.log("id ",id);
+  console.log("parent id ", parent_id);
+  
   try {
-    const res = await api.patch(`${apiUrl}/api/comments/${id}`, { content });
+    const res = await api.patch(`${apiUrl}/api/comments/${id}`, {
+      content: content
+    })
 
-    if (res.status === 200) {
-      // Cập nhật tại chỗ nếu server trả dữ liệu comment đã cập nhật
-      const updated = res.data?.data ?? res.data;
-      const idx = replies.value.findIndex(c => c.id === id);
-      if (idx !== -1 && updated) {
-        replies.value[idx] = { ...replies.value[idx], ...updated };
-      } else {
-        // fallback: refetch danh sách replies của cha hiện tại
-        await fetchReplies(parent_id || props.parent_id);
-      }
+    if (res.status === 201) {
+      // Cập nhật UI nhanh: thêm vào ngay replies nếu API /replies trả về đúng cấu trúc
+      // replies.value.unshift(res.data.data) // nếu muốn optimistic cho list con
 
-      content_fixed_comment.value = "";
-      const i = FixIndex.value.indexOf(id);
-      if (i !== -1) FixIndex.value.splice(i, 1);
+      // Hoặc refetch lại replies của parent
+      await fetchReplies(parent_id)
+
+      content_fixed_comment.value = ""
+      const i = FixIndex.value.indexOf(id)
+      if (i !== -1) FixIndex.value.splice(i, 1)
     }
   } catch (error) {
-    const status = error?.response?.status;
-    if (status === 401) return alert('Bạn cần đăng nhập');
-    if (status === 422) {
-      const errs = error.response.data?.errors || {};
-      const firstErr = Object.values(errs).flat?.()[0] || 'Dữ liệu không hợp lệ.';
-      return alert(firstErr);
+    const status = error?.response?.status
+    if (status === 401) {
+      alert('Bạn cần đăng nhập'); return
     }
-    console.error(error);
-    alert('Có lỗi xảy ra, vui lòng thử lại sau.');
+    if (status === 422) {
+      const errs = error.response.data?.errors || {}
+      const firstErr = Object.values(errs).flat?.()[0] ||
+        'Dữ liệu không hợp lệ (thiếu content / post_id / parent_id).'
+      alert(firstErr); return
+    }
+    console.error(error)
+    alert('Có lỗi xảy ra, vui lòng thử lại sau.')
   }
 }
-
 
 // xoa comment
 
-async function deleteComment(id){
-  if (!confirm('Bạn chắc muốn xoá bình luận này?')) return;
-  try {
-    const res = await api.delete(`${apiUrl}/api/comments/${id}`);
-    if (res.status === 200 || res.status === 204) {
-      // Cập nhật UI ngay
-      const i = replies.value.findIndex(c => c.id === id);
-      if (i !== -1) replies.value.splice(i, 1);
-      // hoặc refetch theo cha hiện tại:
-      // await fetchReplies(props.parent_id)
-    }
-  } catch (error) {
-    const status = error?.response?.status;
-    if (status === 401) return alert('Bạn cần đăng nhập');
-    alert('Xoá bình luận thất bại.');
-  }
-}
 
 
 async function fetchReplies(id) {
