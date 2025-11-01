@@ -35,7 +35,7 @@
           />
           <div>
             <a href="#" class="font-bold text-sm text-text-primary block">{{post.data?.author.name}}</a>
-            <span class="text-[13px] text-text-muted">{{ new Date(post.data?.created_at).toLocaleDateString('vi-VN') }}</span>
+            <span class="text-[13px] text-text-muted">{{ new Date(post.data?.updated_at || created_at).toLocaleDateString('vi-VN') }}</span>
           </div>
           <button class="ml-auto">
             <svg class="w-4 h-4" viewBox="0 0 4 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -176,32 +176,30 @@
           </div>
 
           <!-- Sample Comment -->
-          <div class="flex gap-3 mb-6">
+          <div v-for="comment in post.data?.comments" :key=comment.id class="flex gap-3 mb-6">
             <img 
-              src="https://api.builder.io/api/v1/image/assets/TEMP/1280ea9cc30930a749480f4db06633de9863087d?width=92" 
+              :src="comment?.author.avartar" 
               alt="Commenter" 
               class="w-12 h-12 rounded-full border border-border-light"
             />
             <div class="flex-1">
               <div class="flex items-center gap-2 mb-1">
-                <a href="#" class="font-bold text-sm text-text-primary">Nắng Đêm</a>
-                <span class="text-[13px] text-text-secondary text-opacity-75">29 tháng 10</span>
+                <a href="#" class="font-bold text-sm text-text-primary">{{comment?.author?.name}}</a>
+                <span class="text-[13px] text-text-secondary text-opacity-75">{{ new Date(comment?.updated_at || created_at).toLocaleDateString('vi-VN') }}</span>
               </div>
               <p class="text-sm text-text-primary leading-relaxed mb-4">
-                Thời sinh viên mình thường ăn ngoài quán. Khi đó dĩa cơm giá 15k rồi tăng lên 20k. Ban đầu mình nghĩ là do cơm sinh viên dở và bẩn nên mới rẻ. Nhưng khi ăn tại những quán ăn bình dân khác trong lòng Sài Gòn, thì lại đắt gấp đôi mà cũng dở và bẩn như nhau.
+                {{comment?.content}}
               </p>
               <div class="flex items-center gap-3 text-text-secondary text-opacity-75">
-                <svg class="w-4 h-4" viewBox="0 0 17 15" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M8.32031 3.98438L3.00781 12.5H13.6719L8.32031 3.98438ZM8.32031 0.820312L16.6797 14.1797H0L8.32031 0.820312Z" fill="#969696"/>
-                </svg>
-                <span class="font-semibold">6</span>
-                <svg class="w-4 h-4" viewBox="0 0 17 15" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M8.67969 11.0156L13.9922 2.5H3.32812L8.67969 11.0156ZM8.67969 14.1797L0.320312 0.820314L17 0.820312L8.67969 14.1797Z" fill="#969696"/>
-                </svg>
-                <button class="text-[13px]">Trả lời</button>
+                <button class="text-[13px] font-bold p-[5px] rounded-2xl hover:bg-sky-300">Trả lời</button>
+              </div>
+              <div>
+                <button v-if="comment?.replies_count > 0" class="text-[15px] font-bold text-blue-500">{{comment?.replies_count}} Trả lời</button>
               </div>
             </div>
           </div>
+          <!-- end saple comment -->
+
         </div>
       </div>
     </main>
