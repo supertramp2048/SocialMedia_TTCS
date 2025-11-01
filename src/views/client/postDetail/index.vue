@@ -29,7 +29,7 @@
         <!-- Author Info -->
         <div class="flex items-center gap-3 mb-8">
           <img 
-            :src="post.data?.author?.avartar"
+            :src="post.data?.author?.avatar"
             alt="Author" 
             class="w-14 h-14 rounded-full"
           />
@@ -158,60 +158,169 @@
       <div class="max-w-[768px] mx-auto px-4 mb-16">
         <div class="border border-border-lighter rounded shadow-card p-6">
           <!-- Comment Form -->
-          <div v-if="user" class="border-b border-border-lighter pb-6 mb-6">
-            <input 
-              type="text" 
-              placeholder="Hãy chia sẻ cảm nghĩ của bạn về bài viết" 
-              class="w-full text-sm text-[#CBD5E0] focus:outline-none"
-            />
-            <div class="flex justify-end mt-4">
-              <button class="text-sm text-text-primary px-2 py-1 rounded">Gửi</button>
+          <form
+              v-if="user"
+              class="border-b border-border-lighter pb-6 mb-6"
+              @submit.prevent="sendComment(content_comment, post.data?.id)"
+            >
+            <div class="relative w-full">
+              <input
+                type="text"
+                v-model="content_comment"
+                placeholder="Hãy chia sẻ cảm nghĩ của bạn về bài viết"
+                class="peer leading-[50px] w-full text-lg text-black border-none focus:outline-none"
+              />
+              <!-- baseline mờ (tuỳ chọn) -->
+              <span class="pointer-events-none absolute left-0 right-0 bottom-0 h-px bg-gray-200"></span>
+              <!-- gạch chạy từ trái qua phải khi focus -->
+              <span
+                class="pointer-events-none absolute left-0 bottom-0 h-[2px] w-0 bg-black
+                      transition-[width] duration-300 ease-out peer-focus:w-full">
+              </span>
             </div>
-          </div>
+            <!-- button dang binh luan -->
+            <div class="flex justify-end mt-4">
+              <button 
+              type="submit"
+              class="text-sm text-text-primary px-2 py-1 font-bold hover:bg-sky-200 rounded-2xl "
+              >
+              Gửi
+              </button>
+            </div>
+          </form>
+
           <div v-else class="border-b border-border-lighter pb-6 mb-6">
             <p class="text-xl font-bold">Hãy đăng nhập để bình luận</p>
           </div>
-          <!-- Comment Sorting -->
-          <!-- <div class="flex gap-3 mb-6 justify-end">
-            <button class="text-sm text-primary">Hot nhất</button>
-            <button class="text-sm text-text-primary">Mới nhất</button>
-          </div> -->
-
           <!-- Sample Comment -->
           <div v-for="comment in post.data?.comments" :key=comment.id class="flex gap-3 mb-6">
             <img 
-              :src="comment?.author.avartar" 
+              :src="comment?.author?.avatar" 
               alt="Commenter" 
               class="w-12 h-12 rounded-full border border-border-light"
             />
             <div class="flex-1">
               <div class="flex items-center gap-2 mb-1">
                 <a href="#" class="font-bold text-sm text-text-primary">{{comment?.author?.name}}</a>
-                <span class="text-[13px] text-text-secondary text-opacity-75">{{ new Date(comment?.updated_at || created_at).toLocaleDateString('vi-VN') }}</span>
+                <span class="text-[13px] text-text-secondary text-opacity-75">{{ new Date(comment?.updated_at || comment?.created_at).toLocaleDateString('vi-VN') }}</span>
               </div>
               <p class="text-sm text-text-primary leading-relaxed mb-4">
                 {{comment?.content}}
               </p>
-              <div class="flex items-center gap-3 text-text-secondary text-opacity-75">
-                <button class="text-[13px] font-bold p-[5px] rounded-2xl hover:bg-sky-300">Trả lời</button>
-              </div>
-              <div>
-                <button 
-                @click="toggle(comment?.id)" 
-                v-if="comment?.replies_count > 0" 
-                class="text-[15px] font-bold text-blue-500" >
-                  {{
-                    show.includes(comment?.id)
-                      ?  'Ẩn trả lời' 
-                      : `${comment?.replies_count} Trả lời`
-                    }}
-                  </button>
-              </div>
-              <ChildComments v-if="show.includes(comment?.id)" :parent_id="comment?.id" ></ChildComments>
-            </div>
-          </div>
-          <!-- end saple comment -->
 
+              <div class="items-center gap-3 text-text-secondary text-opacity-75">
+            <div class="flex">
+              <!-- viet binh luan -->
+              <button
+              v-if="user"
+              class="text-[13px] font-bold p-[5px] rounded-2xl hover:bg-sky-300"
+              @click="showReplyForm(comment?.id)"
+            >
+              Trả lời
+            </button>
+              <!-- sua binh luan -->
+              <!-- Sửa -->
+              <button
+                v-if="user && Number(comment?.author?.id) === Number(user.id)"
+                class="text-[13px] font-bold p-[5px] rounded-2xl hover:bg-sky-300"
+                @click="fixComment(comment?.id, comment?.content, comment?.parent_id)"
+              >
+                Sửa
+              </button>
+              <!-- Xoá -->
+              <button
+                v-if="user && Number(comment?.author?.id) === Number(user.id)"
+                class="text-[13px] font-bold p-[5px] rounded-2xl hover:bg-sky-300"
+                @click="deleteComment(comment?.id, comment?.parent_id)"
+              >
+                Xóa
+              </button>
+
+            </div>
+            <!-- form reply comment -->
+            <form
+              v-if="showReply.includes(comment?.id)"
+              class="border-b border-border-lighter pb-6 mb-6"
+              @submit.prevent="sendReplyComment(content_reply_comment, post.data?.id, comment?.id)"
+            >
+
+              <div class="relative w-full">
+                <input
+                  type="text"
+                  v-model="content_reply_comment"
+                  placeholder="Hãy chia sẻ cảm nghĩ của bạn về bài viết"
+                  class="peer leading-[50px] w-full text-lg text-black border-none focus:outline-none"
+                />
+                <span class="pointer-events-none absolute left-0 right-0 bottom-0 h-px bg-gray-200"></span>
+                <span
+                  class="pointer-events-none absolute left-0 bottom-0 h-[2px] w-0 bg-black
+                        transition-[width] duration-300 ease-out peer-focus:w-full">
+                </span>
+              </div>
+
+              <div class="flex justify-end mt-4">
+                <button
+                  type="submit"
+                  class="text-sm text-text-primary px-2 py-1 font-bold hover:bg-sky-200 rounded-2xl "
+                >
+                  Gửi
+                </button>
+              </div>
+            </form>
+            <!-- end form reply comment -->
+            <!-- form fix comment form -->
+            <form
+              v-if="FixIndex.includes(comment?.id)"
+              class="border-b border-border-lighter pb-6 mb-6"
+              @submit.prevent="sendFixedComment(content_fixed_comment, comment?.id, comment?.parent_id)"
+            >
+              <div class="relative w-full">
+                <input
+                  type="text"
+                  v-model="content_fixed_comment"
+                  placeholder="Hãy chia sẻ cảm nghĩ của bạn về bài viết"
+                  class="peer leading-[50px] w-full text-lg text-black border-none focus:outline-none"
+                />
+                <span class="pointer-events-none absolute left-0 right-0 bottom-0 h-px bg-gray-200"></span>
+                <span
+                  class="pointer-events-none absolute left-0 bottom-0 h-[2px] w-0 bg-black
+                        transition-[width] duration-300 ease-out peer-focus:w-full">
+                </span>
+              </div>
+
+              <div class="flex justify-end mt-4">
+                <button
+                  type="submit"
+                  class="text-sm text-text-primary px-2 py-1 font-bold hover:bg-sky-200 rounded-2xl "
+                >
+                  Gửi
+                </button>
+              </div>
+            </form>
+            <!-- end fix comment form -->
+          </div>
+                  <div>
+                    <button 
+                    @click="toggle(comment?.id)" 
+                    v-if="comment?.replies_count > 0" 
+                    class="text-[15px] font-bold text-blue-500" >
+                      {{
+                        show.includes(comment?.id)
+                          ?  'Ẩn trả lời' 
+                          : `${comment?.replies_count} Trả lời`
+                        }}
+                      </button>
+                  </div>
+                  <ChildComments
+                    v-if="show.includes(comment?.id)"
+                    :parent_id="comment?.id"
+                    :post="post.data"
+                    :key="reloadKey[comment.id] || 0"
+                  />
+
+                </div>
+              </div>
+              <!-- end saple comment -->
         </div>
       </div>
     </main>
@@ -223,18 +332,210 @@ import Layout from '../layout/layout.vue'
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth';
-
+import { storeToRefs } from 'pinia'
 import api from "../../../../API/axios"
 import ChildComments from '../../../components/childComments.vue'
 // loader cho trang
 import { globalLoading } from '../../../../API/axios'
 import loader from '../../../components/loader.vue'
-
+const replies = ref([])        
 const route = useRoute()
 const apiUrl = import.meta.env.VITE_API_BASE
 const loading = ref(false)
+// dưới các const khác
+const reloadKey = ref({}) // { [commentId]: number }
+
 const auth = useAuthStore()
-const user = ref(auth.user)
+const {user} = storeToRefs(auth)
+// hien form reply
+const showReply = ref([])
+function showReplyForm(id){
+  const indexOfFix = FixIndex.value.indexOf(id)
+  if(indexOfFix !== -1 ){
+    FixIndex.value.splice(indexOfFix, 1)
+  }
+  const i = showReply.value.indexOf(id)
+  i === -1 ? showReply.value.push(id) : showReply.value.splice(i, 1)
+}
+// show form de sua xomment
+const FixIndex = ref([])
+
+const content_fixed_comment = ref("")
+function fixComment(id, content, parent_id) {
+  content_fixed_comment.value = content
+  // đóng form reply nếu đang mở
+  const i = showReply.value.indexOf(id)
+  if (i !== -1) showReply.value.splice(i, 1)
+
+  const indexOfFix = FixIndex.value.indexOf(id)
+  indexOfFix === -1 ? FixIndex.value.push(id) : FixIndex.value.splice(indexOfFix, 1)
+}
+
+
+//
+// send comment
+const content_comment = ref()
+async function sendComment(content, post_id){
+      if (!content?.trim()) return;
+
+  try {
+    const res = await api.post(`${apiUrl}/api/comments`, {
+      content: content,
+      post_id: post_id
+    });
+
+    if (res.status === 201) {
+      // reset form comment
+      content_comment.value = '';
+      const postId = Number(route.query.id)
+      const res = await api.get(`${apiUrl}/api/posts/${postId}`)
+      post.value = res.data
+      console.log(post.value);
+    }
+  } catch (error) {
+    const status = error?.response?.status;
+    if (status === 401) return alert('Bạn cần đăng nhập');
+    if (status === 422) {
+      const errs = error.response.data?.errors || {};
+      const firstErr = Object.values(errs).flat?.()[0] ||
+        'Dữ liệu không hợp lệ (thiếu content / post_id / parent_id).';
+      return alert(firstErr);
+    }
+    console.error(error);
+    alert('Có lỗi xảy ra, vui lòng thử lại sau.');
+  }
+}
+// reply comment
+const content_reply_comment = ref("")
+
+// Gửi reply comment
+async function sendReplyComment(content, postId, parent_id) {
+  if (!content?.trim()) return;
+
+  try {
+    const res = await api.post(`${apiUrl}/api/comments`, {
+      content: content,
+      post_id: postId,
+      parent_id: parent_id
+    });
+
+    if (res.status === 201) {
+      // mở thread con nếu đang đóng
+      if (!show.value.includes(parent_id)) {
+        show.value.push(parent_id);
+      }
+
+      // tăng tạm replies_count tại chỗ (trên mảng post.data?.comments)
+      const idx = post.value?.data?.comments?.findIndex(c => c.id === parent_id);
+      if (idx !== -1) {
+        post.value.data.comments[idx].replies_count =
+          (post.value.data.comments[idx].replies_count || 0) + 1;
+      }
+
+      // ép remount ChildComments của parent_id để tự fetch lại danh sách con
+      reloadKey.value[parent_id] = (reloadKey.value[parent_id] || 0) + 1;
+
+      // reset & đóng form reply
+      content_reply_comment.value = '';
+      const i = showReply.value.indexOf(parent_id);
+      if (i !== -1) showReply.value.splice(i, 1);
+    }
+  } catch (error) {
+    const status = error?.response?.status;
+    if (status === 401) return alert('Bạn cần đăng nhập');
+    if (status === 422) {
+      const errs = error.response.data?.errors || {};
+      const firstErr = Object.values(errs).flat?.()[0] ||
+        'Dữ liệu không hợp lệ (thiếu content / post_id / parent_id).';
+      return alert(firstErr);
+    }
+    console.error(error);
+    alert('Có lỗi xảy ra, vui lòng thử lại sau.');
+  }
+}
+
+// sua comment
+
+async function sendFixedComment(content, id, parent_id){
+  if (!content?.trim()) return;
+
+  try {
+    const res = await api.patch(`${apiUrl}/api/comments/${id}`, { content });
+
+    if (res.status === 200) {
+      const updated = res.data?.data ?? res.data;
+
+      if (parent_id == null) {
+        // ✅ Bình luận cấp 1: cập nhật ngay trong post.data.comments
+        const list = post.value?.data?.comments || []
+        const idx = list.findIndex(c => c.id === id)
+        if (idx !== -1) {
+          list[idx] = { ...list[idx], ...updated }
+        } else {
+          // fallback: refetch toàn bài viết
+          const r = await api.get(`${apiUrl}/api/posts/${postId.value}`)
+          post.value = r.data
+        }
+      } else {
+        // ✅ Bình luận cấp n>1: giao cho thread con
+        // tăng key để remount ChildComments(parent_id) => tự fetch lại replies con
+        reloadKey.value[parent_id] = (reloadKey.value[parent_id] || 0) + 1
+      }
+
+      content_fixed_comment.value = ""
+      const i = FixIndex.value.indexOf(id)
+      if (i !== -1) FixIndex.value.splice(i, 1)
+    }
+  } catch (error) {
+    const status = error?.response?.status
+    if (status === 401) return alert('Bạn cần đăng nhập')
+    if (status === 422) {
+      const errs = error.response.data?.errors || {}
+      const firstErr = Object.values(errs).flat?.()[0] || 'Dữ liệu không hợp lệ.'
+      return alert(firstErr)
+    }
+    console.error(error)
+    alert('Có lỗi xảy ra, vui lòng thử lại sau.')
+  }
+}
+
+
+// xoa comment
+
+async function deleteComment(id, parent_id){
+  if (!confirm('Bạn chắc muốn xoá bình luận này?')) return;
+
+  try {
+    const res = await api.delete(`${apiUrl}/api/comments/${id}`)
+    if (res.status === 200 || res.status === 204) {
+      if (parent_id == null) {
+        // ✅ Xoá bình luận cấp 1 trong post.data.comments
+        const list = post.value?.data?.comments || []
+        const i = list.findIndex(c => c.id === id)
+        if (i !== -1) list.splice(i, 1)
+        // đồng bộ tổng số comment nếu bạn có field này
+        if (typeof post.value?.data?.comments_count === 'number') {
+          post.value.data.comments_count = Math.max(0, post.value.data.comments_count - 1)
+        }
+      } else {
+        // ✅ Xoá bình luận cấp n>1
+        // Giảm replies_count của cha ngay tại chỗ
+        const parentIdx = post.value?.data?.comments?.findIndex(c => c.id === parent_id)
+        if (parentIdx !== -1) {
+          post.value.data.comments[parentIdx].replies_count =
+            Math.max(0, (post.value.data.comments[parentIdx].replies_count || 1) - 1)
+        }
+        // Ép remount ChildComments(parent_id) để nó tự fetch lại danh sách con
+        reloadKey.value[parent_id] = (reloadKey.value[parent_id] || 0) + 1
+      }
+    }
+  } catch (error) {
+    const status = error?.response?.status
+    if (status === 401) return alert('Bạn cần đăng nhập')
+    alert('Xoá bình luận thất bại.')
+  }
+}
+
 
 const post = ref({})
 // bien de show cac replies comment 
@@ -249,6 +550,24 @@ function toggle(id) {
   } else {
     // Nếu đã có id -> xóa khỏi mảng (đóng comment đó)
     show.value.splice(index, 1)
+  }
+}
+async function fetchReplies(id) {
+  if (!id) return
+  loading.value = true
+  error.value = null
+  try {
+    const res  = await api.get(`${apiUrl}/api/comments/${id}/replies`)
+    
+    // Giả sử API trả { data: [...] }, đổi thành mảng:
+    replies.value = Array.isArray(res.data?.data) ? res.data.data : res.data
+
+    console.log("user ",user);
+    console.log("all rep ",replies.value);
+  } catch (e) {
+    error.value = e
+  } finally {
+    loading.value = false
   }
 }
 
