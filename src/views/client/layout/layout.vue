@@ -175,7 +175,11 @@ const loading = ref(false)
 
 // --- Logout ---
 function logout() {
-  if (window.confirm('Bạn có chắc chắn muốn đăng xuất?')) auth.logout?.()
+  if (window.confirm('Bạn có chắc chắn muốn đăng xuất?')){
+    auth.logout?.()
+    router.push('/')
+  }
+   
 }
 // ---- MENU CATEGORY (giữ logic hiện có) ----
 const showMobileMenu = ref(false)

@@ -158,7 +158,7 @@
       <div class="max-w-[768px] mx-auto px-4 mb-16">
         <div class="border border-border-lighter rounded shadow-card p-6">
           <!-- Comment Form -->
-          <div class="border-b border-border-lighter pb-6 mb-6">
+          <div v-if="user" class="border-b border-border-lighter pb-6 mb-6">
             <input 
               type="text" 
               placeholder="Hãy chia sẻ cảm nghĩ của bạn về bài viết" 
@@ -168,12 +168,14 @@
               <button class="text-sm text-text-primary px-2 py-1 rounded">Gửi</button>
             </div>
           </div>
-
+          <div v-else class="border-b border-border-lighter pb-6 mb-6">
+            <p class="text-xl font-bold">Hãy đăng nhập để bình luận</p>
+          </div>
           <!-- Comment Sorting -->
-          <div class="flex gap-3 mb-6 justify-end">
+          <!-- <div class="flex gap-3 mb-6 justify-end">
             <button class="text-sm text-primary">Hot nhất</button>
             <button class="text-sm text-text-primary">Mới nhất</button>
-          </div>
+          </div> -->
 
           <!-- Sample Comment -->
           <div v-for="comment in post.data?.comments" :key=comment.id class="flex gap-3 mb-6">
@@ -194,8 +196,18 @@
                 <button class="text-[13px] font-bold p-[5px] rounded-2xl hover:bg-sky-300">Trả lời</button>
               </div>
               <div>
-                <button v-if="comment?.replies_count > 0" class="text-[15px] font-bold text-blue-500">{{comment?.replies_count}} Trả lời</button>
+                <button 
+                @click="toggle(comment?.id)" 
+                v-if="comment?.replies_count > 0" 
+                class="text-[15px] font-bold text-blue-500" >
+                  {{
+                    show.includes(comment?.id)
+                      ?  'Ẩn trả lời' 
+                      : `${comment?.replies_count} Trả lời`
+                    }}
+                  </button>
               </div>
+              <ChildComments v-if="show.includes(comment?.id)" :parent_id="comment?.id" ></ChildComments>
             </div>
           </div>
           <!-- end saple comment -->
@@ -210,8 +222,10 @@
 import Layout from '../layout/layout.vue'
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth';
+
 import api from "../../../../API/axios"
-import { usePostDetailStore } from '../../../stores/postDetail'
+import ChildComments from '../../../components/childComments.vue'
 // loader cho trang
 import { globalLoading } from '../../../../API/axios'
 import loader from '../../../components/loader.vue'
@@ -219,8 +233,25 @@ import loader from '../../../components/loader.vue'
 const route = useRoute()
 const apiUrl = import.meta.env.VITE_API_BASE
 const loading = ref(false)
-const postDetail = usePostDetailStore()
+const auth = useAuthStore()
+const user = ref(auth.user)
+
 const post = ref({})
+// bien de show cac replies comment 
+const show = ref([])
+
+function toggle(id) {
+  const index = show.value.indexOf(id)
+
+  if (index === -1) {
+    // Nếu chưa có id -> thêm vào
+    show.value.push(id)
+  } else {
+    // Nếu đã có id -> xóa khỏi mảng (đóng comment đó)
+    show.value.splice(index, 1)
+  }
+}
+
 onMounted( async ()=>{
     const postId = Number(route.query.id)
     const res = await api.get(`${apiUrl}/api/posts/${postId}`)
