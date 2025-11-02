@@ -4,7 +4,7 @@
     <!-- Header & Category bar (giữ nguyên phần của bạn) -->
     <!-- Header -->
       <header class="sticky top-0 z-50 bg-white border-b border-gray-200">
-        <div>
+        <div v-if="showFormSearch === false">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div class="flex items-center justify-between h-16">
             <!-- Logo + Nav -->
@@ -27,7 +27,7 @@
 
             <!-- Right -->
             <div class="flex items-center gap-4">
-              <button @click="showFormSearch()" class="bg-sky-300 rounded-2xl pt-0.5 pb-0.5 pl-3 pr-3"> <i class="fa-solid fa-magnifying-glass"> </i> Tìm kiếm</button>
+              <button @click="showFormSearch = !showFormSearch" class="bg-sky-300 rounded-2xl pt-0.5 pb-0.5 pl-3 pr-3"> <i class="fa-solid fa-magnifying-glass"> </i> Tìm kiếm</button>
               <button class="hidden md:block text-sm text-gray-600 hover:text-gray-900">Liên hệ</button>
 
               <div class="flex items-center gap-4" v-if="auth.user">
@@ -64,6 +64,10 @@
             <a href="#" class="block text-sm text-gray-600 hover:text-gray-900">Đăng ký</a>
           </div>
         </div>
+        </div>
+        <!-- serch form -->
+        <div v-else>
+          <SearchForm @hiddenSearchForm="showFormSearch = $event"></SearchForm>
         </div>
       </header>
       <!-- Category bar (ADDED) -->
@@ -159,7 +163,9 @@ import api from "../../../../API/axios"
 // loader cho trang
 import { globalLoading } from '../../../../API/axios'
 import loader from '../../../components/loader.vue'
+import SearchForm from '../../../components/searchForm.vue'
 //-------------
+const showFormSearch = ref(false)
 const auth = useAuthStore()
 const categoriesStore = useCategoryStore()
 const router = useRouter()

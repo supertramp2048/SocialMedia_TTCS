@@ -92,7 +92,10 @@
               </svg>
             </button>
 
-            <span class="font-semibold text-base">{{post?.data?.vote_score}}</span>
+            <span class="font-semibold text-base">
+              {{ post?.data?.vote_score > 0 ? post.data.vote_score : 0 }}
+            </span>
+
           </div>
           <!-- nút downvote -->
           <button @click="downvote(post?.data?.id)">
@@ -132,54 +135,10 @@
       </div>
 
       <!-- Related Articles Section -->
-      <div class="max-w-[875px] mx-auto px-4 mb-16">
-        <h2 class="font-bold text-sm text-text-primary mb-4">Bài viết nổi bật khác</h2>
-        <div class="border border-border-lighter rounded overflow-x-auto">
-          <div class="flex gap-6 p-8 min-w-max">
-            <!-- Article Card 1 -->
-            <div class="w-64 flex-shrink-0">
-              <img 
-                src="https://api.builder.io/api/v1/image/assets/TEMP/f2766e713f9d4028f5edf8c05c7632476cf51dc5?width=512" 
-                alt="Related Article" 
-                class="w-full h-40 object-cover rounded mb-4"
-              />
-              <p class="text-xs uppercase text-text-primary mb-2">Quan điểm - Tranh luận</p>
-              <h3 class="text-base font-bold font-montserrat text-text-primary leading-6 mb-2">
-                Sex thì tốt đấy, nhưng thiếu hiểu biết về Sex và mắc các
-              </h3>
-              <p class="text-xs font-semibold text-text-primary">yesimquynh</p>
-            </div>
+      <SuggestedPost :categoryId="post?.data?.category?.id" :postId="post?.data?.id"></SuggestedPost>
+      <!-- Trang chi tiết bài viết -->
 
-            <!-- Article Card 2 -->
-            <div class="w-64 flex-shrink-0">
-              <img 
-                src="https://api.builder.io/api/v1/image/assets/TEMP/e0bbde7c13870a482d92c5581df528dc83254386?width=512" 
-                alt="Related Article" 
-                class="w-full h-40 object-cover rounded mb-4"
-              />
-              <p class="text-xs uppercase text-text-primary mb-2">Quan điểm - Tranh luận</p>
-              <h3 class="text-base font-bold font-montserrat text-text-primary leading-6 mb-2">
-                Mua Xe Sang Ở Việt Nam Mắc Gấp 3 Lần Ở Châu Âu, Người
-              </h3>
-              <p class="text-xs font-semibold text-text-primary">The Mighty Piggy</p>
-            </div>
-
-            <!-- Article Card 3 -->
-            <div class="w-64 flex-shrink-0">
-              <img 
-                src="https://api.builder.io/api/v1/image/assets/TEMP/80f4644342e210042292a49e9f806cdc6ba0af7b?width=512" 
-                alt="Related Article" 
-                class="w-full h-40 object-cover rounded mb-4"
-              />
-              <p class="text-xs uppercase text-text-primary mb-2">Quan điểm - Tranh luận</p>
-              <h3 class="text-base font-bold font-montserrat text-text-primary leading-6 mb-2">
-                Sự tương quan giữa trao đổi thị trường và trao đổi xã hội
-              </h3>
-              <p class="text-xs font-semibold text-text-primary">APPLEPIE</p>
-            </div>
-          </div>
-        </div>
-      </div>
+      <!-- end Related Articles Section -->
 
       <!-- Comments Section -->
       <div class="max-w-[768px] mx-auto px-4 mb-16">
@@ -361,11 +320,14 @@ import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth';
 import { storeToRefs } from 'pinia'
 import api from "../../../../API/axios"
+// cac child component
 import ChildComments from '../../../components/childComments.vue'
+import SuggestedPost from '../../../components/suggestedPost.vue'
 // loader cho trang
 import { globalLoading } from '../../../../API/axios'
 import loader from '../../../components/loader.vue'
-const replies = ref([])        
+const replies = ref([])    
+const postSuggested = ref([])    
 const route = useRoute()
 const apiUrl = import.meta.env.VITE_API_BASE
 const loading = ref(false)
@@ -666,12 +628,28 @@ async function downvote(postId){
 
 // end downvote bài viết
 
+watch(() => route.query.id, 
+  async (newId) => {
+    if(!newId) return
+      const res = await api.get(`${apiUrl}/api/posts/${newId}`)
+      post.value = res.data
+  }
+)
 
 onMounted( async ()=>{
-    const postId = Number(route.query.id)
-    const res = await api.get(`${apiUrl}/api/posts/${postId}`)
-    post.value = res.data
-    console.log(post.value);
+  try {
+      const postId = Number(route.query.id)
+      const res = await api.get(`${apiUrl}/api/posts/${postId}`)
+      post.value = res.data
+      console.log("post here ",post.value, "id ",post.value.data.category?.id);
+      
+      const res1 = await api.get(`${apiUrl}/api/posts`, { params: { limit: 5, sort: 'hot', category: post.value.data.category?.id } })
+      postSuggested.value = res1.data.data.filter(item => item.id !== post.value.id)
+      console.log("suggested post ",postSuggested.value);
+  } catch (error) {
+    alert("Hệ thống đang bảo trì")
+  }
+    
     
 })
 </script>

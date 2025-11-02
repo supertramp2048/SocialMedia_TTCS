@@ -112,7 +112,7 @@
                       <svg class="w-4 h-4" :class="{'text-red-500': post.user_vote == 1}" v-if() fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"/>
                       </svg>
-                      {{ post.vote_score}}
+                      {{  post.vote_score > 0 ? post.vote_score : 0}}
                     </span>
                   </div>
                 </div>
@@ -162,7 +162,7 @@
                       <svg class="w-4 h-4" :class="{'text-red-500': article.user_vote == 1}" v-if() fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"/>
                       </svg>
-                      {{ article.vote_score}}
+                      {{ article?.vote_score > 0 ? article?.vote_score : 0}}
                   </span>
                 </div>
                 </div>
@@ -223,12 +223,12 @@
                         loading="lazy"
                       />
                   <span>{{ article.author.name }}</span>
-                  <span>{{ article.comments_count }} Bình luận</span>
+                  <span>{{ article.comments_count  }} Bình luận</span>
                   <span class="flex items-center gap-1">
                       <svg class="w-4 h-4" :class="{'text-red-500': article.user_vote == 1}" v-if() fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"/>
                       </svg>
-                      {{ article.vote_score}}
+                      {{  article?.vote_score > 0 ? article?.vote_score : 0}}
                   </span>
                 </div>
               </router-link>

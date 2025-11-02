@@ -29,6 +29,12 @@ const router = createRouter({
       component: () => import('../views/client/postDetail/index.vue'),
       meta: { requiresAuth: true } 
     },
+    {
+      path: '/tim-kiem',
+      name: 'Tìm kiếm',
+      component: () => import('../views/client/searchPage/index.vue'),
+      meta: { requiresAuth: true } 
+    }
   ],
 })
 router.beforeEach(async (to, from, next)=>{
