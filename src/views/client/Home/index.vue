@@ -88,7 +88,7 @@
                   class="flex flex-col sm:flex-row gap-4 pb-6 border-b border-gray-200 hover:bg-gray-50 transition-colors rounded-lg p-2 -m-2"
                   :to="{ path: '/bai-dang/', query: { id:post.id } }"
                   >
-                <img :src="post.image" :alt="post.title" 
+                <img :src="post.thumbnail_url" :alt="post.title" 
                      class="w-full sm:w-48 h-40 object-cover rounded-lg flex-shrink-0"/>
                 <div class="flex-1 space-y-2">
                   <h3 class="text-lg font-semibold text-gray-900 hover:text-sky-600 cursor-pointer line-clamp-2">
@@ -138,13 +138,14 @@
             <div class="grid sm:grid-cols-2 gap-6">
               <router-link 
                   v-for="article in featuredPosts.data" :key="article.id" 
-                  class="group cursor-pointer"
+                  class="flex sm:flex-col group cursor-pointer"
                   :to="{ path: '/bai-dang/', query: { id:article.id } }"
                   >
                 <div class="mb-3 rounded-lg overflow-hidden">
-                  <img :src="article.image" :alt="article.title" 
+                  <img :src="article.thumbnail_url" :alt="article.title" 
                        class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"/>
                 </div>
+                <div class="ml-1">
                 <h3 class="font-semibold text-gray-900 group-hover:text-sky-600 line-clamp-2 mb-2">
                   {{ article.title }}
                 </h3>
@@ -163,6 +164,7 @@
                       </svg>
                       {{ article.vote_score}}
                   </span>
+                </div>
                 </div>
               </router-link>
             </div>
@@ -205,7 +207,7 @@
                   :to="{ path: '/bai-dang/', query: { id:article.id } }"
                    class="group cursor-pointer">
                 <div class="mb-3 rounded-lg overflow-hidden">
-                  <img :src="article.image" :alt="article.title" 
+                  <img :src="article.thumbnail_url" :alt="article.title" 
                        class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"/>
                 </div>
                 <h3 class="font-semibold text-gray-900 group-hover:text-sky-600 line-clamp-2 mb-2">
@@ -221,7 +223,7 @@
                         loading="lazy"
                       />
                   <span>{{ article.author.name }}</span>
-                  <span>{{ article.comments_count }} comment</span>
+                  <span>{{ article.comments_count }} Bình luận</span>
                   <span class="flex items-center gap-1">
                       <svg class="w-4 h-4" :class="{'text-red-500': article.user_vote == 1}" v-if() fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"/>
@@ -361,7 +363,7 @@ const posts = ref({ data: [] })
 const latestPost = ref({ data: [] })
 const featuredPosts = ref({ data: [] })
 // Phân trang
-const objPagination = ref({ page: 1, limit: 2, sort: 'hot' })
+const objPagination = ref({ page: 1, limit: 5, sort: 'hot' })
 const inputPage = ref(objPagination.value.page) // <--- thêm biến nhập tạm
 const numberOfPost = ref(0)
 const totalPages = computed(() => Math.max(1, Math.ceil(numberOfPost.value / objPagination.value.limit)))

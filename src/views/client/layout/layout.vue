@@ -4,6 +4,7 @@
     <!-- Header & Category bar (giữ nguyên phần của bạn) -->
     <!-- Header -->
       <header class="sticky top-0 z-50 bg-white border-b border-gray-200">
+        <div>
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div class="flex items-center justify-between h-16">
             <!-- Logo + Nav -->
@@ -26,6 +27,7 @@
 
             <!-- Right -->
             <div class="flex items-center gap-4">
+              <button @click="showFormSearch()" class="bg-sky-300 rounded-2xl pt-0.5 pb-0.5 pl-3 pr-3"> <i class="fa-solid fa-magnifying-glass"> </i> Tìm kiếm</button>
               <button class="hidden md:block text-sm text-gray-600 hover:text-gray-900">Liên hệ</button>
 
               <div class="flex items-center gap-4" v-if="auth.user">
@@ -62,12 +64,13 @@
             <a href="#" class="block text-sm text-gray-600 hover:text-gray-900">Đăng ký</a>
           </div>
         </div>
+        </div>
       </header>
       <!-- Category bar (ADDED) -->
 <div class="sticky z-40 bg-white border-b border-gray-200 top-16">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex items-center justify-between h-12">
-      <nav class="hidden md:flex items-center gap-3">
+      <nav class="flex items-center gap-0.5 md:gap-3">
         <!-- 3 mục đầu -->
         <router-link
           type="button"
@@ -108,7 +111,7 @@
           <!-- Danh sách ẩn -->
           <div
             v-show="showMoreMenu"
-            class="absolute left-0 mt-2 w-56 max-h-72 overflow-auto rounded-lg border border-gray-200 bg-white shadow-lg p-2 z-50"
+            class="absolute flex flex-col left-0 mt-2 w-56 max-h-72 overflow-auto rounded-lg border border-gray-200 bg-white shadow-lg p-2 z-50"
             role="menu"
           >
             <router-link

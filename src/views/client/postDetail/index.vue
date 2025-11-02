@@ -73,17 +73,44 @@
           </div>
         </div>
 
-        <!-- Engagement Stats -->
+        <!-- upvote downvote bài viết  -->
         <div class="flex items-center gap-4 py-6 border-b border-border-lighter mb-6">
+          <!-- nút upvote -->
           <div class="flex items-center gap-2">
-            <svg class="w-[18px] h-[18px]" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M8.80974 5.27744L3.18474 14.294H14.4761L8.80974 5.27744ZM8.80974 1.92725L17.6609 16.0725H0L8.80974 1.92725Z" fill="#969696"/>
-            </svg>
-            <span class="font-semibold text-base">20</span>
+            <button @click="upvote(post?.data?.id)">
+              <svg
+                class="w-[18px] h-[18px] transition-colors duration-200"
+                :class="{
+                  'text-sky-500': post?.data?.user_vote === 1,        // đã upvote
+                  'text-gray-400 hover:text-sky-400': post?.data?.user_vote !== 1 // mặc định + hover
+                }"
+                viewBox="0 0 18 18"
+                fill="currentColor"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path d="M8.80974 5.27744L3.18474 14.294H14.4761L8.80974 5.27744ZM8.80974 1.92725L17.6609 16.0725H0L8.80974 1.92725Z" />
+              </svg>
+            </button>
+
+            <span class="font-semibold text-base">{{post?.data?.vote_score}}</span>
           </div>
-          <svg class="w-[18px] h-[18px]" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M9.19027 12.7223L14.8153 3.70574H3.5239L9.19027 12.7223ZM9.19027 16.0725L0.339157 1.92725L18 1.92725L9.19027 16.0725Z" fill="#969696"/>
-          </svg>
+          <!-- nút downvote -->
+          <button @click="downvote(post?.data?.id)">
+            <svg
+              class="w-[18px] h-[18px] transition-colors duration-200"
+              :class="{
+                'text-red-500': post?.data?.user_vote === -1,       // đã downvote
+                'text-gray-400 hover:text-red-400': post?.data?.user_vote !== -1 // mặc định + hover
+              }"
+              viewBox="0 0 18 18"
+              fill="currentColor"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path d="M9.19027 12.7223L14.8153 3.70574H3.5239L9.19027 12.7223ZM9.19027 16.0725L0.339157 1.92725L18 1.92725L9.19027 16.0725Z" />
+            </svg>
+          </button>
+
+          <!-- hiển thị số bình luận bài viết -->
           <span class="text-text-muted">·</span>
           <span class="text-base text-text-primary"> {{ post.data?.comments_count }} bình luận</span>
         </div>
@@ -91,7 +118,7 @@
         <!-- Author Follow Section -->
         <div class="flex items-center gap-4 mb-8">
           <img 
-            :src="post.data?.author?.avater" 
+            :src="post.data?.author?.avatar" 
             alt="Author" 
             class="w-12 h-12 rounded-full"
           />
@@ -570,6 +597,75 @@ async function fetchReplies(id) {
     loading.value = false
   }
 }
+
+// upvote bài viết-----------------
+
+async function upvote(postId){
+  loading.value = true
+  try {
+    // Optimistic
+    // const current = Number(post.value?.data?.vote_score ?? 0)
+    // const optimistic = current + 1
+    // post.value.data.vote_score = optimistic
+    // post.value.data.user_vote  = 1
+
+    const res = await api.post(`${apiUrl}/api/posts/${postId}/upvote`)
+    // Đồng bộ lại theo server (nếu có)
+    if (res.status === 200) {
+      const next = Number(res.data?.vote_score ?? optimistic)
+      post.value.data.vote_score = next
+      
+      if (res.data?.user_vote != null) {
+        post.value.data.user_vote = Number(res.data.user_vote)
+      }
+    }
+  } catch (e) {
+    // Revert nếu lỗi
+    post.value.data.vote_score = Math.max(0, Number(post.value?.data?.vote_score ?? 1) - 1)
+    post.value.data.user_vote = 0
+    console.error(e)
+    alert('Bạn cần đăng nhập')
+  } finally {
+    loading.value = false
+  }
+}
+
+
+// end upvote-----------------------
+// downvote bài viết ---------------
+async function downvote(postId){
+  loading.value = true
+  try {
+    // Optimistic
+    // const current = Number(post.value?.data?.vote_score ?? 0)
+    // const optimistic = current + 1
+    // post.value.data.vote_score = optimistic
+    // post.value.data.user_vote  = 1
+
+    const res = await api.post(`${apiUrl}/api/posts/${postId}/downvote`)
+    // Đồng bộ lại theo server (nếu có)
+    if (res.status === 200) {
+      const next = Number(res.data?.vote_score ?? optimistic)
+      post.value.data.vote_score = next
+      
+      if (res.data?.user_vote != null) {
+        post.value.data.user_vote = Number(res.data.user_vote)
+      }
+    }
+  } catch (e) {
+    // Revert nếu lỗi
+    post.value.data.vote_score = Math.max(0, Number(post.value?.data?.vote_score ?? 1) - 1)
+    post.value.data.user_vote = 0
+    console.error(e)
+    alert('Bạn cần đăng nhập')
+  } finally {
+    loading.value = false
+  }
+}
+
+
+// end downvote bài viết
+
 
 onMounted( async ()=>{
     const postId = Number(route.query.id)
