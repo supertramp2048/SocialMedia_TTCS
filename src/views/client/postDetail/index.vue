@@ -38,7 +38,7 @@
             <span class="text-[13px] text-text-muted">{{ new Date(post.data?.updated_at || created_at).toLocaleDateString('vi-VN') }}</span>
           </div>
           <button class="ml-auto">
-            <svg class="w-4 h-4" viewBox="0 0 4 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg class="w-4 h-4 text-2xl" viewBox="0 0 4 16" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M2 4C0.89543 4 0 3.10457 0 2C0 0.89543 0.895431 0 2 0C3.10457 0 4 0.895431 4 2C4 3.10457 3.10457 4 2 4Z" fill="#111827"/>
               <path d="M2 10C0.89543 10 0 9.10457 0 8C0 6.89543 0.895431 6 2 6C3.10457 6 4 6.89543 4 8C4 9.10457 3.10457 10 2 10Z" fill="#111827"/>
               <path d="M2 16C0.89543 16 0 15.1046 0 14C0 12.8954 0.895431 12 2 12C3.10457 12 4 12.8954 4 14C4 15.1046 3.10457 16 2 16Z" fill="#111827"/>
@@ -75,38 +75,37 @@
 
         <!-- upvote downvote bài viết  -->
         <div class="flex items-center gap-4 py-6 border-b border-border-lighter mb-6">
-          <!-- nút upvote -->
+          
           <div class="flex items-center gap-2">
+            <!-- nút upvote -->
             <button @click="upvote(post?.data?.id)">
               <svg
-                class="w-[18px] h-[18px] transition-colors duration-200"
+                class="w-8 h-8 transition-colors duration-200"
                 :class="{
-                  'text-sky-500': post?.data?.user_vote === 1,        // đã upvote
-                  'text-gray-400 hover:text-sky-400': post?.data?.user_vote !== 1 // mặc định + hover
+                  'fill-sky-500': post?.data?.user_vote === 1,
+                  'fill-gray-400 hover:fill-sky-400': post?.data?.user_vote !== 1
                 }"
                 viewBox="0 0 18 18"
-                fill="currentColor"
                 xmlns="http://www.w3.org/2000/svg"
               >
                 <path d="M8.80974 5.27744L3.18474 14.294H14.4761L8.80974 5.27744ZM8.80974 1.92725L17.6609 16.0725H0L8.80974 1.92725Z" />
               </svg>
             </button>
-
             <span class="font-semibold text-base">
               {{ post?.data?.vote_score > 0 ? post.data.vote_score : 0 }}
             </span>
 
           </div>
           <!-- nút downvote -->
+          <!-- Downvote -->
           <button @click="downvote(post?.data?.id)">
             <svg
-              class="w-[18px] h-[18px] transition-colors duration-200"
+              class="w-8 h-8 transition-colors duration-200"
               :class="{
-                'text-red-500': post?.data?.user_vote === -1,       // đã downvote
-                'text-gray-400 hover:text-red-400': post?.data?.user_vote !== -1 // mặc định + hover
+                'fill-red-500': post?.data?.user_vote === -1,
+                'fill-gray-400 hover:fill-red-400': post?.data?.user_vote !== -1
               }"
               viewBox="0 0 18 18"
-              fill="currentColor"
               xmlns="http://www.w3.org/2000/svg"
             >
               <path d="M9.19027 12.7223L14.8153 3.70574H3.5239L9.19027 12.7223ZM9.19027 16.0725L0.339157 1.92725L18 1.92725L9.19027 16.0725Z" />
@@ -565,12 +564,6 @@ async function fetchReplies(id) {
 async function upvote(postId){
   loading.value = true
   try {
-    // Optimistic
-    // const current = Number(post.value?.data?.vote_score ?? 0)
-    // const optimistic = current + 1
-    // post.value.data.vote_score = optimistic
-    // post.value.data.user_vote  = 1
-
     const res = await api.post(`${apiUrl}/api/posts/${postId}/upvote`)
     // Đồng bộ lại theo server (nếu có)
     if (res.status === 200) {
@@ -598,11 +591,6 @@ async function upvote(postId){
 async function downvote(postId){
   loading.value = true
   try {
-    // Optimistic
-    // const current = Number(post.value?.data?.vote_score ?? 0)
-    // const optimistic = current + 1
-    // post.value.data.vote_score = optimistic
-    // post.value.data.user_vote  = 1
 
     const res = await api.post(`${apiUrl}/api/posts/${postId}/downvote`)
     // Đồng bộ lại theo server (nếu có)
