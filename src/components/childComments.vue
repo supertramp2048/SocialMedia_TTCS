@@ -42,7 +42,7 @@
           <button
           v-if="user && comment?.author?.id == user.id "
           class="text-[13px] font-bold p-[5px] rounded-2xl hover:bg-sky-300"
-          @click="deleteComment(comment?.id)"
+          @click="deleteComment(comment?.id,comment?.parent_id)"
         >
           Xóa
         </button>
@@ -82,7 +82,7 @@
         <form
           v-if="FixIndex.includes(comment?.id)"
           class="border-b border-border-lighter pb-6 mb-6"
-          @submit.prevent="sendFixedComment(content_fixed_comment, comment?.id, comment?.parent_id)"
+          @submit.prevent="sendFixedComment(content_fixed_comment, comment?.id, props.parent_id)"
         >
           <div class="relative w-full">
             <input
@@ -219,6 +219,8 @@ async function sendReplyComment(content, postId, parent_id){
 // sua comment
 
 async function sendFixedComment(content, id, parent_id){
+  console.log("parent id fix", parent_id);
+  
   if (!content?.trim()) return;
   console.log("id ",id);
   console.log("parent id ", parent_id);
@@ -228,12 +230,13 @@ async function sendFixedComment(content, id, parent_id){
       content: content
     })
 
-    if (res.status === 201) {
-      // Cập nhật UI nhanh: thêm vào ngay replies nếu API /replies trả về đúng cấu trúc
-      // replies.value.unshift(res.data.data) // nếu muốn optimistic cho list con
-
-      // Hoặc refetch lại replies của parent
-      await fetchReplies(parent_id)
+    if (res.status === 200 || res.status === 201) {
+      // Tìm và cập nhật comment trong mảng replies
+      const index = replies.value.findIndex(c => c.id === id)
+      if (index !== -1) {
+        replies.value[index].content = content
+        replies.value[index].updated_at = new Date().toISOString()
+      }
 
       content_fixed_comment.value = ""
       const i = FixIndex.value.indexOf(id)
@@ -257,8 +260,31 @@ async function sendFixedComment(content, id, parent_id){
 
 // xoa comment
 
+async function deleteComment(id, parent_id){
+  if (!confirm('Bạn chắc muốn xoá bình luận này?')) return;
 
+  try {
+    const res = await api.delete(`${apiUrl}/api/comments/${id}`)
+    if (res.status === 200 || res.status === 204) {
+      // ✅ Xoá khỏi mảng replies hiện tại
+      const index = replies.value.findIndex(c => c.id === id)
+      if (index !== -1) {
+        replies.value.splice(index, 1)
+      }
 
+      // ✅ Nếu cần cập nhật replies_count của parent
+      // Bạn có thể emit event lên component cha hoặc fetch lại
+      // Hoặc đơn giản để như vậy vì UI đã cập nhật
+      
+      alert('Xoá bình luận thành công!')
+    }
+  } catch (error) {
+    const status = error?.response?.status
+    if (status === 401) return alert('Bạn cần đăng nhập')
+    console.error(error)
+    alert('Xoá bình luận thất bại.')
+  }
+}
 async function fetchReplies(id) {
   if (!id) return
   loading.value = true
