@@ -3,7 +3,7 @@
         <!-- lua chon sap xep post -->
           <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex flex-row-reverse justify-between h-12">
-              <nav class="hidden md:flex gap-3">
+              <nav class="flex gap-3">
                 <!-- 2 mục Sap xep -->
                 <button
                   type="button"

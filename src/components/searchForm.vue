@@ -11,7 +11,7 @@
         </button>
         <input
         type="text"
-        class="leading-[80px] w-full text-lg text-black border-none focus:outline-none"
+        class=" w-full leading-[40px] text-lg text-black border-none focus:outline-none"
         v-model="search_content"
         placeholder="Tìm kiếm bài viết hoặc tên tác giả"
         />

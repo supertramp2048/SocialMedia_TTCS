@@ -32,9 +32,74 @@
 
               <div class="flex items-center gap-4" v-if="auth.user">
                 <button @click="logout" class="hidden md:block text-sm text-gray-600 hover:text-gray-900">Đăng xuất</button>
-                <router-link to="/" class="px-4 py-2 bg-sky-500 text-white text-sm rounded-full hover:bg-sky-600 transition-colors">
-                  {{ auth.user.name }}
-                </router-link>
+               
+                <div class="relative flex">
+                    <button @click="showUserMenu = !showUserMenu ">
+                      <img :src="auth.user.avatar" class="w-[50px] h-[50px] rounded-full" alt="">
+                    </button>       
+
+                    <span
+                      class="absolute bottom-1/2  -right-1/2 -translate-x-1/2 transform border-8 border-b-red-400 border-t-transparent border-l-transparent border-r-transparent transition-all duration-300 ease-in-out"
+                      :class="showUserMenu ? 'translate-y-2 rotate-180 opacity-100' : 'translate-y-0 opacity-70'"
+                    ></span>        
+                <!-- Menu dropdown -->
+                <transition name="fade">
+                  <div
+                    v-if="showUserMenu "
+                    class="absolute right-0 top-full mt-3 w-60 bg-white border border-gray-200 shadow-xl rounded-2xl overflow-hidden z-50"
+                  >
+                    <div class="p-4 border-b flex flex-col border-gray-100 flex items-center gap-3">
+                      <img :src="auth.user.avatar" class="w-10 h-10 rounded-full" alt="">
+                      <div>
+                        <p class="font-bold text-gray-800">{{ auth.user.name }}</p>
+                        <p class="text-sm text-gray-500">{{ auth.user.email }}</p>
+                      </div>
+                      <router-link
+                        :to="{path: `/nguoi-dung/${auth.user.name}` }" 
+                        class=" btnEffect border rounded-2xl border-gray-300 py-0.5 px-2"
+                      >
+                        Xem trang cá nhân
+                      </router-link>
+                    </div>
+
+                    <ul class="py-2 text-gray-700">
+                      <li>
+                        <button class="w-full text-left px-5 py-2 hover:bg-gray-100 flex items-center gap-2">
+                          <i class="fa-regular fa-pen-to-square"></i> Bài viết của tôi
+                        </button>
+                      </li>
+                      <li>
+                        <button class="w-full text-left px-5 py-2 hover:bg-gray-100 flex items-center gap-2">
+                          <i class="fa-regular fa-file-lines"></i> Viết bài
+                        </button>
+                      </li>
+                      <li>
+                        <button class="w-full text-left px-5 py-2 hover:bg-gray-100 flex items-center gap-2">
+                          <i class="fa-regular fa-bookmark"></i> Tùy chỉnh tài khoản
+                        </button>
+                      </li>
+                      <li>
+                        <button class="w-full text-left px-5 py-2 hover:bg-gray-100 flex items-center gap-2">
+                          <i class="fa-solid fa-gear"></i> Tùy chỉnh tài khoản
+                        </button>
+                      </li>
+                      <li>
+                        <button class="w-full text-left px-5 py-2 hover:bg-gray-100 flex items-center gap-2">
+                          <i class="fa-regular fa-envelope"></i> Liên hệ
+                        </button>
+                      </li>
+                    </ul>
+
+                    <div class="border-t border-gray-100">
+                      <button
+                       @click="logout"
+                       class="w-full text-left px-5 py-3 hover:bg-gray-100 flex items-center gap-2 text-red-600 font-semibold">
+                        <i class="fa-solid fa-right-from-bracket"></i> Đăng xuất
+                      </button>
+                    </div>
+                  </div>
+                </transition>
+                </div>
               </div>
 
               <div class="flex items-center gap-4" v-else>
@@ -173,6 +238,7 @@ const route = useRoute()
 const apiUrl = import.meta.env.VITE_API_BASE
 // hien thi cate dang chon
 const chossenCate = ref(null)
+const showUserMenu = ref(false)
  watch(() => route.query, (q) => {
     chossenCate.value = (q.category === undefined || q.category === '') ? null : Number(q.category)
  },{immediate:true})
