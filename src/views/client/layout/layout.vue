@@ -27,17 +27,15 @@
 
             <!-- Right -->
             <div class="flex items-center gap-4">
-              <button @click="showFormSearch = !showFormSearch" class="bg-sky-300 rounded-2xl pt-0.5 pb-0.5 pl-3 pr-3"> <i class="fa-solid fa-magnifying-glass"> </i> Tìm kiếm</button>
-              <button class="hidden md:block text-sm text-gray-600 hover:text-gray-900">Liên hệ</button>
-
+              <button @click="showFormSearch = !showFormSearch" class="bg-sky-300 px-4 py-2 btnEffect rounded-2xl "> <i class="fa-solid fa-magnifying-glass"> </i> Tìm kiếm</button>
               <div class="flex items-center gap-4" v-if="auth.user">
-                <button @click="logout" class="hidden md:block text-sm text-gray-600 hover:text-gray-900">Đăng xuất</button>
-               
+                <button class="btnEffect border border-gray-400 px-4 py-2 rounded-2xl"> 
+                  <i class="fa-solid fa-feather"></i> Viết bài 
+                  </button>
                 <div class="relative flex">
                     <button @click="showUserMenu = !showUserMenu ">
                       <img :src="auth.user.avatar" class="w-[50px] h-[50px] rounded-full" alt="">
                     </button>       
-
                     <span
                       class="absolute bottom-1/2  -right-1/2 -translate-x-1/2 transform border-8 border-b-red-400 border-t-transparent border-l-transparent border-r-transparent transition-all duration-300 ease-in-out"
                       :class="showUserMenu ? 'translate-y-2 rotate-180 opacity-100' : 'translate-y-0 opacity-70'"
@@ -55,7 +53,7 @@
                         <p class="text-sm text-gray-500">{{ auth.user.email }}</p>
                       </div>
                       <router-link
-                        :to="{path: `/nguoi-dung/${auth.user.name}` }" 
+                        :to="{path: `/nguoi-dung/${auth.user.name}/${auth.user.id}`}" 
                         class=" btnEffect border rounded-2xl border-gray-300 py-0.5 px-2"
                       >
                         Xem trang cá nhân

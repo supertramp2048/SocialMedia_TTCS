@@ -34,7 +34,7 @@
                   <img :src="article.thumbnail_url" :alt="article.title" 
                        class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"/>
                 </div>
-                <div>
+                <div class="pb-2 sm:pb-0">
                     <h3 class="font-semibold text-2xl text-gray-900 group-hover:text-sky-600 line-clamp-2 mb-2">
                         {{ article.title }}
                     </h3>
