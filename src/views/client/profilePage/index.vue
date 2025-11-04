@@ -49,33 +49,18 @@
 
                     <!-- Filter + chế độ xem -->
                     <div class="py-4 lg:py-6 flex items-center justify-between">
-                        <div class="inline-flex items-center bg-gray-100 px-4 py-1.5 rounded">
-                        <span class="text-gray-800">Theo thời gian</span>
-                        <svg class="ml-2" width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-                            <path d="M3 5l4 4 4-4" stroke="#666" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                        </div>
-
-                        <div class="hidden lg:block">
-                        <button
-                            class="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded bg-white text-sm text-gray-700 hover:bg-gray-50"
-                        >
-                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                            <path fill-rule="evenodd" clip-rule="evenodd"
-                                    d="M2 2h5v5H2V2Zm7 0h5v5H9V2Zm0 7h5v5H9V9ZM2 9h5v5H2V9Z" fill="#909399"/>
-                            </svg>
-                            <span>Chế độ xem lưới</span>
-                        </button>
-                        </div>
                     </div>
 
                     <!-- Lưới bài viết -->
                     <section class="pb-10">
-                        <div class=" gap-6 lg:gap-8">
+                        <div v-if="posts?.data?.length > 0" class=" gap-6 lg:gap-8">
                         <GridPost
                             :posts="posts"
                             :pageLimit="limitPage"
                         />
+                        </div>
+                        <div v-else>
+                            <p>Không có gì ở đây cả :'(( </p>
                         </div>
                     </section>
                     </main>
@@ -91,15 +76,40 @@
     import {ref, onMounted, watch} from 'vue'
     import api from "../../../../API/axios"
     import { useAuthStore } from '../../../stores/auth'
-    import { useRoute} from 'vue-router'
+    import { useRoute, useRouter} from 'vue-router'
     // Demo data — thay bằng API thật của bạn
 const posts = ref([])
 const auth = useAuthStore()
 const AuthUser = ref()
 const route = useRoute()
+const router = useRouter()
 const limitPage = ref()
-const objPagination = ref()
+const objPagination = ref(route.query)
+const sort = ref('hot')
 let UserId = null
+watch(
+    () => sort.value,
+    (newVal) => {
+        router.replace({
+            query: {
+                ...route.query,
+                sort: newVal
+            }
+        })
+    }
+)
+
+watch(
+  () => route.query.user_id,
+  async (newQuery) => {
+    UserId = route.query.user_id
+    const res = await api.get(`/api/profiles/${UserId}`)
+    AuthUser.value = res?.data
+  },
+  { immediate: true , deep: true} // gọi 1 lần khi load trang
+)
+
+
 watch(
   () => route.query,
   async (newQuery) => {
@@ -109,11 +119,12 @@ watch(
   })
   posts.value = res2.data
   },
-  { immediate: true } // gọi 1 lần khi load trang
+  { immediate: true , deep: true} // gọi 1 lần khi load trang
 )
 
+
 onMounted(async () => {
-  UserId = route.query.id
+  UserId = route.query.user_id
   const res = await api.get(`/api/profiles/${UserId}`)
   AuthUser.value = res?.data
   console.log("auth", AuthUser.value);
@@ -125,7 +136,7 @@ onMounted(async () => {
   })
   posts.value = res2.data
   
-  limitPage.value = Math.ceil(res2.data.meta?.total / 5)
+  limitPage.value = Math.ceil(res2.data.meta?.total / objPagination.value.limit)
   console.log("postt",posts.value);
   
   

@@ -25,27 +25,8 @@
         <h1 class="text-[42px] leading-[58px] font-bold font-montserrat text-[#2D3748] mb-6">
            {{ post.data?.title  }}
         </h1>
-
+        <UserDiv :user="post.data?.author" :date="post.data?.created_at"  ></UserDiv>
         <!-- Author Info -->
-        <div class="flex items-center gap-3 mb-8">
-          <img 
-            :src="post.data?.author?.avatar"
-            alt="Author" 
-            class="w-14 h-14 rounded-full"
-          />
-          <div>
-            <a href="#" class="font-bold text-sm text-text-primary block">{{post.data?.author.name}}</a>
-            <span class="text-[13px] text-text-muted">{{ new Date(post.data?.updated_at || created_at).toLocaleDateString('vi-VN') }}</span>
-          </div>
-          <button class="ml-auto">
-            <svg class="w-4 h-4 text-2xl" viewBox="0 0 4 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M2 4C0.89543 4 0 3.10457 0 2C0 0.89543 0.895431 0 2 0C3.10457 0 4 0.895431 4 2C4 3.10457 3.10457 4 2 4Z" fill="#111827"/>
-              <path d="M2 10C0.89543 10 0 9.10457 0 8C0 6.89543 0.895431 6 2 6C3.10457 6 4 6.89543 4 8C4 9.10457 3.10457 10 2 10Z" fill="#111827"/>
-              <path d="M2 16C0.89543 16 0 15.1046 0 14C0 12.8954 0.895431 12 2 12C3.10457 12 4 12.8954 4 14C4 15.1046 3.10457 16 2 16Z" fill="#111827"/>
-            </svg>
-          </button>
-        </div>
-
         <!-- Article Body -->
         <article class="prose prose-lg max-w-none" v-html="post.data?.content_html">
         </article>
@@ -119,15 +100,8 @@
 
         <!-- Author Follow Section -->
         <div class="flex items-center gap-4 mb-8">
-          <img 
-            :src="post.data?.author?.avatar" 
-            alt="Author" 
-            class="w-12 h-12 rounded-full"
-          />
-          <div class="flex-1">
-            <a href="#" class="font-bold text-sm text-text-primary block">{{post.data?.author?.name}}</a>
-          </div>
-          <button class="px-4 py-2.5 rounded border border-[#E3E3E3] text-sm text-text-primary">
+          <UserDiv :user="post.data?.author" :date="null"  ></UserDiv>
+          <button class="btnEffect px-4 py-2.5 rounded border border-[#E3E3E3] text-sm text-text-primary">
             Follow
           </button>
         </div>
@@ -322,6 +296,7 @@ import api from "../../../../API/axios"
 // cac child component
 import ChildComments from '../../../components/childComments.vue'
 import SuggestedPost from '../../../components/suggestedPost.vue'
+import UserDiv from '../../../components/userDiv.vue'
 // loader cho trang
 import { globalLoading } from '../../../../API/axios'
 import loader from '../../../components/loader.vue'

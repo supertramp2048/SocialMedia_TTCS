@@ -269,7 +269,7 @@ function closeMore() { showMoreMenu.value = false }
 function goProfilePage(id,name){
     router.push({
     path: `/nguoi-dung/${encodeURIComponent('name')}`,
-    query: { id: id, page: 1, limit: 2, sort: 'hot' }
+    query: { user_id: id, page: 1, limit: 2, sort: 'hot' }
   })
 }
 function handleClickOutside(e) {

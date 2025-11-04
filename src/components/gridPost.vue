@@ -67,10 +67,22 @@
     import { ref, computed, watch, onMounted } from 'vue'
     import { useRoute, useRouter } from 'vue-router'
     import Pagination from '../components/pagination.vue'
+    const sortSetting = ref('hot')
+    const route = useRoute()
+    const router = useRouter()
     const props = defineProps({
         posts : {type: Object, required: true},
         pageLimit : {type: Number, required: true}
     })
+    function updatePagination(sort){
+      sortSetting.value = sort
+      router.replace({
+        query:{
+        ...route.query,
+        sort:sort
+        }
+      })
+    }
     onMounted(()=>{
         console.log(props.posts);
         
