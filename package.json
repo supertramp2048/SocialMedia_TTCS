@@ -14,7 +14,7 @@
     "lint": "eslint . --fix --cache",
     "format": "prettier --write src/",
     "server": "json-server --watch API/db.json --port 3000",
-    "start": "concurrently \"npm run dev\" \"npm run server\""
+    "start": "concurrently \"npm run dev\" "
   },
   "dependencies": {
     "@heroicons/vue": "^2.2.0",

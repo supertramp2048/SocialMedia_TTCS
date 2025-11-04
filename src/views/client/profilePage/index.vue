@@ -71,7 +71,7 @@
 
                     <!-- Lưới bài viết -->
                     <section class="pb-10">
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+                        <div class=" gap-6 lg:gap-8">
                         <GridPost
                             :posts="posts"
                             :pageLimit="limitPage"
@@ -88,7 +88,7 @@
     import Layout from '../layout/layout.vue'
     import UserProfile from '../../../components/userProfile.vue'
     import GridPost from '../../../components/gridPost.vue'
-    import {ref, onMounted} from 'vue'
+    import {ref, onMounted, watch} from 'vue'
     import api from "../../../../API/axios"
     import { useAuthStore } from '../../../stores/auth'
     import { useRoute} from 'vue-router'
@@ -98,17 +98,35 @@ const auth = useAuthStore()
 const AuthUser = ref()
 const route = useRoute()
 const limitPage = ref()
+const objPagination = ref()
 let UserId = null
+watch(
+  () => route.query,
+  async (newQuery) => {
+    objPagination.value = newQuery
+    const res2 = await api.get(`/api/posts`, {
+    params: objPagination.value
+  })
+  posts.value = res2.data
+  },
+  { immediate: true } // gọi 1 lần khi load trang
+)
+
 onMounted(async () => {
-  UserId = route.params.id
+  UserId = route.query.id
   const res = await api.get(`/api/profiles/${UserId}`)
   AuthUser.value = res?.data
   console.log("auth", AuthUser.value);
-  const res2 = await api.get(`/api/posts?user_id=${UserId}`)
+  objPagination.value = route.query
+  console.log("objPagination ",objPagination.value);
+  
+  const res2 = await api.get(`/api/posts`, {
+    params: objPagination.value
+  })
   posts.value = res2.data
   
   limitPage.value = Math.ceil(res2.data.meta?.total / 5)
-  console.log(limitPage.value);
+  console.log("postt",posts.value);
   
   
 })

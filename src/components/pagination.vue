@@ -77,6 +77,8 @@ async function goPage() {
   await router.replace({ query: nextQuery })
 }
 onMounted(() => {
+  console.log(objPagination.value);
+  
   console.log('Giới hạn trang:', props.page_limit)
 })
 </script>

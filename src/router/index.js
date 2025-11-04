@@ -36,7 +36,7 @@ const router = createRouter({
       meta: { requiresAuth: true } 
     },
     {
-      path: '/nguoi-dung/:name/:id',
+      path: '/nguoi-dung/:name',
       name: 'Trang cá nhân',
       component: () => import('../views/client/profilePage/index.vue'),
       meta: { requiresAuth: true } 

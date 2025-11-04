@@ -52,12 +52,12 @@
                         <p class="font-bold text-gray-800">{{ auth.user.name }}</p>
                         <p class="text-sm text-gray-500">{{ auth.user.email }}</p>
                       </div>
-                      <router-link
-                        :to="{path: `/nguoi-dung/${auth.user.name}/${auth.user.id}`}" 
+                      <button 
+                        @click="goProfilePage(auth.user.id, auth.user.name)"
                         class=" btnEffect border rounded-2xl border-gray-300 py-0.5 px-2"
                       >
                         Xem trang cá nhân
-                      </router-link>
+                      </button>
                     </div>
 
                     <ul class="py-2 text-gray-700">
@@ -266,7 +266,12 @@ const moreMenuRef = ref(null)
 
 function toggleMore() { showMoreMenu.value = !showMoreMenu.value }
 function closeMore() { showMoreMenu.value = false }
-
+function goProfilePage(id,name){
+    router.push({
+    path: `/nguoi-dung/${encodeURIComponent('name')}`,
+    query: { id: id, page: 1, limit: 2, sort: 'hot' }
+  })
+}
 function handleClickOutside(e) {
   if (moreMenuRef.value && !moreMenuRef.value.contains(e.target)) closeMore()
 }
