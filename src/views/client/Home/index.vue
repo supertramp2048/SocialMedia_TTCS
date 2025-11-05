@@ -81,43 +81,7 @@
               <h2 class="text-xl md:text-2xl font-bold text-gray-900 uppercase tracking-wide">Mới nhất trên Spiderum</h2>
               <router-link to="/posts" class="text-sm text-gray-500 hover:text-gray-700">Xem tất cả →</router-link>
             </div>
-            
-            <div class="space-y-6">
-              <router-link
-                  v-for="post in latestPost.data" :key="post.id" 
-                  class="flex flex-col sm:flex-row gap-4 pb-6 border-b border-gray-200 hover:bg-gray-50 transition-colors rounded-lg p-2 -m-2"
-                  :to="{ path: '/bai-dang/', query: { id:post.id } }"
-                  >
-                <img :src="post.thumbnail_url" :alt="post.title" 
-                     class="w-full sm:w-48 h-40 object-cover rounded-lg flex-shrink-0"/>
-                <div class="flex-1 space-y-2">
-                  <h3 class="text-lg font-semibold text-gray-900 hover:text-sky-600 cursor-pointer line-clamp-2">
-                    {{ post.title }}
-                  </h3>
-                  <div class="flex items-center gap-4 text-sm text-gray-500">
-                    <span class="flex items-center gap-1">
-                      <img
-                        :src="post.author?.avatar || AVATAR_FALLBACK"
-                        alt="avatar"
-                        class="w-5 h-5 rounded-full object-cover"
-                        loading="lazy"
-                      />
-                      {{ post.author.name || 'Ẩn sĩ'}}
-                    </span>
-                    <span class="flex items-center gap-1">
-                      comment
-                      {{ post.comments_count}}
-                    </span>
-                    <span class="flex items-center gap-1">
-                      <svg class="w-4 h-4" :class="{'text-red-500': post.user_vote == 1}" v-if() fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"/>
-                      </svg>
-                      {{  post.vote_score > 0 ? post.vote_score : 0}}
-                    </span>
-                  </div>
-                </div>
-              </router-link>
-            </div>
+            <GridPost :posts="latestPost" :pageLimit="null"></GridPost>
           </section>
 
           <!-- Banner Ad -->
@@ -134,40 +98,9 @@
               <h2 class="text-xl md:text-2xl font-bold text-gray-900 uppercase tracking-wide">Nổi bật trong tuần</h2>
               <a href="#" class="text-sm text-gray-500 hover:text-gray-700">Xem tất cả →</a>
             </div>
-            
-            <div class="grid sm:grid-cols-2 gap-6">
-              <router-link 
-                  v-for="article in featuredPosts.data" :key="article.id" 
-                  class="flex sm:flex-col group cursor-pointer"
-                  :to="{ path: '/bai-dang/', query: { id:article.id } }"
-                  >
-                <div class="mb-3 rounded-lg overflow-hidden">
-                  <img :src="article.thumbnail_url" :alt="article.title" 
-                       class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"/>
-                </div>
-                <div class="ml-1">
-                <h3 class="font-semibold text-gray-900 group-hover:text-sky-600 line-clamp-2 mb-2">
-                  {{ article.title }}
-                </h3>
-                <div class="flex items-center gap-3 text-sm text-gray-500">
-                  <img
-                        :src="article.author?.avatar || AVATAR_FALLBACK"
-                        alt="avatar"
-                        class="w-5 h-5 rounded-full object-cover"
-                        loading="lazy"
-                      />
-                  <span>{{ article.author.name }}</span>
-                  <span>{{ article.comments_count }} comment</span>
-                  <span class="flex items-center gap-1">
-                      <svg class="w-4 h-4" :class="{'text-red-500': article.user_vote == 1}" v-if() fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"/>
-                      </svg>
-                      {{ article?.vote_score > 0 ? article?.vote_score : 0}}
-                  </span>
-                </div>
-                </div>
-              </router-link>
-            </div>
+            <!-- so post noi bat -->
+            <GridPost :posts="featuredPosts" :pageLimit="null"></GridPost>
+
             <div class="bg-gradient-to-r from-orange-400 to-pink-500 rounded-lg overflow-hidden">
             <div class="p-8 text-center text-white">
               <h3 class="text-2xl md:text-3xl font-bold mb-2">THÁNG 9</h3>
@@ -175,107 +108,9 @@
               <p class="text-sm opacity-90">Khuyến mãi đặc biệt trong tháng này</p>
             </div>
           </div>
-
-          <!-- lua chon sap xep post -->
-          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex flex-row-reverse justify-between h-12">
-              <nav class="hidden md:flex gap-3">
-                <!-- 2 mục Sap xep -->
-                <button
-                  type="button"
-                  class="px-3 py-2 text-sm text-gray-700 hover:text-sky-700 hover:bg-sky-50 rounded-md transition-colors"
-                  @click="updatePagination('newest')"
-                  :class="{'bg-sky-300': sortSetting == 'newest'}"
-                >
-                  Mới nhất
-                </button>
-
-                <button
-                  type="button"
-                  class="px-3 py-2 text-sm text-gray-700 hover:text-sky-700 hover:bg-sky-50 rounded-md transition-colors"
-                  @click="updatePagination('hot')"
-                  :class="{'bg-sky-300': sortSetting == 'hot'}"
-                >
-                  Thịnh hành
-                </button>
-              </nav>
-            </div>
-          </div>
-          <!-- // tất cả post có phân trang -->
-          <div class="grid sm:grid-cols-2 gap-6">
-              <router-link v-for="article in posts.data" :key="article.id" 
-                  :to="{ path: '/bai-dang/', query: { id:article.id } }"
-                   class="group cursor-pointer">
-                <div class="mb-3 rounded-lg overflow-hidden">
-                  <img :src="article.thumbnail_url" :alt="article.title" 
-                       class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"/>
-                </div>
-                <h3 class="font-semibold text-gray-900 group-hover:text-sky-600 line-clamp-2 mb-2">
-                  {{ article.title }}
-                </h3>
-                <div
-                class="flex items-center gap-3 text-sm text-gray-500"
-                >
-                  <img
-                        :src="article.author?.avatar || AVATAR_FALLBACK"
-                        alt="avatar"
-                        class="w-5 h-5 rounded-full object-cover"
-                        loading="lazy"
-                      />
-                  <span>{{ article.author.name }}</span>
-                  <span>{{ article.comments_count  }} Bình luận</span>
-                  <span class="flex items-center gap-1">
-                      <svg class="w-4 h-4" :class="{'text-red-500': article.user_vote == 1}" v-if() fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"/>
-                      </svg>
-                      {{  article?.vote_score > 0 ? article?.vote_score : 0}}
-                  </span>
-                </div>
-              </router-link>
-            </div>
-            <!-- phan trang -->
-           <form
-              class="sticky bottom-0 z-30 bg-white border-t shadow-md 
-                    flex justify-center items-center gap-4 px-6 py-3
-                    max-w-2xl mx-auto rounded-t-lg"
-              @submit.prevent="goPage"
-            >
-              <!-- Nút bên trái -->
-              <button
-                type="button"
-                class="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md text-sm font-medium text-gray-700"
-                :disabled="inputPage <= 1 || loading"
-                @click="inputPage--; goPage()"
-              >
-                Trước
-              </button>
-
-              <!-- Ô nhập ở giữa -->
-              <label class="flex items-center gap-2 text-sm text-gray-700">
-                Trang:
-                <input
-                  type="number"
-                  v-model.number="inputPage"
-                  min="1"
-                  :max="totalPages"
-                  class="w-16 px-2 py-1 border rounded-md text-center"
-                />
-                / {{ totalPages }}
-              </label>
-
-              <!-- Nút bên phải -->
-              <button
-                type="button"
-                class="px-4 py-2 bg-sky-500 hover:bg-sky-600 rounded-md text-sm font-medium text-white disabled:opacity-60"
-                :disabled="inputPage >= totalPages || loading"
-                @click="inputPage++; goPage()"
-              >
-                Tiếp
-              </button>
-            </form>
-
+          <!-- grid post tất cả các post theo category id-->
+          <GridPost :posts="posts" :pageLimit="totalPages"></GridPost>
           </section>
-
         </div>
 
         <!-- <--Right Sidebar -->
@@ -367,6 +202,7 @@ const objPagination = ref({ page: 1, limit: 5, sort: 'hot' })
 const inputPage = ref(objPagination.value.page) // <--- thêm biến nhập tạm
 const numberOfPost = ref(0)
 const totalPages = computed(() => Math.max(1, Math.ceil(numberOfPost.value / objPagination.value.limit)))
+import GridPost from '../../../components/gridPost.vue'
 // che do sap xep bai viet
 const loading = ref(false)
 const sortSetting = ref('hot')
