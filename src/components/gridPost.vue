@@ -120,12 +120,7 @@ const props = defineProps({
   pageLimit: { type: Number, required: true }
 })
 
-/**
- * displayMode:
- * - Auto set theo số lượng bài (grid nếu >1, ngược lại col)
- * - Không override khi user đã tự đổi qua select
- * - Mobile (<sm) luôn cột do class chỉ bật grid từ sm:
- */
+
 const displayMode = ref('col')
 const userChanged = ref(false)
 

@@ -4,9 +4,6 @@ import { ref } from 'vue'
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE || 'http://localhost:8000/api',
-  headers: {
-    "Content-Type": "application/json",
-  }
 });
 
 // Gắn token cho mọi request
@@ -14,7 +11,12 @@ api.interceptors.request.use(config => {
   const token = Cookies.get('token');
   console.log('token ben axios', token);
     
-  if (token) config.headers.Authorization = `Bearer ${token}`;
+  if (token) config.headers.Authorization = `Bearer ${token}`
+
+  const isFormData = typeof FormData !== 'undefined' && config.data instanceof FormData
+  if (!isFormData && !config.headers['Content-Type']) {
+    config.headers['Content-Type'] = 'application/json'
+  }
   return config;
 });
 

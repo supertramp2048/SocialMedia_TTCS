@@ -72,14 +72,11 @@
                         </button>
                       </li>
                       <li>
-                        <button class="w-full text-left px-5 py-2 hover:bg-gray-100 flex items-center gap-2">
-                          <i class="fa-regular fa-bookmark"></i> Tùy chỉnh tài khoản
-                        </button>
-                      </li>
-                      <li>
-                        <button class="w-full text-left px-5 py-2 hover:bg-gray-100 flex items-center gap-2">
+                        <router-link
+                         to='/nguoi-dung/cai-dat'
+                         class="w-full text-left px-5 py-2 hover:bg-gray-100 flex items-center gap-2">
                           <i class="fa-solid fa-gear"></i> Tùy chỉnh tài khoản
-                        </button>
+                        </router-link>
                       </li>
                       <li>
                         <button class="w-full text-left px-5 py-2 hover:bg-gray-100 flex items-center gap-2">
