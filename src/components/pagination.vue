@@ -55,10 +55,19 @@ const objPagination = ref({})
 
 watch(() => route.query, 
       (newQuery) => {
-    objPagination.value = { ...newQuery }
+    const page = Number(newQuery.page) || 1
+    objPagination.value = { ...newQuery,page }
     },
 {immediate: true, deep: true}
 )
+
+// Nếu người dùng xóa ô input => gán lại page = 1
+watch(() => objPagination.value.page, (newVal) => {
+  if (newVal === null || newVal === undefined || newVal === '') {
+    objPagination.value.page = 1
+  }
+})
+
 // Hàm tiện ích: loại bỏ key null/undefined/"" để URL gọn
 function cleanQuery(q) {
   const out = {}

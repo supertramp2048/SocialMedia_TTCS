@@ -46,7 +46,7 @@
                     v-if="showUserMenu "
                     class="absolute right-0 top-full mt-3 w-60 bg-white border border-gray-200 shadow-xl rounded-2xl overflow-hidden z-50"
                   >
-                    <div class="p-4 border-b flex flex-col border-gray-100 flex items-center gap-3">
+                    <div class="p-4 border-b flex flex-col border-gray-100 items-center gap-3">
                       <img :src="auth.user.avatar" class="w-10 h-10 rounded-full" alt="">
                       <div>
                         <p class="font-bold text-gray-800">{{ auth.user.name }}</p>

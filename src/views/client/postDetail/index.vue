@@ -54,9 +54,9 @@
           </div>
         </div>
 
-        <!-- upvote downvote bài viết  -->
-        <div class="flex items-center gap-4 py-6 border-b border-border-lighter mb-6">
-          
+        <!-- upvote downvote report bài viết  -->
+        <div class="flex justify-between border-b border-border-lighter mb-6">
+          <div class="flex items-center gap-4 py-6 ">
           <div class="flex items-center gap-2">
             <!-- nút upvote -->
             <button @click="upvote(post?.data?.id)">
@@ -96,14 +96,32 @@
           <!-- hiển thị số bình luận bài viết -->
           <span class="text-text-muted">·</span>
           <span class="text-base text-text-primary"> {{ post.data?.comments_count }} bình luận</span>
+          </div>
+          <button @click="reportPost()" class=" font-bold text-gray-500 px-1  hover:text-red-400">Báo cáo bài viết</button>
         </div>
 
         <!-- Author Follow Section -->
         <div class="flex items-center gap-4 mb-8">
           <UserDiv :user="post.data?.author" :date="null"  ></UserDiv>
-          <button class="btnEffect px-4 py-2.5 rounded border border-[#E3E3E3] text-sm text-text-primary">
-            Follow
-          </button>
+          <div v-if="post.data?.author?.id != auth.user.id ">
+            <button 
+              @click="followHandler"
+              v-if="post?.data?.is_following_author == false " 
+              class="btnEffect px-4 py-2.5 rounded border border-[#E3E3E3] text-sm text-text-primary">
+                <p class="flex justify-center items-center">
+                  Theo dõi <SmallLoadingIcon class="mx-1" v-if="isLoading"></SmallLoadingIcon>
+                </p>
+            </button>
+            <button 
+              v-else-if="post?.data?.is_following_author == true"
+              @click="followHandler"
+              class="btnEffect bg-sky-300 px-4 py-2.5 rounded border border-[#E3E3E3] text-sm text-text-primary">
+              <p class="flex justify-center items-center">
+                <i class="fa-solid fa-check pr-1"></i> Đã Theo dõi <SmallLoadingIcon class="mx-1" v-if="isLoading"></SmallLoadingIcon>
+              </p>
+            </button>
+          </div>
+          
         </div>
       </div>
 
@@ -283,6 +301,11 @@
         </div>
       </div>
     </main>
+    <ReportModal
+      v-model="showReportPostForm"
+      :id="idReport"
+      :type="typeOfReport"
+    />
   </div>
     </Layout>
 </template>
@@ -293,6 +316,8 @@ import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth';
 import { storeToRefs } from 'pinia'
 import api from "../../../../API/axios"
+import ReportModal from '../../../components/reportForm.vue' 
+import SmallLoadingIcon from '../../../components/smallLoadingIcon.vue'
 // cac child component
 import ChildComments from '../../../components/childComments.vue'
 import SuggestedPost from '../../../components/suggestedPost.vue'
@@ -300,16 +325,34 @@ import UserDiv from '../../../components/userDiv.vue'
 // loader cho trang
 import { globalLoading } from '../../../../API/axios'
 import loader from '../../../components/loader.vue'
+
+const typeOfReport = ref('')
+const idReport = ref('')
+
 const replies = ref([])    
 const postSuggested = ref([])    
 const route = useRoute()
 const apiUrl = import.meta.env.VITE_API_BASE
 const loading = ref(false)
+const isLoading = ref(false)
+const showReportPostForm = ref(false)
 // dưới các const khác
 const reloadKey = ref({}) // { [commentId]: number }
 
 const auth = useAuthStore()
 const {user} = storeToRefs(auth)
+// hien form bao cao
+
+function reportPost(){
+  showReportPostForm.value = true
+  typeOfReport.value = 'posts' 
+  idReport.value = post?.value?.data.id
+  console.log("type ",typeOfReport.value,);
+  
+  console.log("bool ",showReportPostForm.value,"id ",idReport.value);
+  
+}
+
 // hien form reply
 const showReply = ref([])
 function showReplyForm(id){
@@ -353,7 +396,7 @@ async function sendComment(content, post_id){
       const postId = Number(route.query.id)
       const res = await api.get(`${apiUrl}/api/posts/${postId}`)
       post.value = res.data
-      console.log(post.value);
+
     }
   } catch (error) {
     const status = error?.response?.status;
@@ -524,9 +567,6 @@ async function fetchReplies(id) {
     
     // Giả sử API trả { data: [...] }, đổi thành mảng:
     replies.value = Array.isArray(res.data?.data) ? res.data.data : res.data
-
-    console.log("user ",user);
-    console.log("all rep ",replies.value);
   } catch (e) {
     error.value = e
   } finally {
@@ -604,15 +644,31 @@ onMounted( async ()=>{
       const postId = Number(route.query.id)
       const res = await api.get(`${apiUrl}/api/posts/${postId}`)
       post.value = res.data
-      console.log("post here ",post.value, "id ",post.value.data.category?.id);
+      console.log("post ", post.value);
       
       const res1 = await api.get(`${apiUrl}/api/posts`, { params: { limit: 5, sort: 'hot', category: post.value.data.category?.id } })
       postSuggested.value = res1.data.data.filter(item => item.id !== post.value.id)
-      console.log("suggested post ",postSuggested.value);
   } catch (error) {
     alert("Hệ thống đang bảo trì")
-  }
-    
-    
+  } 
 })
+
+async function followHandler(){
+  try {
+      isLoading.value = true
+      const res = await api.post(`/api/users/${post.value?.data?.author?.id}/follow`)
+      console.log('post.value structure:', post.value)
+
+        if (post.value?.data) {
+          post.value.data = { ...post.value.data, is_following_author: res.data.is_following }
+        }
+        
+      //post.value?.is_following_author = res.data.followers_count
+  } catch (error) {
+    
+  }
+  finally{
+    isLoading.value = false
+  }
+}
 </script>

@@ -3,7 +3,7 @@ import Cookies from 'js-cookie';
 import { ref } from 'vue'
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE || 'http://localhost:8000/api',
+  baseURL: import.meta.env.VITE_API_BASE 
 });
 
 // Gắn token cho mọi request

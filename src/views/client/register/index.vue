@@ -86,7 +86,9 @@
 <script setup lang='js'>
     import {ref} from 'vue'
     import Loader from '../../../components/smallLoadingIcon.vue'
+    import {useRouter} from 'vue-router'
     import api from "../../../../API/axios"
+    const router = useRouter()
     const isLoading = ref(false)
     const emailInput = ref('')
     const passwordInput = ref('')
@@ -106,7 +108,7 @@
       password_confirmation: confirmPasswordInput.value
     })
     alert('Tạo tài khoản thành công')
-    console.log(res.data)
+    router.push('/login')
   } catch (error) {
     const status = error?.response?.status
     const data = error?.response?.data
