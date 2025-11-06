@@ -102,6 +102,9 @@
                 <router-link to="/login" class="px-4 py-2 bg-sky-500 text-white text-sm rounded-full hover:bg-sky-600 transition-colors">
                   Đăng nhập
                 </router-link>
+                <router-link to="/dang-ky" class="px-4 py-2 bg-sky-500 text-white text-sm rounded-full hover:bg-sky-600 transition-colors">
+                  Đăng ký
+                </router-link>
               </div>
 
               <!-- Mobile Menu Button -->

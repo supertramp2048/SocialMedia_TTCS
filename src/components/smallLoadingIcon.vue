@@ -8,11 +8,11 @@
 
 <style scoped>
 .loader {
-  border: 8px solid #f3f3f3;
+  border: 2px solid #f3f3f3;
   border-radius: 50%;
-  border-top: 8px solid #3498db;
-  width: 50px;
-  height: 50px;
+  border-top: 2px solid #3498db;
+  width: 15px;
+  height: 15px;
   -webkit-animation: spin 2s linear infinite; /* Safari */
   animation: spin 2s linear infinite;
 }

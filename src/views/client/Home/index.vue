@@ -274,12 +274,27 @@ watch(() => route.query, (q) => {
 }, { immediate: true })
 
 // Tự reload khi đổi category/page
-watch(() => objPagination.value, () => {
-  clampPage()
-  fetchPosts()
-  fetchExtras()
-}, { deep: true })
+watch(
+  [() => objPagination.value.category, () => objPagination.value.page, () => objPagination.value.sort],
+  ([newCat, newPage, newSort], [oldCat, oldPage, oldSort]) => {
+    let needFetch = false
 
+    if (newCat !== oldCat) {
+      clampPage()         // có thể set lại page
+      fetchExtras()
+      needFetch = true
+    }
+
+    // Nếu page thay đổi do người dùng hoặc do clampPage()
+    if (newPage !== oldPage || newSort != oldSort) {
+      needFetch = true
+    }
+
+    if (needFetch) fetchPosts()
+
+  },
+  { immediate: true } // tải lần đầu
+)
 // --- Bài mới & nổi bật ---
 async function fetchExtras() {
   loading.value = true

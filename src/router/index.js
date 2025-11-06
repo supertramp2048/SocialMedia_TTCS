@@ -13,6 +13,11 @@ const router = createRouter({
       meta: { requiresAuth: true } 
     },
     {
+      path: '/dang-ky',
+      name: 'Đăng ký tài khoản',
+      component: () => import('../views/client/register/index.vue')
+    },
+    {
       path: '/about',
       name: 'about',
       component: () => import('../views/client/about/index.vue'),
@@ -48,15 +53,15 @@ const router = createRouter({
       meta: { requiresAuth: true } 
     }
   ],
-  // scrollBehavior(to, from, savedPosition) {
-  //   // Nếu người dùng bấm Back/Forward thì giữ nguyên vị trí cuộn
-  //   if (savedPosition) {
-  //     return savedPosition
-  //   } else {
-  //     // Khi điều hướng trang mới → cuộn lên đầu
-  //     return { top: 0 }
-  //   }
-  // }
+  scrollBehavior(to, from, savedPosition) {
+    // Nếu người dùng bấm Back/Forward thì giữ nguyên vị trí cuộn
+    if (savedPosition) {
+      return savedPosition
+    } else {
+      // Khi điều hướng trang mới → cuộn lên đầu
+      return { top: 0 }
+    }
+  }
 })
 router.beforeEach(async (to, from, next)=>{
   console.log('Đi từ:', from.fullPath, '-> tới:', to.fullPath)

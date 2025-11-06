@@ -18,7 +18,7 @@
       <div class="flex items-center justify-between mt-3 mb-3">
         <h1 class="text-lg font-bold text-gray-700">{{user?.name}}</h1>
         <button 
-         v-if=" auth.user.id != user?.id "
+         v-if=" auth?.user?.id != user?.id "
          class="p-1" aria-label="Share">
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path
@@ -49,19 +49,25 @@
       <p class="text-sm text-gray-400 mb-4">{{user?.email}}</p>
 
       <!-- Follow Button -->
-      <div v-if=" auth.user.id != user?.id ">
+      <div v-if=" auth?.user?.id != user?.id ">
         <button
-        v-if="user?.is_following == false" 
-        class="w-full py-2 bg-primary-light text-primary text-base rounded-md hover:bg-primary/10 transition-colors mb-6"
+        @click="followHandler"
+        v-if="userData?.is_following == false" 
+        class="w-full py-2 bg-sky-400 text-white text-xl btnEffect rounded-md hover:bg-primary/10 transition-colors mb-6"
       >
-        Theo dõi
+        <p class="flex justify-center items-center">
+          Theo dõi <SmallLoadingIcon class="mx-1" v-if="isLoading"></SmallLoadingIcon>
+        </p>
       </button>
 
        <button
-        v-else-if="user?.is_following == true" 
-        class="w-full py-2 bg-primary-light text-primary text-base rounded-md hover:bg-primary/10 transition-colors mb-6"
+        @click="followHandler"
+        v-else-if="userData?.is_following == true" 
+        class="w-full py-2 bg-sky-400 text-white text-xl btnEffect rounded-md hover:bg-primary/10 transition-colors mb-6"
       >
-        Bỏ Theo dõi
+        <p class="flex justify-center items-center">
+          <i class="fa-solid fa-check pr-1"></i> Đã Theo dõi <SmallLoadingIcon class="mx-1" v-if="isLoading"></SmallLoadingIcon>
+        </p>
       </button>
       </div>
       
@@ -69,11 +75,11 @@
       <!-- Stats -->
       <div class="grid grid-cols-3 gap-4 text-center">
         <div>
-          <p class="text-base font-semibold text-gray-800">{{user?.followers_count}}</p>
+          <p class="text-base font-semibold text-gray-800">{{userData?.followers_count}}</p>
           <p class="text-sm text-gray-800">followers</p>
         </div>
         <div>
-          <p class="text-base font-semibold text-gray-800">{{user?.following_count}}</p>
+          <p class="text-base font-semibold text-gray-800">{{userData?.following_count}}</p>
           <p class="text-sm text-gray-800">following</p>
         </div>
         <div>
@@ -89,12 +95,33 @@
 import { ref, onMounted, watch  } from "vue";
 import {useRoute } from "vue-router"
 import { useAuthStore } from '../stores/auth'
-
+import SmallLoadingIcon from '../components/smallLoadingIcon.vue'
+import api from '../../API/axios'
+const isLoading = ref(false)
 const auth = useAuthStore()
 const route = useRoute()
 const userId = ref(route.params.id)
 const props = defineProps ({
     user: {type:Object, require: true}
 })
+const userData = ref({ ...props.user })
 
+watch(() => props.user, (newVal) => {
+  userData.value = { ...newVal }
+}, { immediate: true })
+
+async function followHandler(){
+  try {
+      isLoading.value = true
+      const res = await api.post(`/api/users/${props.user?.id}/follow`)
+      
+      userData.value.is_following = res.data.is_following
+      userData.value.followers_count = res.data.followers_count
+  } catch (error) {
+    
+  }
+  finally{
+    isLoading.value = false
+  }
+}
 </script>
