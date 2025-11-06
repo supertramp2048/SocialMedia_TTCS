@@ -15,25 +15,7 @@
         <!-- Main -->
         <section class="col-span-12 md:col-span-9">
           <!-- Ảnh bìa -->
-          <div class="relative rounded-md overflow-hidden bg-slate-300 aspect-[16/5]">
-            <div
-              type="button"
-              class="absolute inset-0 flex flex-col items-center justify-center text-white/90 hover:bg-black/10"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 mb-2 opacity-90" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M4 7a3 3 0 0 1 3-3h2l1-1h4l1 1h2a3 3 0 0 1 3 3v10a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3V7z"/>
-                <path d="M12 9a5 5 0 1 0 0 10 5 5 0 0 0 0-10z"/>
-              </svg>
-              <span class="font-medium">Thay đổi ảnh bìa</span>
-            </div>
-            <input
-                type="file"
-                accept="image/*"
-                ref="fileInput"
-                class="hidden"
-                @change="onFilePick"
-            />
-          </div>
+          <ChangeCoverPhoto></ChangeCoverPhoto>
 
           <!-- Avatar + Bio -->
           <div class="mt-8 grid grid-cols-12 gap-6">
@@ -177,12 +159,14 @@
 import { ref, computed, defineComponent, h } from 'vue'
 import Layout from '../../client/layout/layout.vue'
 import Loader from '../../../components/smallLoadingIcon.vue'
+import ChangeCoverPhoto from '../../../components/changeCoverPhoto.vue'
 import api from "../../../../API/axios"
+import { useAuthStore } from '@/stores/auth';
     const isLoading = ref(false) 
     const fileInput = ref(null)
-    const coverPreview = ref('')
+    const auth = useAuthStore()
+    const coverPreview = ref(auth.user.avatar)
     const avatarFile = ref(null)
-
 
     function onFilePick(e) {
     const file = e.target.files?.[0]
@@ -204,6 +188,7 @@ import api from "../../../../API/axios"
             }
         }) 
             console.log(res.data);
+            await auth.fetchUser()
             
         } catch (error) {
             console.error('❌ Upload failed')

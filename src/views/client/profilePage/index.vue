@@ -3,10 +3,12 @@
         <div class="min-h-screen bg-white">
                 <!-- Khung chính -->
                 <div class="max-w-[1280px]  mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="bg-[url('')] bg-cover bg-center bg-no-repeat h-[100px] "
-                    :style="{ backgroundImage: `url(${AuthUser?.data?.avatar})` }"
+                <!-- ảnh bìa của user  -->
+                <div class=" bg-cover bg-center bg-no-repeat w-full h-[200px] "
+                    :style="{ backgroundImage: `url(${AuthUser?.data?.cover_photo_url})` }"
                     > 
                 </div>
+                <!-- end ------------>
                 <div class="relative lg:grid lg:grid-cols-[364px_minmax(0,1fr)] lg:gap-8">
                     <!-- Sidebar hồ sơ -->
                     <aside class="mb-8 lg:mb-0">
