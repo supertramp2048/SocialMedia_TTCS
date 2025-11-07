@@ -97,7 +97,7 @@
           <span class="text-text-muted">·</span>
           <span class="text-base text-text-primary"> {{ post.data?.comments_count }} bình luận</span>
           </div>
-          <button @click="reportPost()" class=" font-bold text-gray-500 px-1  hover:text-red-400">Báo cáo bài viết</button>
+          <button @click="reportPost(post.data?.id)" class=" font-bold text-gray-500 px-1  hover:text-red-400">Báo cáo bài viết</button>
         </div>
 
         <!-- Author Follow Section -->
@@ -336,6 +336,7 @@ function reportPost(idComment){
   showReportPostForm.value = true
   typeOfReport.value = 'comments' 
   idReport.value = idComment
+  console.log();
   
 }
 

@@ -218,7 +218,7 @@ function updatePagination(patch) {
 
 // Hàm lấy bài viết
 async function fetchPosts() {
-  console.log(objPagination.value);
+  console.log("fetch posts");
   
   loading.value = true
   try {
@@ -297,6 +297,8 @@ watch(
 )
 // --- Bài mới & nổi bật ---
 async function fetchExtras() {
+  console.log("fetchExtras");
+  
   loading.value = true
   try {
     const res1 = await api.get(`${apiUrl}/api/posts`, { params: { limit: 1, sort: 'newest', category: objPagination.value.category } })

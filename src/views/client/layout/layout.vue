@@ -203,10 +203,7 @@
     <!-- Main -->
     <main>
 
-        <slot        />
-
-      <!-- Pagination Sticky -->
-      <!-- Pagination Sticky -->
+        <slot/>
 
     </main>
 

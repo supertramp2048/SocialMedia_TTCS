@@ -16,7 +16,7 @@
       >
         <h3 class="text-lg font-semibold mb-4">Báo cáo bài viết</h3>
 
-        <form @submit.prevent="submitReport">
+        <form @submit.prevent="submitReport()">
           <div class="space-y-3">
             <label class="block text-sm">
               Lý do
@@ -65,6 +65,8 @@ function close() {
 }
 
 async function submitReport() {
+  console.log("submit form báo cáo");
+  
   if (!props.id){
     alert(`thiếu Id của ${props.type}`)
     return

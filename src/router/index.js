@@ -70,13 +70,14 @@ const router = createRouter({
   }
 })
 router.beforeEach(async (to, from, next)=>{
-  console.log('Đi từ:', from.fullPath, '-> tới:', to.fullPath)
+  console.log("fetchUser");
+  
   if (to.meta.requiresAuth){
   let token = Cookies.get('token')  
   if(token){
     const auth = useAuthStore()
     let res = await auth.fetchUser()
-    console.log(res);
+    console.log(res?.data);
   }
 }
   next()

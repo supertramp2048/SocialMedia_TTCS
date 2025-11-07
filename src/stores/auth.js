@@ -25,15 +25,22 @@ export const useAuthStore = defineStore('auth', {
             this.user = null,
             this.token = null,
             Cookies.remove('token')
-            localStorage.removeItem('user')
-            
+            localStorage.clear()
         },
         async fetchUser(){
             try {
                 const res = await api.get('/api/user')
                 //this.user = res.data.user
+                localStorage.setItem('userId', res.data.id)
+                localStorage.setItem('userName', res.data.name)
+                localStorage.setItem('userEmail', res.data.email)
+                localStorage.setItem('userAvatar', res.data.avatar)
+                localStorage.setItem('userCoverPhotoUrl', res.data.cover_photo_url)
+                localStorage.setItem('userCreatedAt', res.data.created_at)
+                localStorage.setItem('userUpdatedAt', res.data.updated_at)
                 this.user = res.data
             } catch (error) {
+                console.log(error);
                 
             }
         }
