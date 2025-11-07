@@ -1,27 +1,26 @@
 <template>
   <!-- Sample Comment -->
   <div v-for="comment in replies" :key="comment.id" class="flex gap-3 mb-6">
-    <img
-      :src="comment?.author?.avatar"
-      alt="Commenter"
-      class="w-12 h-12 rounded-full border border-border-light"
-    />
+    <div class="w-12 h-12 flex-shrink-0"></div>
     <div class="flex-1">
-      <div class="flex items-center gap-2 mb-1">
-        <a href="#" class="font-bold text-sm text-text-primary">
-          {{ comment?.author?.name }}
-        </a>
-        <span class="text-[13px] text-text-secondary text-opacity-75">
-          {{ new Date(comment?.updated_at || comment?.created_at).toLocaleDateString('vi-VN') }}
-        </span>
+      <div class="flex justify-between items-center gap-2 mb-1">
+        <!-- userDiv -->
+
+        <UserDivComment
+        :authorId ="post.data?.author?.id"
+        :user="comment?.author"
+        :date="new Date(comment?.updated_at || comment?.created_at)"
+        :content="comment?.content"
+        class="flex-1"
+        ></UserDivComment>
+        <button @click="reportPost(comment?.id) "
+            class="font-bold text-gray-400 hover:text-red-500"
+            >Báo cáo bình luận
+        </button>
       </div>
 
-      <p class="text-sm text-text-primary leading-relaxed mb-4">
-        {{ comment?.content }}
-      </p>
-
       <div class="items-center gap-3 text-text-secondary text-opacity-75">
-        <div class="flex">
+        <div class="flex ml-[68px]">
           <!-- viet binh luan -->
           <button
             v-if="user"
@@ -111,7 +110,7 @@
         <!-- end fix comment form -->
       </div>
 
-      <div>
+      <div class="ml-[68px]">
         <button
           v-if="comment?.replies_count > 0"
           @click="toggle(comment?.id)"
@@ -129,6 +128,11 @@
       />
     </div>
   </div>
+  <ReportModal
+      v-model="showReportPostForm"
+      :id="idReport"
+      :type="typeOfReport"
+    />
   <!-- end sample comment -->
 </template>
 
@@ -137,6 +141,19 @@ import { ref, watch } from "vue"
 import api from "../../API/axios"
 import { useAuthStore } from '@/stores/auth'
 import { storeToRefs } from 'pinia'
+import UserDivComment from '../components/userDivComment.vue'
+import ReportModal from '../components/reportForm.vue' 
+// module báo cáo bình luận con
+const showReportPostForm = ref(false)
+const typeOfReport = ref('')
+const idReport = ref('')
+function reportPost(idComment){
+  showReportPostForm.value = true
+  typeOfReport.value = 'comments' 
+  idReport.value = idComment
+
+  
+}
 
 const props = defineProps({
   parent_id: { type: [Number, String], required: true },

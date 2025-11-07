@@ -9,9 +9,9 @@
                 class="w-14 h-14 rounded-full"
                 loading="lazy"
             />
-        <div>
-            <span class="font-bold text-sm text-text-primary block">{{ props.user?.name }}</span>
-            <span v-if="data != null" class="text-[13px] text-text-muted"> {{ new Date(props.date).toLocaleDateString('vi-VN') }} </span>
+        <div class="flex justify-center items-center">
+            <span class="font-bold text-sm text-text-primary block mr-2">{{ props.user?.name }}</span>
+            <span v-if="props.date != null" class="text-[13px] text-text-muted"> {{ new Date(props.date).toLocaleDateString('vi-VN') }} </span>
         </div>
     </button>
 </template>
@@ -19,7 +19,6 @@
     import {useRoute, useRouter} from 'vue-router'
     const props = defineProps({
         user: {type: Object, require: true},
-        objPagination: {type: Object, require: true},
         date: {type: Date, require: true}
     })
     const route = useRoute()

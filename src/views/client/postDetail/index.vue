@@ -169,24 +169,24 @@
           <div v-else class="border-b border-border-lighter pb-6 mb-6">
             <p class="text-xl font-bold">Hãy đăng nhập để bình luận</p>
           </div>
-          <!-- Sample Comment -->
+          <!--các comment cha với parent id = null Sample Comment -->
           <div v-for="comment in post.data?.comments" :key=comment.id class="flex gap-3 mb-6">
-            <img 
-              :src="comment?.author?.avatar" 
-              alt="Commenter" 
-              class="w-12 h-12 rounded-full border border-border-light"
-            />
             <div class="flex-1">
-              <div class="flex items-center gap-2 mb-1">
-                <a href="#" class="font-bold text-sm text-text-primary">{{comment?.author?.name}}</a>
-                <span class="text-[13px] text-text-secondary text-opacity-75">{{ new Date(comment?.updated_at || comment?.created_at).toLocaleDateString('vi-VN') }}</span>
+              <div class="flex justify-between items-center gap-2 mb-1">
+                <UserDivComment
+                :authorId ="post.data?.author?.id"
+                :user="comment?.author"
+                :date="new Date(comment?.updated_at || comment?.created_at)"
+                :content="comment?.content"
+                ></UserDivComment>
+                <button @click="reportPost(comment?.id) "
+                    class="font-bold text-gray-400 hover:text-red-500"
+                    >Báo cáo bình luận
+                </button>
               </div>
-              <p class="text-sm text-text-primary leading-relaxed mb-4">
-                {{comment?.content}}
-              </p>
-
+            
               <div class="items-center gap-3 text-text-secondary text-opacity-75">
-            <div class="flex">
+            <div class="flex ml-[68px]">
               <!-- viet binh luan -->
               <button
               v-if="user"
@@ -276,7 +276,7 @@
             </form>
             <!-- end fix comment form -->
           </div>
-                  <div>
+                  <div class="ml-[68px]">
                     <button 
                     @click="toggle(comment?.id)" 
                     v-if="comment?.replies_count > 0" 
@@ -321,13 +321,23 @@ import SmallLoadingIcon from '../../../components/smallLoadingIcon.vue'
 // cac child component
 import ChildComments from '../../../components/childComments.vue'
 import SuggestedPost from '../../../components/suggestedPost.vue'
+import UserDivComment from '../../../components/userDivComment.vue'
 import UserDiv from '../../../components/userDiv.vue'
 // loader cho trang
 import { globalLoading } from '../../../../API/axios'
 import loader from '../../../components/loader.vue'
+// module bao cao binh luan cha
 
+// module báo cáo bình luận con
+const showReportPostForm = ref(false)
 const typeOfReport = ref('')
 const idReport = ref('')
+function reportPost(idComment){
+  showReportPostForm.value = true
+  typeOfReport.value = 'comments' 
+  idReport.value = idComment
+  
+}
 
 const replies = ref([])    
 const postSuggested = ref([])    
@@ -335,7 +345,7 @@ const route = useRoute()
 const apiUrl = import.meta.env.VITE_API_BASE
 const loading = ref(false)
 const isLoading = ref(false)
-const showReportPostForm = ref(false)
+
 // dưới các const khác
 const reloadKey = ref({}) // { [commentId]: number }
 
@@ -343,15 +353,6 @@ const auth = useAuthStore()
 const {user} = storeToRefs(auth)
 // hien form bao cao
 
-function reportPost(){
-  showReportPostForm.value = true
-  typeOfReport.value = 'posts' 
-  idReport.value = post?.value?.data.id
-  console.log("type ",typeOfReport.value,);
-  
-  console.log("bool ",showReportPostForm.value,"id ",idReport.value);
-  
-}
 
 // hien form reply
 const showReply = ref([])
@@ -644,8 +645,7 @@ onMounted( async ()=>{
       const postId = Number(route.query.id)
       const res = await api.get(`${apiUrl}/api/posts/${postId}`)
       post.value = res.data
-      console.log("post ", post.value);
-      
+    
       const res1 = await api.get(`${apiUrl}/api/posts`, { params: { limit: 5, sort: 'hot', category: post.value.data.category?.id } })
       postSuggested.value = res1.data.data.filter(item => item.id !== post.value.id)
   } catch (error) {
@@ -657,7 +657,6 @@ async function followHandler(){
   try {
       isLoading.value = true
       const res = await api.post(`/api/users/${post.value?.data?.author?.id}/follow`)
-      console.log('post.value structure:', post.value)
 
         if (post.value?.data) {
           post.value.data = { ...post.value.data, is_following_author: res.data.is_following }
