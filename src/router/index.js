@@ -13,6 +13,12 @@ const router = createRouter({
       meta: { requiresAuth: true } 
     },
     {
+      path: '/bai-dang/viet-bai',
+      name: 'Viết bài đăng',
+      component: () => import('../views/client/createNewArticale/index.vue'),
+      meta: { requiresAuth: true } 
+    },
+    {
       path: '/dang-ky',
       name: 'Đăng ký tài khoản',
       component: () => import('../views/client/register/index.vue')

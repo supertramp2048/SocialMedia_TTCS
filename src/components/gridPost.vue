@@ -62,7 +62,8 @@
           <img
             :src="article.thumbnail_url"
             :alt="article.title"
-            class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+            class="h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+            :class="displayMode == 'grid' ? 'w-full' : 'w-[250px]'"
           />
         </div>
 

@@ -29,9 +29,11 @@
             <div class="flex items-center gap-4">
               <button @click="showFormSearch = !showFormSearch" class="bg-sky-300 px-4 py-2 btnEffect rounded-2xl "> <i class="fa-solid fa-magnifying-glass"> </i> Tìm kiếm</button>
               <div class="flex items-center gap-4" v-if="auth.user">
-                <button class="btnEffect border border-gray-400 px-4 py-2 rounded-2xl"> 
+                <router-link
+                to='/bai-dang/viet-bai'
+                 class="btnEffect border border-gray-400 px-4 py-2 rounded-2xl"> 
                   <i class="fa-solid fa-feather"></i> Viết bài 
-                  </button>
+                  </router-link>
                 <div class="relative flex">
                     <button @click="showUserMenu = !showUserMenu ">
                       <img :src="auth.user.avatar" class="w-[50px] h-[50px] rounded-full" alt="">

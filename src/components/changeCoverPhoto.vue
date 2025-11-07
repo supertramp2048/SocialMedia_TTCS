@@ -56,7 +56,7 @@
                transition"
         type="submit"
       >
-        Change
+        Lưu thay đổi
       </button>
 
       <!-- Trạng thái chưa có ảnh: nền pattern nhẹ (không ảnh hưởng logic) -->
