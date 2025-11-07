@@ -226,6 +226,8 @@ import api from "../../../../API/axios"
 import { globalLoading } from '../../../../API/axios'
 import loader from '../../../components/loader.vue'
 import SearchForm from '../../../components/searchForm.vue'
+// lay tat ca cac bien tu localStorage
+
 //-------------
 const showFormSearch = ref(false)
 const auth = useAuthStore()

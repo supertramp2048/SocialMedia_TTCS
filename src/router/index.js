@@ -70,14 +70,13 @@ const router = createRouter({
   }
 })
 router.beforeEach(async (to, from, next)=>{
-  console.log("fetchUser");
+  console.log("lấy user từ local");
   
   if (to.meta.requiresAuth){
   let token = Cookies.get('token')  
   if(token){
     const auth = useAuthStore()
-    let res = await auth.fetchUser()
-    console.log(res?.data);
+    auth.getUserFromLocal()
   }
 }
   next()
