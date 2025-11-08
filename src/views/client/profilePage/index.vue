@@ -14,7 +14,7 @@
                     <aside class="mb-8 lg:mb-0">
                     <div class="lg:sticky lg:top-24">
                         <div class="bg-gray-50 rounded-2xl shadow-sm">
-                        <UserProfile :user="AuthUser?.data" />
+                        <UserProfile :user="AuthUser?.data" @ShowForm="handleShowForm" />
                         </div>
                     </div>
                     </aside>
@@ -70,6 +70,11 @@
                 </div>
             </div>
     </Layout>
+    <ReportModal
+      v-model="showReportPostForm"
+      :id="idReport"
+      :type="typeOfReport"
+    />
 </template>
 <script setup lang="js">
     import Layout from '../layout/layout.vue'
@@ -77,9 +82,11 @@
     import GridPost from '../../../components/gridPostForProfilePage.vue'
     import {ref, onMounted, watch} from 'vue'
     import api from "../../../../API/axios"
+    import ReportModal from '../../../components/reportForm.vue' 
     import { useAuthStore } from '../../../stores/auth'
     import { useRoute, useRouter} from 'vue-router'
     // Demo data — thay bằng API thật của bạn
+const showReportPostForm = ref(false)
 const posts = ref([])
 const auth = useAuthStore()
 const AuthUser = ref()
@@ -89,6 +96,13 @@ const limitPage = ref()
 const objPagination = ref(route.query)
 const sort = ref('hot')
 let UserId = null
+const idReport = ref('')
+const typeOfReport = ref('')
+function handleShowForm(value){
+    showReportPostForm.value = value
+    idReport.value = route.query.user_id
+    typeOfReport.value = 'users'
+}
 watch(
     () => sort.value,
     (newVal) => {

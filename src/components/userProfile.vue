@@ -28,7 +28,12 @@
           </svg>
         </button>
         <!-- more option -->
-        <button class="p-1 ml-auto" aria-label="More options">
+        <div class="relative" ref="menuRef">
+        <button 
+          v-if="auth?.user?.id != user?.id "
+          @click.stop="showOption = !showOption "
+          
+          class="p-1 ml-auto" aria-label="More options">
           <svg width="4" height="16" viewBox="0 0 4 16" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path
               d="M2 4C0.89543 4 -4.82823e-08 3.10457 0 2C4.82823e-08 0.89543 0.895431 -4.82823e-08 2 0C3.10457 4.82823e-08 4 0.895431 4 2C4 3.10457 3.10457 4 2 4Z"
@@ -44,6 +49,14 @@
             />
           </svg>
         </button>
+
+        <button
+        v-if="showOption"
+          @click.prevent.stop="toggle"
+         class="btnEffect absolute -bottom-[60px] rounded-xl w-[100px] right-1/4 sm:-right-1/2 z-50 px-2 py-1 bg-gray-300">
+          <i class="fa-regular fa-flag"></i> Báo cáo người dùng
+        </button>
+        </div>
       </div>
 
       <p class="text-sm text-gray-400 mb-4">{{user?.email}}</p>
@@ -92,15 +105,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch  } from "vue";
+import { ref, onMounted, watch, onBeforeUnmount  } from "vue";
 import {useRoute } from "vue-router"
 import { useAuthStore } from '../stores/auth'
 import SmallLoadingIcon from '../components/smallLoadingIcon.vue'
 import api from '../../API/axios'
+const showOption = ref(false)
 const isLoading = ref(false)
 const auth = useAuthStore()
 const route = useRoute()
-const userId = ref(route.params.id)
+
 const props = defineProps ({
     user: {type:Object, require: true}
 })
@@ -124,4 +138,29 @@ async function followHandler(){
     isLoading.value = false
   }
 }
+
+const menuRef = ref(null)
+
+function handleClickOutside(e) {
+  if (menuRef.value && !menuRef.value.contains(e.target)) {
+    showOption.value = false
+  }
+}
+
+onMounted(() => {
+  console.log("auth",auth.user.id);
+
+  
+  document.addEventListener('click', handleClickOutside)
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('click', handleClickOutside)
+})
+
+const emit = defineEmits(['ShowForm']) 
+function toggle(){
+  emit('ShowForm', true)
+}
+
 </script>

@@ -14,7 +14,11 @@
         class="relative z-[1000] w-full max-w-md bg-white rounded-2xl shadow-xl p-5"
         @click.stop
       >
-        <h3 class="text-lg font-semibold mb-4">Báo cáo bài viết</h3>
+        <h3 class="text-lg font-semibold mb-4">Báo cáo 
+          <span v-if="props.type=='posts'">Bài viết</span>
+          <span v-else-if="props.type=='comments'">Bình luận</span>
+          <span v-else-if="props.type=='users'">Người dùng</span>
+        </h3>
 
         <form @submit.prevent="submitReport()">
           <div class="space-y-3">
@@ -59,7 +63,7 @@ const emit = defineEmits(['update:modelValue'])
 
 const reason = ref('')
 const loading = ref(false)
-
+const serverMsg = ref('')  
 function close() {
   emit('update:modelValue', false)
 }
@@ -75,19 +79,35 @@ async function submitReport() {
     alert('Hãy nhập lý do báo cáo')
     return 
   } 
-
+  const payload = { reason: reason.value.trim() } 
   try {
     loading.value = true
     const res = await api.post(`/api/${props.type}/${props.id}/report`, { reason: reason.value })
-    if(res.status == 422){
-      alert('Báo cáo phải có độ dài lớn hơn 10 ký tự')
-      return
-    }
+    serverMsg.value = res.data?.message 
     reason.value = ''
     alert('gửi báo cáo thành công') // thông báo cho cha
     close()
-  } catch (errors) {
-    alert(errors ? Object.values(errors).flat()?.[0] : e?.response?.data?.message || 'Báo cáo phải có ít nhất 10 ký tự')
+  } catch (err) {
+    const status = err?.response?.status
+    const data = err?.response?.data
+
+    if (status === 422) {
+      alert(err.message)
+      // Có 2 khả năng:
+      // 1) Lỗi validate: sẽ có data.errors.reason
+      // 2) Tự báo cáo: message 'Bạn không thể báo cáo chính mình.'
+      if (data?.errors) {
+        errors.value = data.errors
+      } else if (data?.message) {
+        serverMsg.value = data.message
+      }
+    } else if (status === 409) {
+      serverMsg.value = data?.message || 'Bạn đã báo cáo người dùng này rồi.'
+      alert('Bạn đã báo cáo người dùng hoặc bài viết này rồi.')
+    } else {
+      serverMsg.value = 'Có lỗi xảy ra. Vui lòng thử lại.'
+      console.error(err)
+    }
   } finally {
     loading.value = false
   }
