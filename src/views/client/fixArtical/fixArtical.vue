@@ -36,7 +36,7 @@
       
       <!-- Div trigger để chọn file -->
       <div
-        @click="fileInputEl?.click()"
+        @click.prevent.stop="openThumbDialog"
         class="relative h-[200px] rounded-lg border-2 border-dashed cursor-pointer transition-all overflow-hidden"
         :class="coverPreview 
           ? 'border-sky-500 hover:border-sky-600' 
@@ -53,13 +53,10 @@
         </div>
 
         <div v-if="coverPreview" class="absolute flex text-amber-50 inset-0 opacity-0 hover:opacity-100 hover:bg-black/50  items-center justify-center transition-all">
-          
-            Click để thay đổi
-
+          Click để thay đổi
         </div>
       </div>
 
-      
       <!-- Nút xóa ảnh (hiện khi đã có preview) -->
       <div v-if="coverPreview" class="mt-2">
         <button 
@@ -71,6 +68,61 @@
         </button>
       </div>
     </label>
+
+    <!-- Dialog chọn phương thức -->
+    <div v-if="showThumbDialog" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50" @click.self="closeThumbDialog">
+      <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4 p-6">
+        <h3 class="text-lg font-semibold mb-4">Chọn cách nhập ảnh bìa</h3>
+        
+        <!-- Chọn phương thức -->
+        <div v-if="!thumbMode" class="space-y-3">
+          <button
+            @click="thumbMode = 'url'"
+            class="w-full px-4 py-3 border-2 border-sky-500 text-sky-600 rounded-lg hover:bg-sky-50 transition-colors font-medium"
+          >
+            📎 Dán URL ảnh
+          </button>
+          <button
+            @click="selectLocalFile"
+            class="w-full px-4 py-3 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+          >
+            📁 Chọn từ máy
+          </button>
+          <button
+            @click="closeThumbDialog"
+            class="w-full px-4 py-2 text-gray-500 hover:text-gray-700 transition-colors"
+          >
+            Hủy
+          </button>
+        </div>
+
+        <!-- Nhập URL -->
+        <div v-if="thumbMode === 'url'" class="space-y-3">
+          <input
+            v-model.trim="tempUrlInput"
+            type="url"
+            placeholder="https://example.com/image.jpg"
+            class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-sky-500"
+            @keyup.enter="confirmUrlInput"
+          />
+          <div class="flex gap-2">
+            <button
+              @click="confirmUrlInput"
+              :disabled="!isValidUrl(tempUrlInput)"
+              class="flex-1 px-4 py-2 bg-sky-600 text-white rounded hover:bg-sky-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              Xác nhận
+            </button>
+            <button
+              @click="thumbMode = null; tempUrlInput = ''"
+              class="px-4 py-2 border rounded hover:bg-gray-50 transition-colors"
+            >
+              Quay lại
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- TinyMCE Editor -->
     <Editor 
@@ -87,7 +139,7 @@
         @click="updateArticle"
       >
         <span v-if="!loading">Cập nhật bài viết</span>
-        <span v-else>Đang đăng ({{ progress.current }}/{{ progress.total }})…</span>
+        <span v-else>Đang cập nhật ({{ progress.current }}/{{ progress.total }})…</span>
       </button>
 
       <button class="px-4 py-2 rounded border" @click="console.log(content)" type="button">
@@ -102,24 +154,19 @@ import { ref, computed, onBeforeUnmount, onMounted } from 'vue'
 import Editor from '@tinymce/tinymce-vue'
 import api from '../../../../API/axios'
 import { useCategoryStore } from '../../../stores/categories'
-import {useRoute} from 'vue-router'
+import { useRoute } from 'vue-router'
+
 /* ====== QUAN TRỌNG: Import TinyMCE ĐÚNG THỨ TỰ ====== */
-// 1. Import core TRƯỚC TIÊN
 import tinymce from 'tinymce/tinymce'
 
-// 2. CẤU HÌNH base_url NGAY SAU KHI import core (TRƯỚC KHI import bất kỳ plugin nào)
-// Vite sẽ serve /public/tinymce thành /tinymce
 if (typeof window !== 'undefined') {
-  // Set base_url globally trước khi load bất cứ thứ gì
   tinymce.baseURL = '/tinymce'
 }
 
-// 3. SAU ĐÓ mới import theme, icons, models
 import 'tinymce/icons/default'
 import 'tinymce/themes/silver'
 import 'tinymce/models/dom'
 
-// 4. CUỐI CÙNG import plugins
 import 'tinymce/plugins/advlist'
 import 'tinymce/plugins/autolink'
 import 'tinymce/plugins/lists'
@@ -154,9 +201,67 @@ const route = useRoute()
 const apiUrl = import.meta.env.VITE_API_BASE
 const post = ref()
 const postId = ref(null)
-/* ====== ẢNH BÌA ====== */
+
+/* ====== ẢNH BÌA - Thêm state cho dialog ====== */
 const coverFile = ref(null)
 const coverPreview = ref('')
+const fileInputEl = ref(null)
+
+// State cho dialog chọn phương thức
+const showThumbDialog = ref(false)
+const thumbMode = ref(null)
+const thumbnailUrlManual = ref('')
+const tempUrlInput = ref('')
+
+// Mở dialog chọn phương thức
+function openThumbDialog() {
+  showThumbDialog.value = true
+  thumbMode.value = null
+  tempUrlInput.value = ''
+}
+
+// Đóng dialog
+function closeThumbDialog() {
+  showThumbDialog.value = false
+  thumbMode.value = null
+  tempUrlInput.value = ''
+}
+
+// Kiểm tra URL hợp lệ
+function isValidUrl(url) {
+  return url && (url.startsWith('http://') || url.startsWith('https://'))
+}
+
+// Xác nhận nhập URL
+function confirmUrlInput() {
+  if (!isValidUrl(tempUrlInput.value)) {
+    alert('Vui lòng nhập URL hợp lệ (bắt đầu bằng http:// hoặc https://)')
+    return
+  }
+  
+  // Reset coverFile nếu đang có
+  if (coverFile.value) {
+    coverFile.value = null
+  }
+  if (coverPreview.value && coverPreview.value.startsWith('blob:')) {
+    URL.revokeObjectURL(coverPreview.value)
+  }
+  
+  // Set URL manual và preview
+  thumbnailUrlManual.value = tempUrlInput.value
+  coverPreview.value = tempUrlInput.value
+  
+  closeThumbDialog()
+}
+
+// Chọn file từ máy
+function selectLocalFile() {
+  closeThumbDialog()
+  // Reset URL manual nếu đang có
+  thumbnailUrlManual.value = ''
+  // Trigger input file
+  fileInputEl.value?.click()
+}
 
 function onCoverChange(e) {
   const f = e.target.files?.[0]
@@ -172,36 +277,45 @@ function onCoverChange(e) {
     e.target.value = ''
     return
   }
+  
+  // Reset URL manual nếu đang có
+  thumbnailUrlManual.value = ''
+  
   coverFile.value = f
-  if (coverPreview.value) URL.revokeObjectURL(coverPreview.value)
+  if (coverPreview.value && coverPreview.value.startsWith('blob:')) {
+    URL.revokeObjectURL(coverPreview.value)
+  }
   coverPreview.value = URL.createObjectURL(f)
 }
 
 function removeCover() {
+  // Reset tất cả
   coverFile.value = null
-  if (coverPreview.value) {
+  thumbnailUrlManual.value = ''
+  
+  if (coverPreview.value && coverPreview.value.startsWith('blob:')) {
     URL.revokeObjectURL(coverPreview.value)
-    coverPreview.value = ''
+  }
+  coverPreview.value = ''
+  
+  if (fileInputEl.value) {
+    fileInputEl.value.value = ''
   }
 }
 
 onBeforeUnmount(() => {
-  if (coverPreview.value) URL.revokeObjectURL(coverPreview.value)
+  if (coverPreview.value && coverPreview.value.startsWith('blob:')) {
+    URL.revokeObjectURL(coverPreview.value)
+  }
 })
 
 /* ====== TinyMCE config (SELF-HOST với GPL license) ====== */
 const editorInit = {
-  // ⭐ QUAN TRỌNG NHẤT: Khai báo license GPL (miễn phí, self-host)
   license_key: 'gpl',
-  
-  // Base URL cho self-host (backup, đã set trong tinymce.baseURL ở trên)
   base_url: '/tinymce',
   suffix: '.min',
-  
-  // Skin paths (tùy chọn, nhưng nên set rõ ràng)
   skin_url: '/tinymce/skins/ui/oxide',
   content_css: '/tinymce/skins/content/default/content.min.css',
-  
   height: 460,
   menubar: false,
   paste_data_images: true,
@@ -217,11 +331,8 @@ const editorInit = {
     'alignleft aligncenter alignright alignjustify | ' +
     'bullist numlist outdent indent | link image | removeformat | code',
   
-  // Tắt các feature cloud/premium
   promotion: false,
   branding: false,
-  
-  // File picker cho ảnh local
   automatic_uploads: false,
   file_picker_types: 'image',
   file_picker_callback: async (cb, _value, meta) => {
@@ -244,7 +355,7 @@ const editorInit = {
   },
 }
 
-/* ====== Cloudinary upload helpers (giữ nguyên) ====== */
+/* ====== Cloudinary upload helpers ====== */
 async function uploadToCloudinary(file) {
   if (!CLOUD_NAME || !UPLOAD_PRESET) {
     throw new Error('Thiếu VITE_CLOUD_NAME hoặc VITE_UPLOAD_PRESET trong .env')
@@ -294,7 +405,7 @@ async function replaceInlineImagesWithCloudinary(html) {
   return doc.body.innerHTML
 }
 
-/* ====== update ====== */
+/* ====== Update với logic ưu tiên thumbnailUrlManual ====== */
 async function updateArticle() {
   if (!title.value) return alert('Vui lòng nhập tiêu đề.')
   if (!selectedCategoryId.value) return alert('Vui lòng chọn danh mục.')
@@ -305,15 +416,21 @@ async function updateArticle() {
 
     const finalHtml = await replaceInlineImagesWithCloudinary(content.value)
 
-    if (coverFile.value) {
-      thumbnailUrl.value = await uploadToCloudinary(coverFile.value)
+    let finalThumbnailUrl = thumbnailUrl.value
+    
+    // Ưu tiên URL manual trước
+    if (thumbnailUrlManual.value) {
+      finalThumbnailUrl = thumbnailUrlManual.value
+    } else if (coverFile.value) {
+      // Nếu không có URL manual, mới upload file
+      finalThumbnailUrl = await uploadToCloudinary(coverFile.value)
     }
 
     const payload = {
       title: title.value,
       content_html: finalHtml,
       category_id: Number(selectedCategoryId.value),
-      thumbnail_url: thumbnailUrl.value,
+      thumbnail_url: finalThumbnailUrl,
     }
 
     await api.put(`/api/posts/${postId.value}`, payload)
@@ -322,15 +439,15 @@ async function updateArticle() {
     console.log('status:', error?.response?.status)
     console.log('data:', error?.response?.data)
     console.log('errors:', error?.response?.data?.errors)
-    alert('Đăng thất bại: ' + (error?.response?.data?.message || error?.message || 'Validation error'))
+    alert('Cập nhật thất bại: ' + (error?.response?.data?.message || error?.message || 'Validation error'))
   } finally {
     loading.value = false
   }
 }
 
-onMounted(async () =>{
+onMounted(async () => {
   const id = route.query.postId ? Number(route.query.postId) : null
-  console.log("id ben put" , id);
+  console.log("id ben put", id)
   
   if (!id) return 
   postId.value = id
@@ -347,8 +464,5 @@ onMounted(async () =>{
     console.error('❌ Lỗi khi tải bài viết:', error)
     alert("Đã xảy ra lỗi")
   }
-  
 })
-
-
 </script>
