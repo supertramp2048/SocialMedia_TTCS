@@ -336,7 +336,7 @@ function reportPost(idComment){
   showReportPostForm.value = true
   typeOfReport.value = 'comments' 
   idReport.value = idComment
-  console.log();
+
   
 }
 

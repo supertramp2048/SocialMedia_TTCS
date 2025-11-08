@@ -2,12 +2,12 @@
   <div class="space-y-4">
     <!-- Tiêu đề -->
     <label class="block">
-      <span class="block text-sm font-medium text-gray-700 mb-1">Title</span>
+      <span class="block text-sm font-medium text-gray-700 mb-1">Tiêu đề</span>
       <input
         v-model.trim="title"
         type="text"
         class="w-full text-2xl font-bold px-3 py-2 border rounded focus:outline-none focus:ring focus:ring-sky-200"
-        placeholder="Enter article title"
+        placeholder="Nhập tiêu đề bài viết"
       />
     </label>
 
@@ -37,7 +37,7 @@
       <!-- Div trigger để chọn file -->
       <div
         @click="fileInputEl?.click()"
-        class="relative h-[200px] rounded-lg border-2 border-dashed cursor-pointer transition-all overflow-hidden"
+        class="relative h-[200px] m-auto w-full md:w-[900px] rounded-lg border-2 border-dashed cursor-pointer transition-all overflow-hidden"
         :class="coverPreview 
           ? 'border-sky-500 hover:border-sky-600' 
           : 'border-gray-300 hover:border-sky-400 hover:bg-gray-50'"
@@ -71,7 +71,7 @@
         </button>
       </div>
     </label>
-
+    <p class="font-bold">Nội dung bài viết</p>
     <!-- TinyMCE Editor -->
     <Editor 
       v-model="content" 

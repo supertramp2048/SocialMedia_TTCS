@@ -19,6 +19,12 @@ const router = createRouter({
       meta: { requiresAuth: true } 
     },
     {
+      path: '/bai-dang/sua-bai',
+      name: 'Sửa bài đăng',
+      component: () => import('../views/client/fixArtical/index.vue'),
+      meta: { requiresAuth: true } 
+    },
+    {
       path: '/dang-ky',
       name: 'Đăng ký tài khoản',
       component: () => import('../views/client/register/index.vue')
@@ -77,6 +83,7 @@ router.beforeEach(async (to, from, next)=>{
   if(token){
     const auth = useAuthStore()
     auth.getUserFromLocal()
+   
   }
 }
   next()

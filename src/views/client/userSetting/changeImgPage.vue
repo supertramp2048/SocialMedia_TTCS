@@ -119,7 +119,7 @@ import { useAuthStore } from '@/stores/auth';
     async function changeAvatar(){
         const fd = new FormData()
 
-        fd.append('file', avatarFile.value)
+        fd.append('avatar', avatarFile.value)
         try {
             isLoading.value = true
             console.log('form data', fd);
@@ -129,9 +129,20 @@ import { useAuthStore } from '@/stores/auth';
                 'Content-Type': 'multipart/form-data'
             }
         }) 
-            console.log(res.data);
-            await auth.fetchUser()
-            
+            const data = res?.data?.data || res?.data || {}
+            const newUrl = data.avatar || null
+            if (newUrl) {
+            // Cập nhật store
+            auth.user = { ...(auth.user || {}), avatar: newUrl }
+
+            // Cập nhật localStorage (nếu bạn đang lưu user ở đó)
+            const raw = localStorage.getItem('user')
+            if (raw) {
+              const u = JSON.parse(raw)
+              u.avatar = newUrl
+              localStorage.setItem('user', JSON.stringify(u))
+            }
+          }  
         } catch (error) {
             console.error('❌ Upload failed')
             console.error('Status:', error.response?.status)
@@ -147,7 +158,6 @@ import { useAuthStore } from '@/stores/auth';
         finally{
             isLoading.value = false
         }
-       
     }
 </script>
 <style scoped>

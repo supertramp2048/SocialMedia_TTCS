@@ -68,60 +68,96 @@
     </div>
   </form>
 </template>
-
 <script setup lang='js'>
+
 import Loader from '../components/smallLoadingIcon.vue'
 import api from "../../API/axios"
 import { useAuthStore } from '@/stores/auth';
-import { ref, computed, defineComponent, h } from 'vue'
+import { ref, onMounted } from 'vue'
+
 const isLoading = ref(false) 
-    const fileInput = ref(null)
-    const auth = useAuthStore()
-    const coverPhotoPreview = ref(auth.user.cover_photo_url)
-    const CoverPhotoFile = ref(null)
+const fileInput = ref(null)
+const auth = useAuthStore()
 
-    function onFilePick(e) {
-    const file = e.target.files?.[0]
-    if (!file) return
-    coverPhotoPreview.value = URL.createObjectURL(file)
-    CoverPhotoFile.value = file
-    }
-    async function changeCoverPhoto(){
-        const fd = new FormData()
+// Lấy URL ban đầu từ user (nếu có)
+const coverPhotoPreview = ref(auth?.user?.cover_photo_url || null)
+const CoverPhotoFile = ref(null)
+let lastObjectUrl = null
 
-        fd.append('cover_photo', CoverPhotoFile.value)
-        try {
-            isLoading.value = true
-            console.log('form data', fd);
-            
-            const res = await api.post('/api/user/cover-photo',fd,{
-            headers: { 
-                'Content-Type': 'multipart/form-data'
-            }
-        }) 
-            console.log(res.data);
-            await auth.fetchUser()
-            
-        } catch (error) {
-            console.error('❌ Upload failed')
-            console.error('Status:', error.response?.status)
-            console.error('Data:', error.response?.data)
-            console.error('Errors:', error.response?.data?.errors)
-        
-        // Hiển thị lỗi cụ thể
-        const errorMsg = error.response?.data?.message || 
-                        error.response?.data?.errors?.avatar?.[0] ||
-                        'Upload thất bại'
-        alert(errorMsg)
-        }
-        finally{
-            isLoading.value = false
-        }
-       
+function onFilePick(e) {
+  const file = e.target.files?.[0]
+  if (!file) return
+
+  // thu hồi URL cũ (nếu có) để tránh rò rỉ
+  if (lastObjectUrl) URL.revokeObjectURL(lastObjectUrl)
+
+  const previewUrl = URL.createObjectURL(file)
+  lastObjectUrl = previewUrl
+
+  coverPhotoPreview.value = previewUrl
+  CoverPhotoFile.value = file
+}
+
+async function changeCoverPhoto(){
+  // 1) Chặn submit nếu chưa chọn file
+  if (!CoverPhotoFile.value) {
+    alert('Vui lòng chọn ảnh bìa trước khi lưu')
+    return
+  }
+
+  const fd = new FormData()
+  // 2) ĐÚNG tên field theo backend
+  fd.append('cover', CoverPhotoFile.value)
+
+  try {
+    isLoading.value = true
+
+    const res = await api.post('/api/user/cover-photo', fd, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    })
+
+    // 3) Cập nhật lại auth/localStorage từ response
+    // Tùy UserResource của bạn, thử lấy theo 2 dạng phổ biến:
+    const data = res?.data?.data || res?.data || {}
+    const newUrl = data.cover_photo_url || data.cover || data.avatar || null
+
+    if (newUrl) {
+      // Cập nhật store
+      auth.user = { ...(auth.user || {}), cover_photo_url: newUrl }
+
+      // Cập nhật localStorage (nếu bạn đang lưu user ở đó)
+      const raw = localStorage.getItem('user')
+      if (raw) {
+        const u = JSON.parse(raw)
+        u.cover_photo_url = newUrl
+        localStorage.setItem('user', JSON.stringify(u))
+      }
+
+      // Cập nhật preview sang URL thật từ Cloudinary (tránh 404)
+      coverPhotoPreview.value = newUrl
     }
+
+    alert('Cập nhật ảnh bìa thành công!')
+
+  } catch (error) {
+    console.error('❌ Upload failed')
+    console.error('Status:', error.response?.status)
+    console.error('Data:', error.response?.data)
+    console.error('Errors:', error.response?.data?.errors)
+
+    // 4) Đọc đúng key lỗi `cover` (không phải `avatar`)
+    const errorMsg =
+      error.response?.data?.message ||
+      error.response?.data?.errors?.cover?.[0] ||
+      'Upload thất bại'
+    alert(errorMsg)
+
+  } finally {
+    isLoading.value = false
+  }
+}
 
 </script>
-
 <style scoped>
 /* Pattern chấm nhỏ nhã nhặn khi chưa có ảnh xem trước */
 .pattern-dots-sm {

@@ -74,7 +74,7 @@
 <script setup lang="js">
     import Layout from '../layout/layout.vue'
     import UserProfile from '../../../components/userProfile.vue'
-    import GridPost from '../../../components/gridPost.vue'
+    import GridPost from '../../../components/gridPostForProfilePage.vue'
     import {ref, onMounted, watch} from 'vue'
     import api from "../../../../API/axios"
     import { useAuthStore } from '../../../stores/auth'

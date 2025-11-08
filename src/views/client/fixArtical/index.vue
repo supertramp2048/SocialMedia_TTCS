@@ -1,6 +1,8 @@
 <template>
     <layout>
-        <FixArtical></FixArtical>
+        <FixArtical
+        
+        ></FixArtical>
     </layout>
 </template>
 <script setup lan='js'>

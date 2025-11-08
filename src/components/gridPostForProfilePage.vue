@@ -58,6 +58,14 @@
         class="group cursor-pointer"
         :class="displayMode === 'col' ? ['flex','flex-col','sm:flex-row'] : ''"
       >
+        <div>
+          <button
+          @click.prevent.stop="goToFixArticalPage(article.id)"
+           class="border btnEffect border-transparent text-sky-500 bg-gray-200 rounded-xl px-2 py-1 m-1">Sửa</button>
+          <button 
+          @click.prevent.stop="deleteArtical()"
+          class="border btnEffect border-transparent text-red-500 bg-gray-200 rounded-xl px-2 py-1 m-1">Xóa</button>
+        </div>
         <div class="mb-3 mr-3 rounded-lg overflow-hidden">
           <img
             :src="article.thumbnail_url"
@@ -135,7 +143,7 @@ watch(
   },
   { immediate: true }
 )
-
+// di den trang chi dinh
 function updatePagination(sort) {
   sortSetting.value = sort
   router.replace({
@@ -145,9 +153,16 @@ function updatePagination(sort) {
     }
   })
 }
+// go to update artical page
+function goToFixArticalPage(id){
+    router.push({
+        path:'/bai-dang/sua-bai',
+        query:{postId: id}
+    })
+  }
+function deleteArtical(id){
+    console.log('delete artical');
+    
+}
 
-onMounted(() => {
-  console.log('posts:', props.posts)
-  console.log('pageLimit:', props.pageLimit)
-})
 </script>

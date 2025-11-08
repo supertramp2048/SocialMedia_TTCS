@@ -78,12 +78,16 @@ async function submitReport() {
 
   try {
     loading.value = true
-    await api.post(`/api/${props.type}/${props.id}/report`, { reason: reason.value })
+    const res = await api.post(`/api/${props.type}/${props.id}/report`, { reason: reason.value })
+    if(res.status == 422){
+      alert('Báo cáo phải có độ dài lớn hơn 10 ký tự')
+      return
+    }
     reason.value = ''
     alert('gửi báo cáo thành công') // thông báo cho cha
     close()
-  } catch (e) {
-    alert(errors ? Object.values(errors).flat()?.[0] : e?.response?.data?.message || 'Gửi báo cáo thất bại')
+  } catch (errors) {
+    alert(errors ? Object.values(errors).flat()?.[0] : e?.response?.data?.message || 'Báo cáo phải có ít nhất 10 ký tự')
   } finally {
     loading.value = false
   }
