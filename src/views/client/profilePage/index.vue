@@ -59,6 +59,7 @@
                         <GridPost
                             :posts="posts"
                             :pageLimit="limitPage"
+                            @update-posts="updatePosts"
                         />
                         </div>
                         <div v-else>
@@ -157,4 +158,10 @@ onMounted(async () => {
   
   
 })
+
+function updatePosts(newVal){
+    console.log('📦 Received from child:', newVal)
+    posts.value = { ...newVal }
+    limitPage.value = Math.ceil(newVal.meta.total / objPagination.value.limit)
+}
 </script>

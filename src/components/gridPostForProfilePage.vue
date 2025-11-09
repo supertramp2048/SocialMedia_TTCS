@@ -63,7 +63,7 @@
           @click.prevent.stop="goToFixArticalPage(article.id)"
            class="border btnEffect border-transparent text-sky-500 bg-gray-200 rounded-xl px-2 py-1 m-1">Sửa</button>
           <button 
-          @click.prevent.stop="deleteArtical()"
+          @click.prevent.stop="deleteArtical(article.id)"
           class="border btnEffect border-transparent text-red-500 bg-gray-200 rounded-xl px-2 py-1 m-1">Xóa</button>
         </div>
         <div class="mb-3 mr-3 rounded-lg overflow-hidden">
@@ -119,11 +119,11 @@ import SmallUserDiv from '../components/smallUserDiv.vue'
 import { ref, watch, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import Pagination from '../components/pagination.vue'
-
+import api from '../../API/axios.js'
+const emit = defineEmits(['update-posts'])
 const sortSetting = ref('hot')
 const route = useRoute()
 const router = useRouter()
-
 const props = defineProps({
   posts: { type: Object, required: true },
   pageLimit: { type: Number, required: true }
@@ -160,9 +160,39 @@ function goToFixArticalPage(id){
         query:{postId: id}
     })
   }
-function deleteArtical(id){
-    console.log('delete artical');
-    
+  let statusDelete = ref('')
+async function deleteArtical(id){
+    let decision = confirm("Bạn có chắc muốn xóa bài viết này ?")
+  if(decision == true){
+    try {
+      const res = await api.delete(`/api/posts/${id}`)
+      statusDelete.value = res.status
+      if(res.status == 204){
+        alert("Xóa thành công")
+      }
+      const newPosts = props.posts.data.filter(p => p.id !== id)
+      emit('update-posts', {
+        data: newPosts,
+        meta: {
+          ...props.posts.meta,
+          total: props.posts.meta.total - 1
+        }
+    })
+    } catch (error) {
+      if(statusDelete.value == 401){
+         alert("Bạn chưa đăng nhập")
+         return
+      }
+      else if(statusDelete.value == 403){
+        alert("Token không phải của chủ sở hữu")
+        return
+      }
+      else if(statusDelete.value == 404){
+        alert("post id không tồn tại")
+        return
+      }
+    }
+  }
 }
 
 </script>
