@@ -1,52 +1,182 @@
 <template>
-    <Layout>
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
-          <div class="max-w-7xl flex mx-auto px-1 sm:px-2 lg:px-3 py-3 md:py-3 justify-center">
-            <h1 class="text-3xl font-bold">
-            Kết quả tìm kiếm cho: <span class="font-bold italic" > "{{search_content}}"</span> 
-            </h1>
+  <Layout>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+      <!-- Header tìm kiếm -->
+      <div class="max-w-7xl flex flex-col mx-auto px-1 sm:px-2 lg:px-3 py-3 md:py-3 justify-center">
+        <h1 class="text-3xl mb-2 font-bold">
+          Kết quả tìm kiếm cho: 
+          <span class="font-bold italic">"{{ search_content }}"</span> 
+        </h1>
+
+        <!-- Tab switcher -->
+        <div class="w-full border border-gray-400">
+          <div class="flex leading-[50px] justify-center">
+            <button 
+              @click="optionSearch = 'posts'"
+              :class="optionSearch == 'posts' ? 'border-b-sky-400 text-black' : 'border-b-transparent text-gray-400'"
+              class="mx-2 flex-1 text-xl font-bold btnEffect text-center border-b-4"
+            >
+              Post
+            </button>
+            <button 
+              @click="optionSearch = 'users'"
+              :class="optionSearch == 'users' ? 'border-b-sky-400 text-black' : 'border-b-transparent text-gray-400'"
+              class="mx-2 flex-1 text-xl font-bold btnEffect text-center border-b-4"
+            >
+              User
+            </button>
           </div>
-          <GridPost :posts="searchResult" :pageLimit="page_limit"></GridPost>
         </div>
-    </Layout>
+      </div>
+
+      <!-- Loading state -->
+      <div v-if="loading" class="flex justify-center items-center py-12">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-sky-500"></div>
+      </div>
+
+      <!-- Nội dung kết quả -->
+      <div v-else>
+        <!-- Hiển thị Posts -->
+        <div v-if="optionSearch === 'posts'">
+          <GridPost 
+            v-if="searchResult?.data?.length > 0"
+            :posts="searchResult" 
+            :pageLimit="page_limit"
+          />
+          <div v-else class="py-12">
+            <p class="text-center text-gray-500 italic text-lg">
+              Không tìm thấy bài viết nào.
+            </p>
+          </div>
+        </div>
+
+        <!-- Hiển thị Users -->
+        <div v-else-if="optionSearch === 'users'">
+          <UserList 
+            v-if="searchResult?.data?.length > 0"
+            :users="searchResult.data"
+          />
+          <div v-else class="py-12">
+            <p class="text-center text-gray-500 italic text-lg">
+              Không tìm thấy người dùng nào.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </Layout>
 </template>
+
 <script setup lang="js">
-    import Layout from '../layout/layout.vue'
-    import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
-    import { useRoute, useRouter } from 'vue-router'
-    import api from "../../../../API/axios"
-    import { globalLoading } from '../../../../API/axios'
-    import loader from '../../../components/loader.vue'
-    import GridPost from '../../../components/gridPost.vue'
-    const route = useRoute()
-    const apiUrl = import.meta.env.VITE_API_BASE
-    const loading = ref(false)
-    const searchResult = ref([])
-    const search_content = ref(route.query.q)
-    const page_limit = ref()
-    watch(
-  () => route.query,               // theo dõi toàn bộ query object
-  async (newQuery) => {
-    if (!newQuery || !newQuery.q) return // nếu không có ?q= thì bỏ qua
+import Layout from '../layout/layout.vue'
+import { ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
+import api from "../../../../API/axios"
+import GridPost from '../../../components/gridPost.vue'
+import UserList from '../../../components/UserList.vue'
 
-    search_content.value = newQuery.q.trim()
+// Refs
+const optionSearch = ref('posts')
+const route = useRoute()
+const apiUrl = import.meta.env.VITE_API_BASE
+const loading = ref(false)
+const searchResult = ref({ data: [], meta: { total: 0 } })
+const search_content = ref('')
+const page_limit = ref(1)
 
-    try {
-      const res = await api.get(`${apiUrl}/api/posts`, {
-        params: newQuery           // truyền toàn bộ query params lên server
-      })
-      searchResult.value = res.data
-      page_limit.value = Math.ceil(res.data.meta?.total / route.query.limit)
-      console.log('Kết quả:', searchResult.value)
-      console.log('limit page ', page_limit.value);
-      
-    } catch (error) {
-      console.error('Lỗi khi tìm kiếm:', error)
+// ✅ Hàm fetch dữ liệu dựa trên loại tìm kiếm
+async function fetchSearchResults() {
+  // Kiểm tra query
+  if (!route.query.q) {
+    console.warn('Không có query tìm kiếm')
+    return
+  }
+
+  search_content.value = route.query.q.trim()
+  loading.value = true
+
+  try {
+    // Xác định endpoint dựa trên optionSearch
+    const endpoint = optionSearch.value === 'posts' 
+      ? `/api/posts` 
+      : `/api/users/search`
+
+    console.log(`🔍 Đang tìm kiếm ${optionSearch.value}:`, search_content.value)
+
+    // Gọi API với query params
+    const res = await api.get(endpoint, {
+      params: route.query
+    })
+
+    // Cập nhật kết quả
+    searchResult.value = res.data
+    
+    // Tính số trang (chỉ cho posts)
+    if (optionSearch.value === 'posts' && res.data.meta) {
+      const limit = parseInt(route.query.limit) || 10
+      page_limit.value = Math.ceil(res.data.meta.total / limit)
+    }
+
+    console.log('✅ Kết quả:', {
+      type: optionSearch.value,
+      count: res.data.data?.length || 0,
+      total: res.data.meta?.total
+    })
+
+  } catch (error) {
+    console.error('❌ Lỗi khi tìm kiếm:', error)
+    
+    // Reset kết quả nếu lỗi
+    searchResult.value = { data: [], meta: { total: 0 } }
+    
+    // Hiển thị thông báo lỗi nếu cần
+    if (error.response?.status === 404) {
+      console.log('Không tìm thấy kết quả')
+    }
+  } finally {
+    loading.value = false
+  }
+}
+
+// ✅ Watch để refetch khi đổi tab hoặc query thay đổi
+watch(
+  [optionSearch, () => route.query],
+  async ([newOption, newQuery]) => {
+    console.log('🔄 Thay đổi phát hiện:', { 
+      option: newOption, 
+      query: newQuery?.q 
+    })
+    
+    // Chỉ fetch nếu có query search
+    if (newQuery?.q) {
+      await fetchSearchResults()
     }
   },
-  { immediate: true, deep: true }  // deep để bắt thay đổi trong object route.query
+  { 
+    immediate: true,  // Fetch ngay khi component mount
+    deep: true        // Bắt thay đổi sâu trong route.query
+  }
 )
-
-
-
 </script>
+
+<style scoped>
+/* Animation cho nút tab */
+.btnEffect {
+  transition: all 0.3s ease;
+}
+
+.btnEffect:hover {
+  transform: translateY(-2px);
+}
+
+/* Loading spinner animation */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+</style>
