@@ -24,7 +24,7 @@
 
           <!-- 2 mục Sap xep -->
           <button
-            v-if="props.posts?.data?.length > 4"
+            v-if="props.pageLimit != null"
             type="button"
             class="px-3 py-2 text-sm text-gray-700 hover:text-sky-700 hover:bg-sky-50 rounded-md transition-colors"
             @click="updatePagination('newest')"
@@ -34,7 +34,7 @@
           </button>
 
           <button
-            v-if="props.posts?.data?.length > 4"
+            v-if="props.pageLimit != null"
             type="button"
             class="px-3 py-2 text-sm text-gray-700 hover:text-sky-700 hover:bg-sky-50 rounded-md transition-colors"
             @click="updatePagination('hot')"

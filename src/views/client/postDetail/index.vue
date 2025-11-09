@@ -137,7 +137,7 @@
         <!-- Author Follow Section -->
         <div class="flex items-center gap-4 mb-8">
           <UserDiv :user="post.data?.author" :date="null"  ></UserDiv>
-          <div v-if="post.data?.author?.id != auth.user.id ">
+          <div v-if="post?.data?.author?.id != auth?.user?.id ">
             <button 
               @click="followHandler"
               v-if="post?.data?.is_following_author == false " 
@@ -254,7 +254,7 @@
                   </button>
                   
                   <button
-                    v-if="user && Number(comment?.author?.id) === Number(user.id)"
+                    v-if="user && Number(comment?.author?.id) === Number(user?.id)"
                     class="text-[13px] font-bold p-[5px] rounded-2xl hover:bg-sky-300"
                     @click="fixComment(comment?.id, comment?.content, comment?.parent_id)"
                   >
@@ -262,7 +262,7 @@
                   </button>
                   
                   <button
-                    v-if="user && Number(comment?.author?.id) === Number(user.id)"
+                    v-if="user && Number(comment?.author?.id) === Number(user?.id)"
                     class="text-[13px] font-bold p-[5px] rounded-2xl hover:bg-sky-300"
                     @click="deleteComment(comment?.id, comment?.parent_id)"
                   >

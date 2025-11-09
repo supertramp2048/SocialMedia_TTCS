@@ -69,47 +69,131 @@ function close() {
 }
 
 async function submitReport() {
-  console.log("submit form báo cáo");
+  console.log("=== BẮT ĐẦU SUBMIT FORM BÁO CÁO ===");
   
-  if (!props.id){
-    alert(`thiếu Id của ${props.type}`)
-    return
+  // Validation
+  if (!props.id) {
+    alert(`Thiếu Id của ${props.type}`);
+    return;
   }
-  if (!reason.value?.trim()){
-    alert('Hãy nhập lý do báo cáo')
-    return 
-  } 
-  const payload = { reason: reason.value.trim() } 
+  
+  if (!reason.value?.trim()) {
+    alert('Hãy nhập lý do báo cáo');
+    return;
+  }
+  
+  const payload = { reason: reason.value.trim() };
+  
   try {
-    loading.value = true
-    const res = await api.post(`/api/${props.type}/${props.id}/report`, { reason: reason.value })
-    serverMsg.value = res.data?.message 
-    reason.value = ''
-    alert('gửi báo cáo thành công') // thông báo cho cha
-    close()
+    loading.value = true;
+    console.log("Đang gửi request:", payload);
+    
+    const res = await api.post(`/api/${props.type}/${props.id}/report`, payload);
+    
+    console.log("✅ Response thành công:", res.data);
+    serverMsg.value = res.data?.message || 'Báo cáo đã được gửi';
+    reason.value = '';
+    alert('Gửi báo cáo thành công! ✓');
+    close();
+    
   } catch (err) {
-    const status = err?.response?.status
-    const data = err?.response?.data
-
-    if (status === 422) {
-      alert(err.message)
-      // Có 2 khả năng:
-      // 1) Lỗi validate: sẽ có data.errors.reason
-      // 2) Tự báo cáo: message 'Bạn không thể báo cáo chính mình.'
-      if (data?.errors) {
-        errors.value = data.errors
-      } else if (data?.message) {
-        serverMsg.value = data.message
+    console.error("❌ LỖI XẢY RA:", err);
+    console.log("Error response:", err.response);
+    console.log("Error status:", err.response?.status);
+    console.log("Error data:", err.response?.data);
+    
+    // Biến để lưu thông báo sẽ hiển thị
+    let userMessage = '';
+    
+    // CASE 1: Có phản hồi từ server (err.response tồn tại)
+    if (err.response) {
+      const status = err.response.status;
+      const data = err.response.data;
+      
+      switch (status) {
+        case 422: // Validation error
+          userMessage = 'Dữ liệu không hợp lệ. Vui lòng kiểm tra lại.';
+          
+          if (data?.errors) {
+            errors.value = data.errors;
+            // Lấy lỗi đầu tiên để hiển thị
+            const firstError = Object.values(data.errors)[0];
+            if (firstError && firstError[0]) {
+              userMessage = firstError[0];
+            }
+          } else if (data?.message) {
+            userMessage = data.message;
+          }
+          
+          serverMsg.value = userMessage;
+          break;
+          
+        case 409: // Conflict - Đã báo cáo rồi
+          userMessage = data?.message || 'Bạn đã báo cáo người dùng hoặc bài viết này rồi.';
+          serverMsg.value = userMessage;
+          break;
+          
+        case 401: // Unauthorized
+          userMessage = 'Bạn cần đăng nhập để thực hiện chức năng này.';
+          serverMsg.value = userMessage;
+          break;
+          
+        case 403: // Forbidden
+          userMessage = 'Bạn không có quyền thực hiện hành động này.';
+          serverMsg.value = userMessage;
+          break;
+          
+        case 404: // Not found
+          userMessage = `Không tìm thấy ${props.type} này.`;
+          serverMsg.value = userMessage;
+          break;
+          
+        case 429: // Too many requests
+          userMessage = 'Bạn đã gửi quá nhiều yêu cầu. Vui lòng thử lại sau.';
+          serverMsg.value = userMessage;
+          break;
+          
+        case 500: // Server error
+        case 502:
+        case 503:
+        case 504:
+          userMessage = 'Máy chủ đang gặp sự cố. Vui lòng thử lại sau.';
+          serverMsg.value = userMessage;
+          break;
+          
+        default:
+          userMessage = data?.message || `Có lỗi xảy ra (Mã lỗi: ${status}). Vui lòng thử lại.`;
+          serverMsg.value = userMessage;
       }
-    } else if (status === 409) {
-      serverMsg.value = data?.message || 'Bạn đã báo cáo người dùng này rồi.'
-      alert('Bạn đã báo cáo người dùng hoặc bài viết này rồi.')
-    } else {
-      serverMsg.value = 'Có lỗi xảy ra. Vui lòng thử lại.'
-      console.error(err)
+      
+    } 
+    // CASE 2: Lỗi mạng/CORS (không có err.response)
+    else if (err.request) {
+      // Request được gửi nhưng không nhận được phản hồi
+      console.error("Không nhận được phản hồi từ server:", err.request);
+      userMessage = 'Không thể kết nối tới máy chủ. Vui lòng kiểm tra kết nối mạng.';
+      serverMsg.value = userMessage;
+    } 
+    // CASE 3: Lỗi khác (setup request, timeout, etc.)
+    else {
+      console.error("Lỗi khi thiết lập request:", err.message);
+      userMessage = 'Có lỗi xảy ra khi gửi báo cáo. Vui lòng thử lại.';
+      serverMsg.value = userMessage;
     }
+    
+    // ⚠️ QUAN TRỌNG: Luôn hiển thị alert cho mọi trường hợp lỗi
+    alert(userMessage);
+    
+    // Log chi tiết để debug
+    console.group("📋 Chi tiết lỗi");
+    console.log("Message hiển thị:", userMessage);
+    console.log("Server message:", serverMsg.value);
+    console.log("Full error:", err);
+    console.groupEnd();
+    
   } finally {
-    loading.value = false
+    loading.value = false;
+    console.log("=== KẾT THÚC SUBMIT ===");
   }
 }
 </script>

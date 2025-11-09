@@ -18,11 +18,11 @@
                 <span class="text-xl font-bold text-gray-900">spiderum</span>
               </router-link>
 
-              <nav class="hidden md:flex items-center gap-6">
+              <!-- <nav class="hidden md:flex items-center gap-6">
                 <a href="#" class="text-sm text-gray-600 hover:text-gray-900">Vườn Học</a>
                 <a href="#" class="text-sm text-gray-600 hover:text-gray-900">Nghiên Cứu</a>
                 <a href="#" class="text-sm text-gray-600 hover:text-gray-900">Cộng đồng</a>
-              </nav>
+              </nav> -->
             </div>
 
             <!-- Right -->
@@ -100,7 +100,6 @@
               </div>
 
               <div class="flex items-center gap-4" v-else>
-                <button class="hidden md:block text-sm text-gray-600 hover:text-gray-900">Đăng ký</button>
                 <router-link to="/login" class="px-4 py-2 bg-sky-500 text-white text-sm rounded-full hover:bg-sky-600 transition-colors">
                   Đăng nhập
                 </router-link>
@@ -110,25 +109,22 @@
               </div>
 
               <!-- Mobile Menu Button -->
-              <button @click="showMobileMenu = !showMobileMenu" class="md:hidden p-2" aria-label="Toggle menu">
+              <!-- <button @click="showMobileMenu = !showMobileMenu" class="md:hidden p-2" aria-label="Toggle menu">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
                 </svg>
-              </button>
+              </button> -->
             </div>
           </div>
         </div>
 
         <!-- Mobile Menu -->
-        <div v-if="showMobileMenu" class="md:hidden border-t border-gray-200">
+        <!-- <div v-if="showMobileMenu" class="md:hidden border-t border-gray-200">
           <div class="px-4 py-3 space-y-3">
-            <a href="#" class="block text-sm text-gray-600 hover:text-gray-900">Vườn Học</a>
-            <a href="#" class="block text-sm text-gray-600 hover:text-gray-900">Nghiên Cứu</a>
-            <a href="#" class="block text-sm text-gray-600 hover:text-gray-900">Cộng đồng</a>
-            <a href="#" class="block text-sm text-gray-600 hover:text-gray-900">Liên hệ</a>
-            <a href="#" class="block text-sm text-gray-600 hover:text-gray-900">Đăng ký</a>
+            <button class="block text-sm text-gray-600 hover:text-gray-900">Liên hệ</button>
+            <button class="block text-sm text-gray-600 hover:text-gray-900">Đăng ký</button>
           </div>
-        </div>
+        </div> -->
         </div>
         <!-- serch form -->
         <div v-else>
