@@ -47,6 +47,7 @@ export const useAuthStore = defineStore('auth', {
         // },
         getUserFromLocal() {
             const raw = localStorage.getItem('user')
+            
             if (!raw) {
                 this.user = null
                 return null

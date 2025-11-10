@@ -80,12 +80,11 @@
               :user="article?.author"
               :date="null"
             />
-            <span>{{ article.comments_count }} Bình luận</span>
-            <span class="flex items-center gap-1">
-              <svg
-                v-if="article?.user_vote == 1"
+            <span class="text-[15px]">{{ article.comments_count }} Bình luận</span>
+            <span class="flex items-center gap-1 text-[15px]">
+              <!-- <svg
                 class="w-4 h-4"
-                :class="{ 'text-red-500': article.user_vote == 1 }"
+                :class=" article.user_vote == 1 ? 'text-red-500' : 'text-gray-500' "
                 fill="currentColor"
                 viewBox="0 0 20 20"
               >
@@ -94,8 +93,12 @@
                   d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
                   clip-rule="evenodd"
                 />
-              </svg>
+              </svg> -->
               {{ article?.vote_score > 0 ? article?.vote_score : 0 }}
+              <i 
+              class="fa-regular fa-circle-up text-xl"
+              :class=" article.user_vote == 1 ? 'text-blue-500' : 'text-gray-500' "
+              ></i>
             </span>
           </div>
         </div>

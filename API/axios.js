@@ -9,7 +9,6 @@ const api = axios.create({
 // Gắn token cho mọi request
 api.interceptors.request.use(config => {
   const token = Cookies.get('token');
-  console.log('token ben axios', token);
     
   if (token) config.headers.Authorization = `Bearer ${token}`
 

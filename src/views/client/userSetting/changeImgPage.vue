@@ -99,7 +99,7 @@
         </section>
 </template>
 <script setup lang="js">
-import { ref, computed, defineComponent, h } from 'vue'
+import { ref, computed, onMounted, defineComponent, h } from 'vue'
 import Loader from '../../../components/smallLoadingIcon.vue'
 import ChangeCoverPhoto from '../../../components/changeCoverPhoto.vue'
 import api from "../../../../API/axios"
@@ -109,7 +109,9 @@ import { useAuthStore } from '@/stores/auth';
     const auth = useAuthStore()
     const coverPreview = ref(auth.user.avatar)
     const avatarFile = ref(null)
-
+    onMounted(() => {
+      console.log(auth.user);
+    })
     function onFilePick(e) {
     const file = e.target.files?.[0]
     if (!file) return

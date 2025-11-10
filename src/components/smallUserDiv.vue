@@ -6,12 +6,12 @@
         <img
                 :src="props.user?.avatar "
                 alt="avatar"
-                class="w-5 h-5 rounded-full"
+                class="w-[40px] h-[40px] rounded-full"
                 loading="lazy"
             />
         <div>
-            <span class="hover:underline text-sm text-text-primary block">{{ props.user?.name }}</span>
-            <span v-if="data != null" class="text-sm text-text-muted"> {{ new Date(props.date).toLocaleDateString('vi-VN') }} </span>
+            <span class="hover:underline text-lg font-medium text-text-primary block">{{ props.user?.name }}</span>
+            <span v-if="data != null" class="text-lg text-text-muted"> {{ new Date(props.date).toLocaleDateString('vi-VN') }} </span>
         </div>
     </button>
 </template>

@@ -20,6 +20,7 @@
 
         <!-- Main -->
         <ChangeImgPage v-if="active == 'account'"></ChangeImgPage>
+        <ChangePassword v-if="active == 'changePassword'"></ChangePassword>
       </div>
     </div>
   </Layout>
@@ -30,6 +31,7 @@
 <script setup lang="js">
   import Layout from '../../client/layout/layout.vue'
   import ChangeImgPage from "../userSetting/changeImgPage.vue"
+  import ChangePassword from "../userSetting/changePassword.vue"
   import {ref} from "vue"
   const active = ref('account')
 </script>

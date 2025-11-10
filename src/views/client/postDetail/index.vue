@@ -30,32 +30,9 @@
         <!-- Article Body -->
         <article class="prose prose-lg max-w-none" v-html="post.data?.content_html">
         </article>
-        <!-- Tags -->
-        <div class="flex gap-3 mt-8 mb-6">
-          <a href="#" class="px-2.5 py-2 rounded bg-black bg-opacity-5 text-xs uppercase text-text-primary">
-            Góc_nhìn_thời_sự
-          </a>
-          <a href="#" class="px-2.5 py-2 rounded bg-black bg-opacity-5 text-xs uppercase text-text-primary">
-            Thinking_Out_Loud
-          </a>
-        </div>
-
-        <!-- Newsletter Signup -->
-        <div class="w-full h-[200px] bg-[#002E75] rounded mb-8 flex items-center justify-center p-4">
-          <div class="max-w-[400px] w-full">
-            <input 
-              type="email" 
-              placeholder="Your Email" 
-              class="w-full px-4 py-2.5 rounded border border-[#EAE9E9] mb-5 text-sm"
-            />
-            <button class="w-full px-4 py-3 rounded bg-[#078CC0] text-white text-sm font-normal">
-              ĐĂNG KÝ!
-            </button>
-          </div>
-        </div>
-
+        
         <!-- upvote downvote report bài viết  -->
-        <div class="flex justify-between border-b border-border-lighter mb-6">
+        <div class=" mt-3 flex justify-between border-b border-border-lighter mb-6">
           <div class="flex items-center gap-4 py-6 ">
           <div class="flex items-center gap-2">
             <!-- nút upvote -->
@@ -212,6 +189,7 @@
                 <!-- Menu báo cáo cho comment -->
                 <div class="relative" :ref="el => commentMenuRefs[comment.id] = el">
                   <button 
+                    v-if="auth?.user?.id != comment?.author?.id "
                     @click.stop="toggleCommentMenu(comment.id)"
                     :aria-expanded="openMenuCommentId === comment.id"
                     aria-haspopup="menu"

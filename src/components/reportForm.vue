@@ -115,7 +115,7 @@ async function submitReport() {
           userMessage = 'Dữ liệu không hợp lệ. Vui lòng kiểm tra lại.';
           
           if (data?.errors) {
-            errors.value = data.errors;
+            err.value = data.errors;
             // Lấy lỗi đầu tiên để hiển thị
             const firstError = Object.values(data.errors)[0];
             if (firstError && firstError[0]) {

@@ -1,7 +1,7 @@
 <template>
   <!-- Section wrapper -->
   <section 
-    class="max-w-[875px] mx-auto px-4 sm:px-6 mb-20 sm:mb-24"
+    class=" max-w-[875px] mx-auto px-0 sm:px-6 mb-20 sm:mb-24"
     aria-labelledby="featured-posts-heading"
   >
 
@@ -56,7 +56,7 @@
         <!-- Track -->
         <div 
           ref="track" 
-          class="flex gap-4 sm:gap-6 p-6 sm:p-8 min-w-max"
+          class="flex gap-4 sm:gap-6 p-0 sm:p-8 "
         >
           <!-- Empty state -->
           <div 
@@ -73,7 +73,7 @@
             :key="post.id"
             class="
               card-post
-              w-64 sm:w-72 flex-shrink-0 snap-start
+              w-full sm:w-72 flex-shrink-0 snap-start
               group/card
               block
               rounded-2xl
@@ -147,7 +147,7 @@
               </h3>
 
               <!-- Tác giả -->
-              <p 
+              <!-- <p 
                 class="
                   text-xs font-medium
                   text-gray-600
@@ -156,7 +156,8 @@
               >
                 <i class="fa-solid fa-user text-[10px]"></i>
                 <span class="line-clamp-1">{{ post.author?.name || 'Không rõ tác giả' }}</span>
-              </p>
+              </p> -->
+              <SmallUserDiv :user="post.author"></SmallUserDiv>
             </div>
           </router-link>
         </div>
@@ -222,7 +223,7 @@
 
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount, watch, nextTick } from 'vue'
-
+import SmallUserDiv from "../components/smallUserDiv.vue"
 const props = defineProps({
   posts: { type: Array, default: () => [] },
   minCardWidth: { type: Number, default: 256 },

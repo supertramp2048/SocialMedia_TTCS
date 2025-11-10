@@ -23,27 +23,48 @@
         @keydown.right.prevent="goNext"
       >
         <div ref="track" class="flex gap-6 p-8 min-w-max">
+          <!-- CHỈ CẦN CHỈNH KHỐI CARD -->
           <router-link
             v-for="post in postsForRender"
             :key="post.id"
-            class="w-64 flex-shrink-0 snap-start"
-            :to="{ path: '/bai-dang/', query: { id:post.id } }"
+            :to="{ path: '/bai-dang/', query: { id: post.id } }"
+            class="w-64 p-1 flex-shrink-0 snap-start
+                  rounded border border-border-lighter bg-white
+                  hover:shadow transition-shadow
+                  flex flex-col h-full self-stretch"
           >
-            <img
-              :src="post.thumbnail_url"
-              :alt="post.title || 'Related Article'"
-              class="w-full h-40 object-cover rounded mb-4"
-            />
-            <p class="text-xs uppercase text-text-primary mb-2">
-              {{ post.category?.name || 'Danh mục' }}
-            </p>
-            <h3 class="text-base font-bold font-montserrat text-text-primary leading-6 mb-2 line-clamp-2">
-              {{ post.title || 'Không có tiêu đề' }}
-            </h3>
-            <p class="text-xs font-semibold text-text-primary">
-              {{ post.author?.name || 'Không rõ tác giả' }}
-            </p>
+            <!-- Thumbnail đồng nhất -->
+            <div class="w-full aspect-[16/10] overflow-hidden rounded mb-4">
+              <img
+                :src="post.thumbnail_url"
+                :alt="post.title || 'Related Article'"
+                class="w-full h-full object-cover"
+              />
+            </div>
+
+            <!-- Body: dàn cột để đẩy user xuống đáy -->
+            <div class="flex flex-col h-full">
+              <!-- Category -->
+              <p class="text-xs uppercase text-text-primary mb-2">
+                {{ post.category?.name || 'Danh mục' }}
+              </p>
+
+              <!-- Title: 3 dòng cố định chiều cao -->
+              <h3
+                class="text-base font-bold font-montserrat text-text-primary
+                      leading-6 line-clamp-3 mb-3
+                      min-h-[4.5rem]"
+              >
+                {{ post.title || 'Không có tiêu đề' }}
+              </h3>
+
+              <!-- User: luôn chạm đáy card -->
+              <div class="mt-auto">
+                <SmallUserDiv :user="post.author" />
+              </div>
+            </div>
           </router-link>
+
         </div>
       </div>
 
@@ -75,7 +96,7 @@
 <script setup>
 import { ref, computed, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import api from '../../API/axios'
-
+import SmallUserDiv from "../components/smallUserDiv.vue"
 /**
  * Props:
  * - categoryId: danh mục để lấy bài gợi ý
