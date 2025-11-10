@@ -1,5 +1,4 @@
 <template>
-  <loader :show="globalLoading" />
   <div class="min-h-screen bg-white">
     <!-- Header & Category bar (giữ nguyên phần của bạn) -->
     <!-- Header -->
@@ -218,9 +217,6 @@ import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '../../../stores/auth'
 import { useCategoryStore } from '../../../stores/categories'
 import api from "../../../../API/axios"
-// loader cho trang
-import { globalLoading } from '../../../../API/axios'
-import loader from '../../../components/loader.vue'
 import SearchForm from '../../../components/searchForm.vue'
 // lay tat ca cac bien tu localStorage
 

@@ -37,13 +37,18 @@
                             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg 
                                     focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5" required>
                     </div>
-                    <button type="submit"
+                    <button
+                        type="submit"
                         :disabled="loading"
-                        class="w-full text-white btnEffect bg-gray-300 hover:bg-primary-700 focus:ring-4 
+                        :aria-busy="loading"
+                        class="w-full relative flex items-center justify-center gap-2 text-white btnEffect bg-gray-300 hover:bg-primary-700 focus:ring-4 
                                 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm 
-                                px-5 py-2.5 text-center">
-                        <template v-if="!loading">Reset password</template>
-                        <ScaleLoader  v-else color="#fff" height="20px" />
+                                px-5 py-2.5 text-center disabled:opacity-60 disabled:cursor-not-allowed disabled:pointer-events-none">
+                        <span v-if="!loading">Reset password</span>
+                        <span v-else class="inline-flex items-center" aria-live="polite">
+                            <span class="mr-2">Đang gửi</span>
+                            <span class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
+                        </span>
                     </button>
                 </form>
             </div>
@@ -53,7 +58,6 @@
 <script setup lang='js'>
     import {ref, onMounted, watch} from 'vue'
     import {useRoute, useRouter} from 'vue-router'
-    import { ScaleLoader  } from 'vue3-spinner'
     import api from "../../../../API/axios"
     const loading = ref(false)
     const form = ref({

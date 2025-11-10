@@ -64,24 +64,32 @@
       <!-- Follow Button -->
       <div v-if=" auth?.user?.id != user?.id ">
         <button
-        @click="followHandler"
-        v-if="userData?.is_following == false" 
-        class="w-full py-2 bg-sky-400 text-white text-xl btnEffect rounded-md hover:bg-primary/10 transition-colors mb-6"
-      >
-        <p class="flex justify-center items-center">
-          Theo dõi <SmallLoadingIcon class="mx-1" v-if="isLoading"></SmallLoadingIcon>
-        </p>
-      </button>
+          @click="followHandler"
+          v-if="userData?.is_following == false" 
+          :disabled="isLoading"
+          :aria-busy="isLoading"
+          class="w-full relative flex items-center justify-center gap-2 py-2 bg-sky-400 text-white text-xl btnEffect rounded-md hover:bg-primary/10 transition-colors mb-6 disabled:opacity-60 disabled:cursor-not-allowed disabled:pointer-events-none"
+        >
+          <span v-if="!isLoading">Theo dõi</span>
+          <span v-else class="inline-flex items-center" aria-live="polite">
+            <span class="mr-2">Đang theo dõi</span>
+            <span class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
+          </span>
+        </button>
 
-       <button
-        @click="followHandler"
-        v-else-if="userData?.is_following == true" 
-        class="w-full py-2 bg-sky-400 text-white text-xl btnEffect rounded-md hover:bg-primary/10 transition-colors mb-6"
-      >
-        <p class="flex justify-center items-center">
-          <i class="fa-solid fa-check pr-1"></i> Đã Theo dõi <SmallLoadingIcon class="mx-1" v-if="isLoading"></SmallLoadingIcon>
-        </p>
-      </button>
+        <button
+          @click="followHandler"
+          v-else-if="userData?.is_following == true" 
+          :disabled="isLoading"
+          :aria-busy="isLoading"
+          class="w-full relative flex items-center justify-center gap-2 py-2 bg-sky-400 text-white text-xl btnEffect rounded-md hover:bg-primary/10 transition-colors mb-6 disabled:opacity-60 disabled:cursor-not-allowed disabled:pointer-events-none"
+        >
+          <span v-if="!isLoading"><i class="fa-solid fa-check pr-1"></i> Đã Theo dõi</span>
+          <span v-else class="inline-flex items-center" aria-live="polite">
+            <span class="mr-2">Đang xử lý</span>
+            <span class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
+          </span>
+        </button>
       </div>
       
 
@@ -108,7 +116,6 @@
 import { ref, onMounted, watch, onBeforeUnmount  } from "vue";
 import {useRoute } from "vue-router"
 import { useAuthStore } from '../stores/auth'
-import SmallLoadingIcon from '../components/smallLoadingIcon.vue'
 import api from '../../API/axios'
 const showOption = ref(false)
 const isLoading = ref(false)

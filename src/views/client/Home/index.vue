@@ -1,7 +1,6 @@
 
 <template>
   <Layout>
-    <loader :show="globalLoading" />
     <!-- Hero Section -->
     <Banner></Banner>
     <!-- Main Content -->
@@ -14,7 +13,10 @@
             <div class="flex items-center justify-between mb-6">
               <h2 class="text-xl md:text-2xl font-bold text-gray-900 uppercase tracking-wide">Mới nhất trên Spiderum</h2>
             </div>
-            <GridPost :posts="latestPost" :pageLimit="null"></GridPost>
+            <div v-if="loadingExtras" class="grid gap-6 sm:grid-cols-2 lg:grid-cols-2">
+              <SkeletonCard v-for="n in 1" :key="'sk-latest-'+n" />
+            </div>
+            <GridPost v-else :posts="latestPost" :pageLimit="null"></GridPost>
           </section>
 
           <!-- Banner Ad -->
@@ -31,7 +33,10 @@
               <h2 class="text-xl md:text-2xl font-bold text-gray-900 uppercase tracking-wide">Nổi bật trong tuần</h2>
             </div>
             <!-- so post noi bat -->
-            <Carousel :posts="featuredPosts?.data"></Carousel>
+            <div v-if="loadingExtras" class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+              <SkeletonCard v-for="n in 4" :key="'sk-featured-'+n" />
+            </div>
+            <Carousel v-else :posts="featuredPosts?.data"></Carousel>
             <!-- <GridPost :posts="featuredPosts" :pageLimit="null"></GridPost> -->
 
             <div class="bg-gradient-to-r from-orange-400 to-pink-500 rounded-lg overflow-hidden">
@@ -42,7 +47,10 @@
             </div>
           </div>
           <!-- grid post tất cả các post theo category id-->
-          <GridPost :posts="posts" :pageLimit="totalPages"></GridPost>
+          <div v-if="loadingPosts" class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <SkeletonCard v-for="n in objPagination.limit || 6" :key="'sk-grid-'+n" />
+          </div>
+          <GridPost v-else :posts="posts" :pageLimit="totalPages"></GridPost>
           </section>
         </div>
 
@@ -61,8 +69,8 @@ import RightSider from "../Home/rightSider.vue"
 import Banner from "../Home/banner.vue"
 // loader cho trang
 import { globalLoading } from '../../../../API/axios'
-import loader from '../../../components/loader.vue'
 import Carousel from '../../../components/caroulselPost.vue'
+import SkeletonCard from '../../../components/skeleton/SkeletonCard.vue'
 const router = useRouter()
 const route = useRoute()
 const apiUrl = import.meta.env.VITE_API_BASE
@@ -77,7 +85,8 @@ const numberOfPost = ref(0)
 const totalPages = computed(() => Math.max(1, Math.ceil(numberOfPost.value / objPagination.value.limit)))
 import GridPost from '../../../components/gridPost.vue'
 // che do sap xep bai viet
-const loading = ref(false)
+const loadingPosts = ref(false)   // loading cho danh sách bài chính (grid)
+const loadingExtras = ref(false)  // loading cho latest/featured (extras)
 const sortSetting = ref('hot')
 function updatePagination(patch) {
   const next = { ...route.query }
@@ -93,7 +102,7 @@ function updatePagination(patch) {
 async function fetchPosts() {
   console.log("fetch posts");
   
-  loading.value = true
+  loadingPosts.value = true
   try {
     const res = await api.get(`${apiUrl}/api/posts`, { params: objPagination.value })
     posts.value = res.data
@@ -101,7 +110,7 @@ async function fetchPosts() {
   } catch (error) {
     console.error('Lỗi tải posts:', error)
   } finally {
-    loading.value = false
+    loadingPosts.value = false
   }
 }
 function goPage() {
@@ -146,33 +155,41 @@ watch(() => route.query, (q) => {
   objPagination.value.sort = sort
 }, { immediate: true })
 
-// Tự reload khi đổi category/page
+// Watch A: chỉ khi đổi category → fetchExtras + fetchPosts (và reset page = 1)
+watch(() => objPagination.value.category, async (newCat, oldCat) => {
+  if (newCat === oldCat) return
+  // Reset page về 1 khi đổi category để kết quả nhất quán
+  objPagination.value.page = 1
+  inputPage.value = 1
+  // Cập nhật URL giữ nguyên sort và category
+  const next = { ...route.query, page: 1 }
+  if (newCat == null) {
+    delete next.category
+  } else {
+    next.category = newCat
+    next.sort = objPagination.value.sort
+  }
+  router.replace({ query: next })
+  // Thực thi fetch
+  clampPage()
+  await fetchExtras()   // ✅ chỉ chạy ở đây và onMounted
+  await fetchPosts()
+}, { immediate: false })
+
+// Watch B: đổi page hoặc sort → chỉ fetchPosts (KHÔNG fetchExtras)
 watch(
-  [() => objPagination.value.category, () => objPagination.value.page, () => objPagination.value.sort],
-  ([newCat, newPage, newSort], [oldCat, oldPage, oldSort]) => {
-    let needFetch = false
-
-    if (newCat !== oldCat) {
-      clampPage()         // có thể set lại page
-      fetchExtras()
-      needFetch = true
-    }
-
-    // Nếu page thay đổi do người dùng hoặc do clampPage()
-    if (newPage !== oldPage || newSort != oldSort) {
-      needFetch = true
-    }
-
-    if (needFetch) fetchPosts()
-
+  [() => objPagination.value.page, () => objPagination.value.sort],
+  async ([p, s], [op, os]) => {
+    if (p === op && s === os) return
+    await fetchPosts() // ❌ tuyệt đối không gọi fetchExtras() ở đây
   },
-  { immediate: true } // tải lần đầu
+  { immediate: false }
 )
 // --- Bài mới & nổi bật ---
 async function fetchExtras() {
   console.log("fetchExtras");
   
-  loading.value = true
+  loadingExtras.value = true
   try {
     const res1 = await api.get(`${apiUrl}/api/posts`, { params: { limit: 1, sort: 'newest', category: objPagination.value.category } })
     latestPost.value = res1.data
@@ -182,7 +199,7 @@ async function fetchExtras() {
   } catch (error) {
     console.error('Lỗi lấy bài nổi bật:', error)
   } finally {
-    loading.value = false
+    loadingExtras.value = false
   }
 }
 

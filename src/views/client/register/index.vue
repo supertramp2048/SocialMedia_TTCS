@@ -68,11 +68,17 @@
                                 <label for="terms" class="font-light text-gray-500 dark:text-gray-300">I accept the <a class="font-medium text-primary-600 hover:underline dark:text-primary-500" href="#">Terms and Conditions</a></label>
                             </div>
                         </div>
-                        <button :disabled="isLoading" type="submit" class="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
-                            <p class="flex justify-center">
-                                Create an account <Loader v-if="isLoading"></Loader>
-                            </p>
-                            </button>
+                        <button
+                          :disabled="isLoading"
+                          :aria-busy="isLoading"
+                          type="submit"
+                          class="w-full relative flex items-center justify-center gap-2 text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800 disabled:opacity-60 disabled:cursor-not-allowed disabled:pointer-events-none">
+                          <span v-if="!isLoading">Create an account</span>
+                          <span v-else class="inline-flex items-center" aria-live="polite">
+                            <span class="mr-2">Đang tạo</span>
+                            <span class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
+                          </span>
+                        </button>
                         <p class="text-sm font-light text-gray-500 dark:text-gray-400">
                             Already have an account? 
                             <router-link to="/login" class="font-medium text-primary-600 hover:underline dark:text-primary-500">Login here</router-link>
@@ -85,7 +91,6 @@
 </template>
 <script setup lang='js'>
     import {ref} from 'vue'
-    import Loader from '../../../components/smallLoadingIcon.vue'
     import {useRouter} from 'vue-router'
     import api from "../../../../API/axios"
     const router = useRouter()

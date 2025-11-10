@@ -65,15 +65,15 @@ const router = createRouter({
       meta: { requiresAuth: true } 
     }
   ],
-  scrollBehavior(to, from, savedPosition) {
-    // Nếu người dùng bấm Back/Forward thì giữ nguyên vị trí cuộn
-    if (savedPosition) {
-      return savedPosition
-    } else {
-      // Khi điều hướng trang mới → cuộn lên đầu
-      return { top: 0 }
-    }
-  }
+  // scrollBehavior(to, from, savedPosition) {
+  //   // Nếu người dùng bấm Back/Forward thì giữ nguyên vị trí cuộn
+  //   if (savedPosition) {
+  //     return savedPosition
+  //   } else {
+  //     // Khi điều hướng trang mới → cuộn lên đầu
+  //     return { top: 0 }
+  //   }
+  // }
 })
 router.beforeEach(async (to, from, next)=>{
   console.log("lấy user từ local");

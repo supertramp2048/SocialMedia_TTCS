@@ -118,18 +118,26 @@
             <button 
               @click="followHandler"
               v-if="post?.data?.is_following_author == false " 
-              class="btnEffect px-4 py-2.5 rounded border border-[#E3E3E3] text-sm text-text-primary">
-                <p class="flex justify-center items-center">
-                  Theo dõi <SmallLoadingIcon class="mx-1" v-if="isLoading"></SmallLoadingIcon>
-                </p>
+              :disabled="isLoading"
+              :aria-busy="isLoading"
+              class="relative flex items-center justify-center gap-2 btnEffect px-4 py-2.5 rounded border border-[#E3E3E3] text-sm text-text-primary disabled:opacity-60 disabled:cursor-not-allowed disabled:pointer-events-none">
+                <span v-if="!isLoading">Theo dõi</span>
+                <span v-else class="inline-flex items-center" aria-live="polite">
+                  <span class="mr-2">Đang theo dõi</span>
+                  <span class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"></span>
+                </span>
             </button>
             <button 
               v-else-if="post?.data?.is_following_author == true"
               @click="followHandler"
-              class="btnEffect bg-sky-300 px-4 py-2.5 rounded border border-[#E3E3E3] text-sm text-text-primary">
-              <p class="flex justify-center items-center">
-                <i class="fa-solid fa-check pr-1"></i> Đã Theo dõi <SmallLoadingIcon class="mx-1" v-if="isLoading"></SmallLoadingIcon>
-              </p>
+              :disabled="isLoading"
+              :aria-busy="isLoading"
+              class="relative flex items-center justify-center gap-2 btnEffect bg-sky-300 px-4 py-2.5 rounded border border-[#E3E3E3] text-sm text-text-primary disabled:opacity-60 disabled:cursor-not-allowed disabled:pointer-events-none">
+              <span v-if="!isLoading"><i class="fa-solid fa-check pr-1"></i> Đã Theo dõi</span>
+              <span v-else class="inline-flex items-center" aria-live="polite">
+                <span class="mr-2">Đang xử lý</span>
+                <span class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"></span>
+              </span>
             </button>
           </div>
           
@@ -163,10 +171,16 @@
             </div>
             <div class="flex justify-end mt-4">
               <button 
-              type="submit"
-              class="text-sm text-text-primary px-2 py-1 font-bold hover:bg-sky-200 rounded-2xl "
+                type="submit"
+                :disabled="commentSubmitting"
+                :aria-busy="commentSubmitting"
+                class="relative flex items-center justify-center gap-2 text-sm text-text-primary px-2 py-1 font-bold hover:bg-sky-200 rounded-2xl disabled:opacity-60 disabled:cursor-not-allowed disabled:pointer-events-none"
               >
-              Gửi
+                <span v-if="!commentSubmitting">Gửi</span>
+                <span v-else class="inline-flex items-center" aria-live="polite">
+                  <span class="mr-2">Đang gửi</span>
+                  <span class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"></span>
+                </span>
               </button>
             </div>
           </form>
@@ -352,16 +366,13 @@ import { useAuthStore } from '@/stores/auth';
 import { storeToRefs } from 'pinia'
 import api from "../../../../API/axios"
 import ReportModal from '../../../components/reportForm.vue' 
-import SmallLoadingIcon from '../../../components/smallLoadingIcon.vue'
 import ReportMenu from '../../../components/ReportMenu.vue'
 // cac child component
 import ChildComments from '../../../components/childComments.vue'
 import SuggestedPost from '../../../components/suggestedPost.vue'
 import UserDivComment from '../../../components/userDivComment.vue'
 import UserDiv from '../../../components/userDiv.vue'
-// loader cho trang
-import { globalLoading } from '../../../../API/axios'
-import loader from '../../../components/loader.vue'
+// loader overlay removed; rely on local skeletons and inline button loading
 
 const showOption = ref(false)
 const openMenuCommentId = ref(null)
@@ -444,6 +455,7 @@ const route = useRoute()
 const apiUrl = import.meta.env.VITE_API_BASE
 const loading = ref(false)
 const isLoading = ref(false)
+const commentSubmitting = ref(false)
 
 const reloadKey = ref({})
 
@@ -480,6 +492,7 @@ async function sendComment(content, post_id){
   if (!content?.trim()) return;
 
   try {
+    commentSubmitting.value = true
     const res = await api.post(`${apiUrl}/api/comments`, {
       content: content,
       post_id: post_id
@@ -502,7 +515,7 @@ async function sendComment(content, post_id){
     }
     console.error(error);
     alert('Có lỗi xảy ra, vui lòng thử lại sau.');
-  }
+  } finally { commentSubmitting.value = false }
 }
 
 // reply comment

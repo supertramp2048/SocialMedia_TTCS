@@ -1,6 +1,9 @@
 <template>
+  <!-- Loading skeleton for replies -->
+  <SkeletonList v-if="loading" :rows="5" />
+
   <!-- Sample Comment -->
-  <div v-for="comment in replies" :key="comment.id" class="flex gap-3 mb-6">
+  <div v-else v-for="comment in replies" :key="comment.id" class="flex gap-3 mb-6">
     <div class="w-12 h-12 flex-shrink-0"></div>
     <div class="flex-1">
       <div class="flex justify-between items-center gap-2 mb-1">
@@ -70,10 +73,16 @@
           <!-- xoa binh luan  -->
           <button
             v-if="user && comment?.author?.id == user.id"
-            class="text-[13px] font-bold p-[5px] rounded-2xl hover:bg-sky-300"
+            class="text-[13px] font-bold p-[5px] rounded-2xl hover:bg-sky-300 disabled:opacity-60 disabled:cursor-not-allowed disabled:pointer-events-none"
+            :disabled="deleteSubmittingId === comment?.id"
+            :aria-busy="deleteSubmittingId === comment?.id"
             @click="deleteComment(comment?.id, comment?.parent_id)"
           >
-            Xóa
+            <span v-if="deleteSubmittingId !== comment?.id">Xóa</span>
+            <span v-else class="inline-flex items-center" aria-live="polite">
+              <span class="mr-2">Đang xóa</span>
+              <span class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"></span>
+            </span>
           </button>
         </div>
 
@@ -100,9 +109,15 @@
           <div class="flex justify-end mt-4">
             <button
               type="submit"
-              class="text-sm text-text-primary px-2 py-1 font-bold hover:bg-sky-200 rounded-2xl"
+              class="relative flex items-center justify-center gap-2 text-sm text-text-primary px-2 py-1 font-bold hover:bg-sky-200 rounded-2xl disabled:opacity-60 disabled:cursor-not-allowed disabled:pointer-events-none"
+              :disabled="replySubmittingId === comment?.id"
+              :aria-busy="replySubmittingId === comment?.id"
             >
-              Gửi
+              <span v-if="replySubmittingId !== comment?.id">Gửi</span>
+              <span v-else class="inline-flex items-center" aria-live="polite">
+                <span class="mr-2">Đang gửi</span>
+                <span class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"></span>
+              </span>
             </button>
           </div>
         </form>
@@ -131,9 +146,15 @@
           <div class="flex justify-end mt-4">
             <button
               type="submit"
-              class="text-sm text-text-primary px-2 py-1 font-bold hover:bg-sky-200 rounded-2xl"
+              class="relative flex items-center justify-center gap-2 text-sm text-text-primary px-2 py-1 font-bold hover:bg-sky-200 rounded-2xl disabled:opacity-60 disabled:cursor-not-allowed disabled:pointer-events-none"
+              :disabled="fixSubmittingId === comment?.id"
+              :aria-busy="fixSubmittingId === comment?.id"
             >
-              Gửi
+              <span v-if="fixSubmittingId !== comment?.id">Gửi</span>
+              <span v-else class="inline-flex items-center" aria-live="polite">
+                <span class="mr-2">Đang sửa</span>
+                <span class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"></span>
+              </span>
             </button>
           </div>
         </form>
@@ -177,6 +198,7 @@ import UserDivComment from '../components/userDivComment.vue'
 import ReportModal from '../components/reportForm.vue'
 // ✅ NEW: Import ReportMenu component
 import ReportMenu from '../components/ReportMenu.vue'
+import SkeletonList from './skeleton/SkeletonList.vue'
 
 const props = defineProps({
   parent_id: { type: [Number, String], required: true },
@@ -190,6 +212,11 @@ const apiUrl = import.meta.env.VITE_API_BASE
 const replies = ref([])
 const loading = ref(false)
 const error = ref(null)
+
+// Inline submitting states per action
+const replySubmittingId = ref(null)
+const fixSubmittingId = ref(null)
+const deleteSubmittingId = ref(null)
 
 // ✅ NEW: State cho menu báo cáo (độc lập với component cha)
 const openChildMenuCommentId = ref(null)
@@ -314,6 +341,7 @@ async function sendReplyComment(content, postId, parent_id) {
   if (!content?.trim()) return
 
   try {
+    replySubmittingId.value = parent_id
     const res = await api.post(`${apiUrl}/api/comments`, {
       content: content,
       post_id: postId,
@@ -347,6 +375,9 @@ async function sendReplyComment(content, postId, parent_id) {
     console.error(error)
     alert('Có lỗi xảy ra, vui lòng thử lại sau.')
   }
+  finally {
+    replySubmittingId.value = null
+  }
 }
 
 // sua comment
@@ -354,6 +385,7 @@ async function sendFixedComment(content, id, parent_id) {
   if (!content?.trim()) return
 
   try {
+    fixSubmittingId.value = id
     const res = await api.patch(`${apiUrl}/api/comments/${id}`, {
       content: content
     })
@@ -385,6 +417,9 @@ async function sendFixedComment(content, id, parent_id) {
     console.error(error)
     alert('Có lỗi xảy ra, vui lòng thử lại sau.')
   }
+  finally {
+    fixSubmittingId.value = null
+  }
 }
 
 // xoa comment
@@ -392,6 +427,7 @@ async function deleteComment(id, parent_id) {
   if (!confirm('Bạn chắc muốn xoá bình luận này?')) return
 
   try {
+    deleteSubmittingId.value = id
     const res = await api.delete(`${apiUrl}/api/comments/${id}`)
     if (res.status === 200 || res.status === 204) {
       const index = replies.value.findIndex(c => c.id === id)
@@ -409,6 +445,9 @@ async function deleteComment(id, parent_id) {
     }
     console.error(error)
     alert('Xoá bình luận thất bại.')
+  }
+  finally {
+    deleteSubmittingId.value = null
   }
 }
 

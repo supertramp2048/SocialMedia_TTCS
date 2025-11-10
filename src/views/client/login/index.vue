@@ -67,13 +67,14 @@
           <button
             type="submit"
             :disabled="loading"
+            :aria-busy="loading"
             class="flex w-full justify-center items-center gap-2 rounded-md bg-indigo-600 px-3 py-2
                    text-sm font-semibold text-white hover:bg-indigo-500
                    focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600
                    disabled:opacity-60 disabled:cursor-not-allowed"
           >
             <span v-if="!loading">Sign in</span>
-            <span v-else class="inline-flex items-center">
+            <span v-else class="inline-flex items-center" aria-live="polite">
               <span class="mr-2">Signing in</span>
               <!-- spinner thuần Tailwind -->
               <span class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
