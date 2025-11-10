@@ -113,12 +113,12 @@ const props = defineProps({
 const rawPosts = ref([])       // dữ liệu thô từ API
 const postsForRender = computed(() => {
   const arr = normalizeArray(rawPosts.value)
-  if (props.currentId != null) {
-    const cur = Number(props.currentId)
-    return arr.filter(item => Number(item?.id) !== cur)
-  }
-  return arr
+  const cur = Number(props.currentId)
+  return Number.isFinite(cur)
+    ? arr.filter(p => Number(p?.id) !== cur)
+    : arr
 })
+
 
 // --- Carousel state ---
 const viewport = ref(null)

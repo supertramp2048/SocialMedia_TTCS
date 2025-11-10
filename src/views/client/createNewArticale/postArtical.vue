@@ -155,7 +155,7 @@ import { ref, computed, onBeforeUnmount, onMounted } from 'vue'
 import Editor from '@tinymce/tinymce-vue'
 import api from '../../../../API/axios'
 import { useCategoryStore } from '../../../stores/categories'
-
+import { useRouter} from 'vue-router'
 /* ====== QUAN TRỌNG: Import TinyMCE ĐÚNG THỨ TỰ ====== */
 import tinymce from 'tinymce/tinymce'
 
@@ -185,6 +185,10 @@ import 'tinymce/plugins/table'
 import 'tinymce/plugins/help'
 import 'tinymce/plugins/wordcount'
 
+import { useToast } from 'vue-toastification'
+
+const toast = useToast()
+const router = useRouter()
 const CLOUD_NAME = import.meta.env.VITE_CLOUD_NAME
 const UPLOAD_PRESET = import.meta.env.VITE_UPLOAD_PRESET
 
@@ -230,7 +234,7 @@ function isValidUrl(url) {
 // Xác nhận nhập URL
 function confirmUrlInput() {
   if (!isValidUrl(tempUrlInput.value)) {
-    alert('Vui lòng nhập URL hợp lệ (bắt đầu bằng http:// hoặc https://)')
+    toast.error("Vui lòng nhập URL hợp lệ")
     return
   }
   
@@ -262,13 +266,14 @@ function onCoverChange(e) {
   const f = e.target.files?.[0]
   if (!f) return
   if (!f.type.startsWith('image/')) {
-    alert('Chỉ chọn tệp ảnh.')
+    toast.error('Chỉ chọn tệp ảnh.')
     e.target.value = ''
     return
   }
   const MAX = 5 * 1024 * 1024
   if (f.size > MAX) {
-    alert('Ảnh quá lớn (>5MB).')
+    toast.error('Ảnh quá lớn (>5MB).')
+    
     e.target.value = ''
     return
   }
@@ -402,8 +407,7 @@ async function replaceInlineImagesWithCloudinary(html) {
 
 /* ====== Submit với logic ưu tiên thumbnailUrlManual ====== */
 async function postArticle() {
-  if (!title.value) return alert('Vui lòng nhập tiêu đề.')
-  if (!selectedCategoryId.value) return alert('Vui lòng chọn danh mục.')
+  if (!selectedCategoryId.value) return toast.error('Vui lòng chọn danh mục.') 
 
   try {
     loading.value = true
@@ -428,13 +432,22 @@ async function postArticle() {
       thumbnail_url: thumbnailUrl,
     }
 
-    await api.post('/api/posts', payload)
-    alert('Đăng bài thành công!')
+    const res = await api.post('/api/posts', payload)
+    console.log(res.data.data.id);
+    toast.success('Đăng bài thành công!')
+    router.push({
+      path:'/bai-dang',
+      query: {
+      id: res.data.data.id
+    } 
+   })
+    
   } catch (error) {
     console.log('status:', error?.response?.status)
     console.log('data:', error?.response?.data)
     console.log('errors:', error?.response?.data?.errors)
-    alert('Đăng thất bại: ' + (error?.response?.data?.message || error?.message || 'Validation error'))
+    toast.error('Đăng thất bại: '+ (error?.response?.data?.message || error?.message || 'Validation error'))
+
   } finally {
     loading.value = false
   }
