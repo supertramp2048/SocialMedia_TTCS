@@ -433,7 +433,7 @@ async function postArticle() {
     }
 
     const res = await api.post('/api/posts', payload)
-    console.log(res.data.data.id);
+
     toast.success('Đăng bài thành công!')
     router.push({
       path:'/bai-dang',

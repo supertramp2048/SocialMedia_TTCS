@@ -1,13 +1,13 @@
 <template>
   <div class="flex min-h-screen flex-col justify-center px-6 py-12 lg:px-8 bg-white">
     <div class="sm:mx-auto sm:w-full sm:max-w-sm">
-      <img
+      <!-- <img
         src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=500"
         alt="Your Company"
         class="mx-auto h-10 w-auto"
-      />
+      /> -->
       <h2 class="mt-10 text-center text-2xl font-bold tracking-tight text-gray-900">
-        Sign in to your account
+        Đăng nhập vào tài khoản của bạn
       </h2>
     </div>
 
@@ -15,7 +15,7 @@
       <form @submit.prevent="onSubmit" method="POST" class="space-y-6" novalidate>
         <!-- Email -->
         <div>
-          <label for="email" class="block text-sm font-medium text-gray-900">Email address</label>
+          <label for="email" class="block text-sm font-medium text-gray-900">Email </label>
           <div class="mt-2">
             <input
               v-model.trim="email"
@@ -39,7 +39,7 @@
             <label for="password" class="block text-sm font-medium text-gray-900">Password</label>
             <div class="text-sm">
               <router-link to="/quen-mat-khau" class="font-semibold text-indigo-600 hover:text-indigo-500">
-                Forgot password?
+                Quên mật khẩu?
               </router-link>
             </div>
           </div>

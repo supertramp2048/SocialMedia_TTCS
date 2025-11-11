@@ -3,6 +3,13 @@
         <div class="min-h-screen bg-white">
     <!-- Main Content -->
     <main class="w-full">
+      <SkeletonLoader
+        v-if="isLoadingPage"
+        variant="detail"
+        :minHeight="360"
+        class="w-full max-w-[700px] mx-auto px-4 py-8"
+      />
+      <template v-else>
       <!-- Top Banner Ad -->
       <div class="flex justify-center py-8 bg-white">
         <div class="w-full max-w-[680px] px-4">
@@ -347,6 +354,7 @@
           </div>
         </div>
       </div>
+      </template>
     </main>
     
     <ReportModal
@@ -367,6 +375,7 @@ import { storeToRefs } from 'pinia'
 import api from "../../../../API/axios"
 import ReportModal from '../../../components/reportForm.vue' 
 import ReportMenu from '../../../components/ReportMenu.vue'
+import SkeletonLoader from '../../../components/ui/SkeletonLoader.vue'
 // cac child component
 import ChildComments from '../../../components/childComments.vue'
 import SuggestedPost from '../../../components/suggestedPost.vue'
@@ -633,6 +642,7 @@ async function deleteComment(id, parent_id){
 }
 
 const post = ref({})
+const isLoadingPage = computed(() => !(post.value && post.value.data && post.value.data.id))
 const show = ref([])
 
 function toggle(id) {

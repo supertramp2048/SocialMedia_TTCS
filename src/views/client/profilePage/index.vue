@@ -2,7 +2,13 @@
     <Layout>
         <div class="min-h-screen bg-white">
                 <!-- Khung chính -->
-                <div class="max-w-[1280px]  mx-auto px-4 sm:px-6 lg:px-8">
+                <SkeletonLoader
+                  v-if="isLoadingProfile"
+                  variant="detail"
+                  :minHeight="420"
+                  class="w-full max-w-[1280px] mx-auto my-6 px-4 sm:px-6 lg:px-8"
+                />
+                <div v-else class="max-w-[1280px]  mx-auto px-4 sm:px-6 lg:px-8">
                 <!-- ảnh bìa của user  -->
                 <div class=" bg-cover bg-center bg-no-repeat w-full h-[200px] "
                     :style="{ backgroundImage: `url(${AuthUser?.data?.cover_photo_url})` }"
@@ -55,7 +61,10 @@
 
                     <!-- Lưới bài viết -->
                     <section class="pb-10">
-                        <div v-if="posts?.data?.length > 0" class=" gap-6 lg:gap-8">
+                        <div v-if="!posts || !posts.data">
+                          <SkeletonLoader variant="list" :rows="6" :avatar="true" class="mt-4" />
+                        </div>
+                        <div v-else-if="posts?.data?.length > 0" class=" gap-6 lg:gap-8">
                         <GridPost
                             :posts="posts"
                             :pageLimit="limitPage"
@@ -86,6 +95,7 @@
     import ReportModal from '../../../components/reportForm.vue' 
     import { useAuthStore } from '../../../stores/auth'
     import { useRoute, useRouter} from 'vue-router'
+    import SkeletonLoader from '../../../components/ui/SkeletonLoader.vue'
     // Demo data — thay bằng API thật của bạn
 const showReportPostForm = ref(false)
 const posts = ref([])
@@ -99,6 +109,7 @@ const sort = ref('hot')
 let UserId = null
 const idReport = ref('')
 const typeOfReport = ref('')
+const isLoadingProfile = ref(true)
 function handleShowForm(value){
     showReportPostForm.value = value
     idReport.value = route.query.user_id
@@ -122,6 +133,7 @@ watch(
     UserId = route.query.user_id
     const res = await api.get(`/api/profiles/${UserId}`)
     AuthUser.value = res?.data
+    isLoadingProfile.value = !Boolean(AuthUser.value?.data)
   },
   { immediate: true , deep: true} // gọi 1 lần khi load trang
 )
@@ -144,6 +156,7 @@ onMounted(async () => {
   UserId = route.query.user_id
   const res = await api.get(`/api/profiles/${UserId}`)
   AuthUser.value = res?.data
+  isLoadingProfile.value = !Boolean(AuthUser.value?.data)
   console.log("auth", AuthUser.value);
   objPagination.value = route.query
   console.log("objPagination ",objPagination.value);

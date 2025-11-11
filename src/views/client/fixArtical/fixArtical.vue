@@ -154,8 +154,8 @@ import { ref, computed, onBeforeUnmount, onMounted } from 'vue'
 import Editor from '@tinymce/tinymce-vue'
 import api from '../../../../API/axios'
 import { useCategoryStore } from '../../../stores/categories'
-import { useRoute } from 'vue-router'
-
+import { useRoute, useRouter } from 'vue-router'
+import {useToast} from 'vue-toastification'
 /* ====== QUAN TRỌNG: Import TinyMCE ĐÚNG THỨ TỰ ====== */
 import tinymce from 'tinymce/tinymce'
 
@@ -184,6 +184,7 @@ import 'tinymce/plugins/media'
 import 'tinymce/plugins/table'
 import 'tinymce/plugins/help'
 import 'tinymce/plugins/wordcount'
+import VueToastificationPlugin from 'vue-toastification'
 
 const CLOUD_NAME = import.meta.env.VITE_CLOUD_NAME
 const UPLOAD_PRESET = import.meta.env.VITE_UPLOAD_PRESET
@@ -201,7 +202,8 @@ const route = useRoute()
 const apiUrl = import.meta.env.VITE_API_BASE
 const post = ref()
 const postId = ref(null)
-
+const toast = useToast()
+const router = useRouter()
 /* ====== ẢNH BÌA - Thêm state cho dialog ====== */
 const coverFile = ref(null)
 const coverPreview = ref('')
@@ -235,7 +237,7 @@ function isValidUrl(url) {
 // Xác nhận nhập URL
 function confirmUrlInput() {
   if (!isValidUrl(tempUrlInput.value)) {
-    alert('Vui lòng nhập URL hợp lệ (bắt đầu bằng http:// hoặc https://)')
+    toast.error('Vui lòng nhập URL hợp lệ (bắt đầu bằng http:// hoặc https://)')
     return
   }
   
@@ -267,13 +269,13 @@ function onCoverChange(e) {
   const f = e.target.files?.[0]
   if (!f) return
   if (!f.type.startsWith('image/')) {
-    alert('Chỉ chọn tệp ảnh.')
+    toast.error('Chỉ chọn tệp ảnh.')
     e.target.value = ''
     return
   }
   const MAX = 5 * 1024 * 1024
   if (f.size > MAX) {
-    alert('Ảnh quá lớn (>5MB).')
+    toast.error('Ảnh quá lớn (>5MB).')
     e.target.value = ''
     return
   }
@@ -406,9 +408,9 @@ async function replaceInlineImagesWithCloudinary(html) {
 }
 
 /* ====== Update với logic ưu tiên thumbnailUrlManual ====== */
-async function updateArticle() {
-  if (!title.value) return alert('Vui lòng nhập tiêu đề.')
-  if (!selectedCategoryId.value) return alert('Vui lòng chọn danh mục.')
+async function updateArticle(){
+  if (!title.value) return toast.error('Vui lòng nhập tiêu đề.')
+  if (!selectedCategoryId.value) return toast.error('Vui lòng chọn danh mục.')
 
   try {
     loading.value = true
@@ -433,13 +435,19 @@ async function updateArticle() {
       thumbnail_url: finalThumbnailUrl,
     }
 
-    await api.put(`/api/posts/${postId.value}`, payload)
-    alert('Cập nhật bài viết thành công!')
+    const res = await api.put(`/api/posts/${postId.value}`, payload)
+    toast.success("Cập nhật bài viết thành công ! ")
+     router.push({
+      path:'/bai-dang',
+      query: {
+      id: res.data.data.id
+    } 
+   })
   } catch (error) {
     console.log('status:', error?.response?.status)
     console.log('data:', error?.response?.data)
     console.log('errors:', error?.response?.data?.errors)
-    alert('Cập nhật thất bại: ' + (error?.response?.data?.message || error?.message || 'Validation error'))
+    toast.error('Cập nhật thất bại: ' + (error?.response?.data?.message || error?.message || 'Validation error'))
   } finally {
     loading.value = false
   }
@@ -462,7 +470,7 @@ onMounted(async () => {
     selectedCategoryId.value = post.value.data?.category?.id
   } catch (error) {
     console.error('❌ Lỗi khi tải bài viết:', error)
-    alert("Đã xảy ra lỗi")
+    toast.error("Đã xảy ra lỗi")
   }
 })
 </script>
