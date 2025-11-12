@@ -196,21 +196,31 @@
             <p class="text-xl font-bold">Hãy đăng nhập để bình luận</p>
           </div>
           
+          <!-- Skeleton khi load lần đầu -->
+          <SkeletonList
+            v-if="isLoadingComments && parentComments.length === 0"
+            :rows="objPaginationComment.limit"
+            aria-busy="true"
+            aria-live="polite"
+            class="mt-2"
+          />
+
           <!--các comment cha với parent id = null Sample Comment -->
-          <div v-for="comment in post.data?.comments" :key="comment.id" class="flex gap-3 mb-6">
+          <div v-else>
+            <div v-for="comment in parentComments" :key="comment.id" class="flex gap-3 mb-6">
             <div class="flex-1">
               <div class="flex justify-between items-start gap-2 mb-1">
                 <UserDivComment
                   :authorId="post.data?.author?.id"
-                  :user="comment?.author"
-                  :date="new Date(comment?.updated_at || comment?.created_at)"
-                  :content="comment?.content"
+                  :user="comment.author"
+                  :date="new Date(comment.updated_at || comment.created_at)"
+                  :content="comment.content"
                 ></UserDivComment>
 
                 <!-- Menu báo cáo cho comment -->
                 <div class="relative" :ref="el => commentMenuRefs[comment.id] = el">
                   <button 
-                    v-if="auth?.user?.id != comment?.author?.id "
+                    v-if="auth?.user?.id != comment.author?.id "
                     @click.stop="toggleCommentMenu(comment.id)"
                     :aria-expanded="openMenuCommentId === comment.id"
                     aria-haspopup="menu"
@@ -231,7 +241,7 @@
                       />
                     </svg>
                   </button>
-
+                  
                   <!-- Sử dụng ReportMenu component -->
                   <ReportMenu 
                     v-if="openMenuCommentId === comment.id"
@@ -247,23 +257,23 @@
                   <button
                     v-if="user"
                     class="text-[13px] font-bold p-[5px] rounded-2xl hover:bg-sky-300"
-                    @click="showReplyForm(comment?.id)"
+                    @click="showReplyForm(comment.id)"
                   >
                     Trả lời
                   </button>
                   
                   <button
-                    v-if="user && Number(comment?.author?.id) === Number(user?.id)"
+                    v-if="user && Number(comment.author?.id) === Number(user?.id)"
                     class="text-[13px] font-bold p-[5px] rounded-2xl hover:bg-sky-300"
-                    @click="fixComment(comment?.id, comment?.content, comment?.parent_id)"
+                    @click="fixComment(comment.id, comment.content, comment.parent_id)"
                   >
                     Sửa
                   </button>
                   
                   <button
-                    v-if="user && Number(comment?.author?.id) === Number(user?.id)"
+                    v-if="user && Number(comment.author?.id) === Number(user?.id)"
                     class="text-[13px] font-bold p-[5px] rounded-2xl hover:bg-sky-300"
-                    @click="deleteComment(comment?.id, comment?.parent_id)"
+                    @click="deleteComment(comment.id, comment.parent_id)"
                   >
                     Xóa
                   </button>
@@ -271,9 +281,9 @@
 
                 <!-- form reply comment -->
                 <form
-                  v-if="showReply.includes(comment?.id)"
+                  v-if="showReply.includes(comment.id)"
                   class="border-b border-border-lighter pb-6 mb-6"
-                  @submit.prevent="sendReplyComment(content_reply_comment, post.data?.id, comment?.id)"
+                  @submit.prevent="sendReplyComment(content_reply_comment, post.data?.id, comment.id)"
                 >
                   <div class="relative w-full">
                     <input
@@ -301,9 +311,9 @@
 
                 <!-- form fix comment -->
                 <form
-                  v-if="FixIndex.includes(comment?.id)"
+                  v-if="FixIndex.includes(comment.id)"
                   class="border-b border-border-lighter pb-6 mb-6"
-                  @submit.prevent="sendFixedComment(content_fixed_comment, comment?.id, comment?.parent_id)"
+                  @submit.prevent="sendFixedComment(content_fixed_comment, comment.id, comment.parent_id)"
                 >
                   <div class="relative w-full">
                     <input
@@ -332,26 +342,55 @@
 
               <div class="ml-[68px]">
                 <button 
-                  @click="toggle(comment?.id)" 
-                  v-if="comment?.replies_count > 0" 
+                  @click="toggle(comment.id)" 
+                  v-if="comment.replies_count > 0" 
                   class="text-[15px] font-bold text-blue-500" 
                 >
                   {{
-                    show.includes(comment?.id)
+                    show.includes(comment.id)
                       ?  'Ẩn trả lời' 
-                      : `${comment?.replies_count} Trả lời`
+                      : `${comment.replies_count} Trả lời`
                   }}
                 </button>
               </div>
               
               <ChildComments
-                v-if="show.includes(comment?.id)"
-                :parent_id="comment?.id"
+                v-if="show.includes(comment.id)"
+                :parent_id="comment.id"
                 :post="post.data"
                 :key="reloadKey[comment.id] || 0"
               />
             </div>
           </div>
+          </div>
+
+          <!-- Skeleton khi loadMore -->
+          <SkeletonList
+            v-if="isLoadingMore && parentComments.length > 0"
+            :rows="3"
+            class="mt-4"
+          />
+
+          <!-- nút hiển thị thêm bình luận -->
+          <div v-if="!isLoadingComments || parentComments.length > 0" class="text-center mt-6">
+            <button
+              v-if="!isLoadingMore && metaComment && metaComment.current_page < metaComment.last_page"
+              @click="loadMoreComments"
+              class="px-4 py-2 text-sky-600 font-semibold hover:underline rounded-lg"
+            >
+              Hiển thị thêm bình luận
+            </button>
+
+            <div v-else-if="isLoadingMore && parentComments.length === 0" class="text-gray-500 italic">
+              Đang tải thêm bình luận...
+            </div>
+
+            <div v-else-if="metaComment && metaComment.current_page >= metaComment.last_page" class="text-gray-400 text-sm">
+              Đã hiển thị tất cả bình luận
+            </div>
+          </div>
+
+
         </div>
       </div>
       </template>
@@ -376,6 +415,7 @@ import api from "../../../../API/axios"
 import ReportModal from '../../../components/reportForm.vue' 
 import ReportMenu from '../../../components/ReportMenu.vue'
 import SkeletonLoader from '../../../components/ui/SkeletonLoader.vue'
+import SkeletonList from '../../../components/skeleton/SkeletonList.vue'
 // cac child component
 import ChildComments from '../../../components/childComments.vue'
 import SuggestedPost from '../../../components/suggestedPost.vue'
@@ -441,7 +481,7 @@ const postMenuItems = computed(() => [
 
 // Menu items cho từng comment
 function getCommentMenuItems(comment) {
-  const isOwnComment = auth?.user?.id === comment?.author?.id
+  const isOwnComment = auth?.user?.id === comment.author?.id
   
   return [
     {
@@ -506,12 +546,26 @@ async function sendComment(content, post_id){
       content: content,
       post_id: post_id
     });
-
+    console.log(res.data);
+    
     if (res.status === 201) {
       content_comment.value = '';
-      const postId = Number(route.query.id)
-      const res = await api.get(`${apiUrl}/api/posts/${postId}`)
-      post.value = res.data
+      
+      // Nếu backend trả về comment object trong response, unshift vào đầu mảng
+      const newComment = res.data?.data ?? res.data;
+      if (newComment && newComment.id) {
+        parentComments.value.unshift(newComment);
+      } else {
+        // Fallback: refetch parentComments
+        parentComments.value = [];
+        objPaginationComment.value.page = 1;
+        await getParentComments(Number(route.query.id));
+      }
+      
+      // Cập nhật comments_count
+      if (typeof post.value?.data?.comments_count === 'number') {
+        post.value.data.comments_count = (post.value.data.comments_count || 0) + 1;
+      }
     }
   } catch (error) {
     const status = error?.response?.status;
@@ -545,10 +599,10 @@ async function sendReplyComment(content, postId, parent_id) {
         show.value.push(parent_id);
       }
 
-      const idx = post.value?.data?.comments?.findIndex(c => c.id === parent_id);
+      const idx = parentComments.value.findIndex(c => c.id === parent_id);
       if (idx !== -1) {
-        post.value.data.comments[idx].replies_count =
-          (post.value.data.comments[idx].replies_count || 0) + 1;
+        parentComments.value[idx].replies_count =
+          (parentComments.value[idx].replies_count || 0) + 1;
       }
 
       reloadKey.value[parent_id] = (reloadKey.value[parent_id] || 0) + 1;
@@ -582,21 +636,26 @@ async function sendFixedComment(content, id, parent_id){
       const updated = res.data?.data ?? res.data;
 
       if (parent_id == null) {
-        const list = post.value?.data?.comments || []
-        const idx = list.findIndex(c => c.id === id)
+        // ✅ Sửa comment cha: cập nhật đúng nguồn đang render
+        const list = parentComments.value || [];
+        const idx = list.findIndex(c => c.id === id);
         if (idx !== -1) {
-          list[idx] = { ...list[idx], ...updated }
+          // replace để đảm bảo reactivity
+          parentComments.value[idx] = { ...list[idx], ...updated };
         } else {
-          const r = await api.get(`${apiUrl}/api/posts/${postId.value}`)
-          post.value = r.data
+          // fallback: refetch trang đầu cho chắc
+          parentComments.value = [];
+          objPaginationComment.value.page = 1;
+          await getParentComments(Number(route.query.id));
         }
       } else {
-        reloadKey.value[parent_id] = (reloadKey.value[parent_id] || 0) + 1
+        // ✅ Sửa reply: ép ChildComments refetch
+        reloadKey.value[parent_id] = (reloadKey.value[parent_id] || 0) + 1;
       }
 
-      content_fixed_comment.value = ""
-      const i = FixIndex.value.indexOf(id)
-      if (i !== -1) FixIndex.value.splice(i, 1)
+      content_fixed_comment.value = "";
+      const i = FixIndex.value.indexOf(id);
+      if (i !== -1) FixIndex.value.splice(i, 1);
     }
   } catch (error) {
     const status = error?.response?.status
@@ -613,25 +672,31 @@ async function sendFixedComment(content, id, parent_id){
 
 // xoa comment
 async function deleteComment(id, parent_id){
-  if (!confirm('Bạn chắc muốn xoá bình luận này?')) return;
+  if (!confirm(`Bạn chắc muốn xoá bình luận id = ${id} này?`)) return;
 
   try {
     const res = await api.delete(`${apiUrl}/api/comments/${id}`)
+    console.log(res.status);
+    
     if (res.status === 200 || res.status === 204) {
       if (parent_id == null) {
-        const list = post.value?.data?.comments || []
-        const i = list.findIndex(c => c.id === id)
-        if (i !== -1) list.splice(i, 1)
+        // ✅ Xóa comment cha trong parentComments
+        const i = parentComments.value.findIndex(c => c.id === id);
+        if (i !== -1) {
+          parentComments.value.splice(i, 1);
+        }
+
         if (typeof post.value?.data?.comments_count === 'number') {
-          post.value.data.comments_count = Math.max(0, post.value.data.comments_count - 1)
+          post.value.data.comments_count = Math.max(0, post.value.data.comments_count - 1);
         }
       } else {
-        const parentIdx = post.value?.data?.comments?.findIndex(c => c.id === parent_id)
-        if (parentIdx !== -1) {
-          post.value.data.comments[parentIdx].replies_count =
-            Math.max(0, (post.value.data.comments[parentIdx].replies_count || 1) - 1)
+        // ✅ Xóa reply: giảm replies_count ở đúng nguồn
+        const pIdx = parentComments.value.findIndex(c => c.id === parent_id);
+        if (pIdx !== -1) {
+          parentComments.value[pIdx].replies_count =
+            Math.max(0, (parentComments.value[pIdx].replies_count || 1) - 1);
         }
-        reloadKey.value[parent_id] = (reloadKey.value[parent_id] || 0) + 1
+        reloadKey.value[parent_id] = (reloadKey.value[parent_id] || 0) + 1;
       }
     }
   } catch (error) {
@@ -659,7 +724,7 @@ async function fetchReplies(id) {
   loading.value = true
   error.value = null
   try {
-    const res  = await api.get(`${apiUrl}/api/comments/${id}/replies`)
+    const res  = await api.get(`/api/comments/${id}/replies`)
     replies.value = Array.isArray(res.data?.data) ? res.data.data : res.data
   } catch (e) {
     error.value = e
@@ -667,6 +732,27 @@ async function fetchReplies(id) {
     loading.value = false
   }
 }
+// fetch comment cha
+let objPaginationComment = ref({
+  page: 1,
+  limit: 10,
+})
+const parentComments = ref([])
+// async function getParentComments(postId) {
+//   const res = await api.get(`/api/posts/${postId}/comments`, {
+//     params:{
+//       page:objPaginationComment.value.page,
+//       limit: objPaginationComment.value.limit
+//     }
+//   })
+//   const { data, meta, links } = res.data
+//   parentComments.value = data  
+// }
+// watcher phân trang
+watch(() => objPaginationComment.value.page, async (newPage) => {
+  const postId = Number(route.query.id)
+  await getParentComments(postId) // không destructure res nữa
+})
 
 // upvote bài viết
 async function upvote(postId){
@@ -719,6 +805,7 @@ watch(() => route.query.id,
     if(!newId) return
     const res = await api.get(`${apiUrl}/api/posts/${newId}`)
     post.value = res.data
+    getParentComments(newId)
   }
 )
 
@@ -732,6 +819,8 @@ onMounted(async () => {
       params: { limit: 5, sort: 'hot', category: post.value.data.category?.id } 
     })
     postSuggested.value = res1.data.data.filter(item => item.id !== post.value.id)
+
+    getParentComments(postId)
   } catch (error) {
     alert("Hệ thống đang bảo trì")
   }
@@ -772,6 +861,55 @@ function handleClickOutside(e) {
     }
   }
 }
+
+const metaComment = ref(null)
+const isLoadingMore = ref(false)
+const isLoadingComments = ref(false)
+
+async function getParentComments(postId) {
+  try {
+    if (objPaginationComment.value.page === 1) {
+      isLoadingComments.value = true
+    }
+
+    const res = await api.get(`/api/posts/${postId}/comments`, {
+      params: {
+        page: objPaginationComment.value.page,
+        limit: objPaginationComment.value.limit
+      }
+    })
+
+    const { data, meta } = res.data
+    metaComment.value = meta
+
+    // Nếu là trang đầu tiên → gán mới
+    if (objPaginationComment.value.page === 1) {
+      parentComments.value = data
+    } else {
+      // Nếu là các trang tiếp theo → nối thêm
+      parentComments.value.push(...data)
+    }
+
+  } catch (error) {
+    console.error('Lỗi khi tải bình luận:', error)
+  } finally {
+    if (objPaginationComment.value.page === 1) {
+      isLoadingComments.value = false
+    }
+  }
+}
+
+async function loadMoreComments() {
+  if (isLoadingMore.value) return
+  if (metaComment.value && metaComment.value.current_page >= metaComment.value.last_page) return
+
+  isLoadingMore.value = true
+  objPaginationComment.value.page++
+  const postId = Number(route.query.id)
+  await getParentComments(postId)
+  isLoadingMore.value = false
+}
+
 
 onBeforeUnmount(() => {
   document.removeEventListener('click', handleClickOutside)
