@@ -636,7 +636,7 @@ async function sendFixedComment(content, id, parent_id){
       const updated = res.data?.data ?? res.data;
 
       if (parent_id == null) {
-        // ✅ Sửa comment cha: cập nhật đúng nguồn đang render
+        // Sửa comment cha: cập nhật đúng nguồn đang render
         const list = parentComments.value || [];
         const idx = list.findIndex(c => c.id === id);
         if (idx !== -1) {
@@ -649,7 +649,7 @@ async function sendFixedComment(content, id, parent_id){
           await getParentComments(Number(route.query.id));
         }
       } else {
-        // ✅ Sửa reply: ép ChildComments refetch
+        // Sửa reply: ép ChildComments refetch
         reloadKey.value[parent_id] = (reloadKey.value[parent_id] || 0) + 1;
       }
 
@@ -672,7 +672,7 @@ async function sendFixedComment(content, id, parent_id){
 
 // xoa comment
 async function deleteComment(id, parent_id){
-  if (!confirm(`Bạn chắc muốn xoá bình luận id = ${id} này?`)) return;
+  if (!confirm(`Bạn chắc muốn xoá bình luận này?`)) return;
 
   try {
     const res = await api.delete(`${apiUrl}/api/comments/${id}`)
@@ -680,7 +680,7 @@ async function deleteComment(id, parent_id){
     
     if (res.status === 200 || res.status === 204) {
       if (parent_id == null) {
-        // ✅ Xóa comment cha trong parentComments
+        // Xóa comment cha trong parentComments
         const i = parentComments.value.findIndex(c => c.id === id);
         if (i !== -1) {
           parentComments.value.splice(i, 1);
@@ -690,7 +690,7 @@ async function deleteComment(id, parent_id){
           post.value.data.comments_count = Math.max(0, post.value.data.comments_count - 1);
         }
       } else {
-        // ✅ Xóa reply: giảm replies_count ở đúng nguồn
+        // Xóa reply: giảm replies_count ở đúng nguồn
         const pIdx = parentComments.value.findIndex(c => c.id === parent_id);
         if (pIdx !== -1) {
           parentComments.value[pIdx].replies_count =
@@ -738,21 +738,6 @@ let objPaginationComment = ref({
   limit: 10,
 })
 const parentComments = ref([])
-// async function getParentComments(postId) {
-//   const res = await api.get(`/api/posts/${postId}/comments`, {
-//     params:{
-//       page:objPaginationComment.value.page,
-//       limit: objPaginationComment.value.limit
-//     }
-//   })
-//   const { data, meta, links } = res.data
-//   parentComments.value = data  
-// }
-// watcher phân trang
-watch(() => objPaginationComment.value.page, async (newPage) => {
-  const postId = Number(route.query.id)
-  await getParentComments(postId) // không destructure res nữa
-})
 
 // upvote bài viết
 async function upvote(postId){
@@ -867,6 +852,8 @@ const isLoadingMore = ref(false)
 const isLoadingComments = ref(false)
 
 async function getParentComments(postId) {
+  console.log('goi ham get comment');
+  
   try {
     if (objPaginationComment.value.page === 1) {
       isLoadingComments.value = true
@@ -900,6 +887,7 @@ async function getParentComments(postId) {
 }
 
 async function loadMoreComments() {
+  
   if (isLoadingMore.value) return
   if (metaComment.value && metaComment.value.current_page >= metaComment.value.last_page) return
 

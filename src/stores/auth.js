@@ -19,7 +19,7 @@ export const useAuthStore = defineStore('auth', {
                 localStorage.setItem('user', JSON.stringify(user))
                 this.user = user
             } catch (error) {
-                alert("Email hoặc mật khẩu sai")
+                
             }
         },
         async logout(){

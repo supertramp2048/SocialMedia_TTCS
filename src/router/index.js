@@ -59,6 +59,18 @@ const router = createRouter({
       meta: { requiresAuth: true } 
     },
     {
+      path: '/password-reset/:token',
+      name: 'Đặt lại mật khẩu',
+      component: () => import('../views/client/forgotPassword/resetPassword.vue'),
+      meta: { requiresAuth: true } 
+    },
+    {
+      path: '/quen-mat-khau',
+      name: 'Trang cá nhân',
+      component: () => import('../views/client/forgotPassword/index.vue'),
+      meta: { requiresAuth: true } 
+    },
+    {
       path: '/nguoi-dung/cai-dat',
       name: 'Trang tùy chỉnh tài khoản',
       component: () => import('../views/client/userSetting/index.vue'),

@@ -70,7 +70,7 @@
             :aria-busy="loading"
             class="flex w-full justify-center items-center gap-2 rounded-md bg-indigo-600 px-3 py-2
                    text-sm font-semibold text-white hover:bg-indigo-500
-                   focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600
+                   focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-indigo-600
                    disabled:opacity-60 disabled:cursor-not-allowed"
           >
             <span v-if="!loading">Sign in</span>
@@ -117,9 +117,14 @@ async function onSubmit () {
   loading.value = true
   error.value = ''
   try {
-    await auth.login(email.value, password.value)
-    toast.success('Đăng nhập thành công!')
-    router.push('/')
+      await auth.login(email.value, password.value)
+      if(auth.user){
+        toast.success('Đăng nhập thành công!')
+        router.push('/')
+      }
+      else{
+        toast.error('Đăng nhập thất bại. Vui lòng kiểm tra thông tin.')
+      }
   } catch (err) {
     // tuỳ backend: lấy message từ response
     const msg = err?.response?.data?.message || 'Đăng nhập thất bại. Vui lòng kiểm tra thông tin.'
