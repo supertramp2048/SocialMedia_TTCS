@@ -53,6 +53,12 @@ const router = createRouter({
       meta: { requiresAuth: true } 
     },
     {
+      path: '/nhan-tin',
+      name: 'chat',
+      component: () => import('../views/client/chat/index.vue'),
+      meta: { requiresAuth: true } 
+    },
+    {
       path: '/nguoi-dung/:name',
       name: 'Trang cá nhân',
       component: () => import('../views/client/profilePage/index.vue'),
@@ -66,7 +72,7 @@ const router = createRouter({
     },
     {
       path: '/quen-mat-khau',
-      name: 'Trang cá nhân',
+      name: 'Quên mật khẩu',
       component: () => import('../views/client/forgotPassword/index.vue'),
       meta: { requiresAuth: true } 
     },

@@ -104,19 +104,11 @@ async function sendFormChangePassword() {
             password: form.value.password,
             password_confirmation: form.value.password_confirmation
         })
-        // TODO: Gửi request lên backend của bạn, ví dụ:
-        // await api.post('/reset-password', {
-        //   token,
-        //   email,
-        //   password: form.value.password,
-        //   password_confirmation: form.value.password_confirmation
-        // })
         if(res.status == 200){
             toast.success('Đổi mật khẩu thành công')
             router.push({path:'/login'})
         }
-        // Ví dụ: điều hướng về trang đăng nhập
-        // router.push({ name: 'login' })
+        
     } catch (error) {
         toast.error('Token không hợp lệ hoặc đã hết hạn')
     } finally {

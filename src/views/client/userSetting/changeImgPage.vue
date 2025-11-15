@@ -112,7 +112,7 @@
         <div class="col-span-12 md:col-span-6 relative mt-2 flex justify-end">
           <button
             @click="saveChanges"
-            :disabled="isAvatarLoading || isCoverLoading"
+            :disabled="isAvatarLoading || isCoverLoading || isNameLoading"
             class="btnEffect
                   bg-sky-500 hover:bg-sky-600 text-white font-semibold
                   shadow-md rounded-full
@@ -121,7 +121,7 @@
                   disabled:opacity-60 disabled:cursor-not-allowed"
             type="button"
           >
-            {{ (isAvatarLoading || isCoverLoading) ? 'Đang lưu...' : 'Lưu thay đổi' }}
+            {{ (isAvatarLoading || isCoverLoading || isNameLoading) ? 'Đang lưu...' : 'Lưu thay đổi' }}
           </button>
         </div>
 
@@ -141,7 +141,7 @@ const toast = useToast()
 const auth = useAuthStore()
 const isAvatarLoading = ref(false)
 const isCoverLoading = ref(false)
-
+const isNameLoading = ref(false)
 // Avatar
 const avatarFileInput = ref(null)
 const avatarFile = ref(null)
@@ -194,7 +194,7 @@ async function saveChanges() {
   const needCover = !!coverFile.value
 
   if (!needAvatar && !needCover && oldName.value == userName.value) {
-    toast.info("Không có ảnh nào thay đổi")
+    toast.info("Không có thay đổi nào")
     return
   }
 
@@ -209,9 +209,11 @@ async function saveChanges() {
     }
     // ✅ Cập nhật tên hiển thị
     if (oldName.value !== userName.value) {
+      isNameLoading.value = true
       const res = await api.patch('/api/profile/details', { name: userName.value })
       // Tùy backend trả name ở đâu, ưu tiên name người dùng vừa nhập
       const newName = userName.value || res?.data?.name || res?.data?.data?.name
+      isNameLoading.value = false
       updateUserCache({ name: newName })
       oldName.value = newName
     }
@@ -219,7 +221,7 @@ async function saveChanges() {
     // Reset files sau khi upload thành công
     avatarFile.value = null
     coverFile.value = null
-    toast.success('Đã cập nhật ảnh')
+    toast.success(' Cập nhật thành công')
     
   } catch (err) {
     console.error('Upload error:', err)
@@ -243,7 +245,7 @@ async function uploadCombined() {
   const fd = new FormData()
   
   if (avatarFile.value) fd.append('avatar', avatarFile.value)
-  if (coverFile.value) fd.append('cover_photo', coverFile.value)
+  if (coverFile.value) fd.append('cover', coverFile.value)
 
   const res = await api.post('/api/user/profile-images', fd, {
     headers: { 'Content-Type': 'multipart/form-data' }
@@ -263,7 +265,7 @@ async function uploadSeparate() {
   if (avatarFile.value) {
     isAvatarLoading.value = true
     const fd = new FormData()
-    fd.append('file', avatarFile.value)
+    fd.append('avatar', avatarFile.value)
     promises.push(
       api.post('/api/user/avatar', fd, {
         headers: { 'Content-Type': 'multipart/form-data' }
@@ -276,7 +278,7 @@ async function uploadSeparate() {
   if (coverFile.value) {
     isCoverLoading.value = true
     const fd = new FormData()
-    fd.append('cover_photo', coverFile.value)
+    fd.append('cover', coverFile.value)
     promises.push(
       api.post('/api/user/cover-photo', fd, {
         headers: { 'Content-Type': 'multipart/form-data' }

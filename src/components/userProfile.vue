@@ -17,7 +17,8 @@
       <!-- User Info -->
       <div class="flex items-center justify-between mt-3 mb-3">
         <h1 class="text-lg font-bold text-gray-700">{{user?.name}}</h1>
-        <button 
+        <router-link
+        :to="{path:'/nhan-tin', query:{id:user?.id}}" 
          v-if=" auth?.user?.id != user?.id "
          class="p-1" aria-label="Share">
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -26,7 +27,7 @@
               fill="#606266"
             />
           </svg>
-        </button>
+        </router-link>
         <!-- more option -->
         <div class="relative" ref="menuRef">
         <button 

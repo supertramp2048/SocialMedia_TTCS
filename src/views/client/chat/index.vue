@@ -1,0 +1,228 @@
+
+
+<template>
+  <Layout>
+    <div class="min-h-screen bg-gray-50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+          <!-- Chat Column -->
+          <!-- Sidebar (Desktop) -->
+          <div class="hidden md:block md:col-span-5">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 h-[70vh] flex flex-col">
+              <div class="px-4 py-4 border-b border-gray-100">
+                <h2 class="text-lg font-semibold text-gray-900">Danh sách trò chuyện</h2>
+                <p class="text-xs text-gray-500 mt-1">Chọn cuộc trò chuyện để xem chi tiết</p>
+              </div>
+              <div class="flex-1 overflow-y-auto divide-y divide-gray-100">
+                <div 
+                v-for="item in conversations" :key="item?.conversation_id"
+                class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 cursor-pointer">
+                  <img 
+                  :src=item.user.avatar
+                  class="h-10 w-10 rounded-full bg-sky-100 flex items-center justify-center text-xs font-semibold text-sky-600"></img>
+                  <div class="flex-1">
+                    <p class="text-sm font-semibold text-gray-900">{{item.user.name}}</p>
+                    <p class="text-xs text-gray-500">{{item.last_message.content}}</p>
+                  </div>
+                  <span class="text-[11px] text-gray-400">09:24</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="fixed z-50">
+            <button
+                type="button"
+                class="block items-center justify-center px-3 py-1.5 rounded-lg text-xs font-medium bg-sky-500 text-white md:hidden"
+                @click="toggleSidebar"
+              >
+                Danh sách chat
+            </button>
+          </div>
+          <ChatContainer @newMessage='handleNewMessage' :chats="chatHistory"></ChatContainer>
+        </div>
+      </div>
+
+      <!-- Mobile Sidebar Overlay -->
+      <div v-if="isSidebarOpen" class="fixed inset-0 z-40 md:hidden">
+        <div class="absolute inset-0 bg-black/40" @click="closeSidebar"></div>
+
+        <div class="absolute inset-y-0 right-0 w-full max-w-sm bg-white shadow-xl border-l border-gray-200 flex flex-col">
+          <div class="px-4 py-4 border-b border-gray-100 flex items-center justify-between">
+            <div>
+              <h2 class="text-lg font-semibold text-gray-900">Danh sách trò chuyện</h2>
+              <p class="text-xs text-gray-500 mt-1">Chọn cuộc trò chuyện để xem chi tiết</p>
+            </div>
+            <button
+              type="button"
+              class="p-2 rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+              @click="closeSidebar"
+              aria-label="Đóng danh sách"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+
+          <div 
+
+          class="flex-1 overflow-y-auto divide-y divide-gray-100">
+            <div class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 cursor-pointer" @click="closeSidebar">
+              <div class="h-10 w-10 rounded-full bg-sky-100 flex items-center justify-center text-xs font-semibold text-sky-600">JD</div>
+              <div class="flex-1">
+                <p class="text-sm font-semibold text-gray-900">John Doe</p>
+                <p class="text-xs text-gray-500">Hey, dạo này bạn thế nào?</p>
+              </div>
+              <span class="text-[11px] text-gray-400">09:24</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </Layout>
+</template>
+<script setup>
+import { ref, onMounted, onBeforeUnmount, inject, watch } from 'vue'
+import { useAuthStore } from '../../../stores/auth'
+import api from '../../../../API/axios'
+import Layout from '@/views/client/layout/layout.vue'
+import ChatContainer from './chatContainer.vue'
+import {useRoute, useRouter} from 'vue-router'
+const echo = inject('echo')
+const isSidebarOpen = ref(false)
+const auth = useAuthStore()
+const route = useRoute()
+const otherId = ref(route.query.id)
+const toggleSidebar = () => {
+  isSidebarOpen.value = !isSidebarOpen.value
+}
+const closeSidebar = () => {
+  isSidebarOpen.value = false
+}
+watch(()=>route.query.id, (newVal)=>{
+  otherId.value= newVal
+})
+let chatChannel = null
+  function handleNewMessage(obj){
+    chatHistory.value.push(obj)
+  }
+// HÀM ĐĂNG KÝ CHANNEL – tách riêng cho dễ gọi lại
+const subscribeToChannel = () => {
+  if (!echo) {
+    console.warn('Echo is not provided!')
+    return
+  }
+
+  if (!auth.user || !auth.user.id) {
+    console.warn('Chưa có auth.user hoặc auth.user.id, chưa subscribe được')
+    return
+  }
+
+  const userId = String(auth.user.id)
+  const channelName = `App.Models.User.${userId}`
+  console.log('Subscribing to channel:', channelName, 'typeof =', typeof channelName)
+
+  // Nếu đã từng subscribe thì rời channel cũ trước
+  if (chatChannel) {
+    echo.leave(channelName)
+    chatChannel = null
+  }
+
+  chatChannel = echo.private(channelName)
+    .subscribed(() => {
+      console.log('✅ Đã subscribe thành công channel:', channelName)
+    })
+    // event nhan duoc tu pusher
+    .listen('.MessageSent', (payload) => {
+      console.log('✅ Đã nhận event .MessageSent:', payload)
+      let newMessage = {
+        content: payload.MessageText,
+        created_at: null,
+        id: null,
+        image_url: payload.imageUrl,
+        receiver_id: payload.ReceiverId,
+        receiver_id: auth.user.id
+      }
+      console.log("obj message ", newMessage);
+      chatHistory.value.push(newMessage)
+      // TODO: thêm logic cập nhật UI tin nhắn ở đây
+    })
+    .error((error) => {
+      console.error('❌ Lỗi khi subscribe channel:', error)
+    })
+    
+  // Bật Pusher logging
+  if (window.Pusher) {
+    window.Pusher.logToConsole = true
+    console.log('📡 Pusher logging đã bật')
+  }
+}
+let converationChannel = null
+const  subscribeToChannelConversation = () => {
+    if (!echo) {
+    console.warn('Echo is not provided!')
+    return
+    }
+
+    if (!auth.user || !auth.user.id) {
+    console.warn('Chưa có auth.user hoặc auth.user.id, chưa subscribe được')
+    return
+    }
+    const userId = String(auth.user.id)
+    const channelName = `converation.change.${userId}`
+    if(converationChannel){
+      echo.leave(channelName)
+      converationChannel = null
+    }
+
+    converationChannel = echo.private(channelName)
+    .subscribed(() => {
+      console.log("Đã subscribe thành công channel: ",channelName);
+    })
+    .listen('.ConversationChange', (payload) => {
+      console.log("da nhan event chang converation ",payload);
+      
+    })
+}
+
+
+const conversations = ref([])
+const chatHistory = ref([])
+onMounted(async () => {
+  // gọi API conversation (không phụ thuộc Echo)
+  try {
+    const res = await api.get('/realtime/conversations')
+    console.log("conversation ",res.data );
+    conversations.value = res.data
+  } catch (error) {
+    console.error('Lỗi load conversations:', error)
+  }
+
+  // thử subscribe ngay nếu user đã có sẵn
+  subscribeToChannel()
+  subscribeToChannelConversation()
+  // nếu auth.user được set bất đồng bộ (vd: sau khi refresh mới restore từ localStorage),
+  // watch để khi có user.id thì auto subscribe
+  watch(
+    () => auth.user && auth.user.id,
+    (newVal, oldVal) => {
+      if (newVal && newVal !== oldVal) {
+        console.log('🔄 auth.user.id thay đổi, subscribe lại channel')
+        subscribeToChannel()
+      }
+    }
+  )
+  const res2 = await api.get(`/realtime/messages/${otherId.value}`)
+  console.log("history ",res2.data);
+  
+  chatHistory.value = res2.data
+  
+})
+
+onBeforeUnmount(() => {
+  if (echo && auth.user && auth.user.id) {
+    const channelName = `App.Models.User.${auth.user.id}`
+    echo.leave(channelName)
+    console.log('Đã rời khỏi channel:', channelName)
+  }
+  chatChannel = null
+})
+</script>

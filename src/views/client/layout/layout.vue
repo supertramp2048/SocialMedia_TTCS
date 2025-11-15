@@ -259,12 +259,14 @@ const moreMenuRef = ref(null)
 
 function toggleMore() { showMoreMenu.value = !showMoreMenu.value }
 function closeMore() { showMoreMenu.value = false }
-function goProfilePage(id,name){
-    router.push({
-    path: `/nguoi-dung/${encodeURIComponent('name')}`,
+function goProfilePage(id, name) {
+  router.push({
+    name: 'Trang cá nhân',          // phải đúng với name trong router
+    params: { name },               // sẽ map vào :name
     query: { user_id: id, page: 1, limit: 2, sort: 'hot' }
   })
 }
+
 function handleClickOutside(e) {
   if (moreMenuRef.value && !moreMenuRef.value.contains(e.target)) closeMore()
 }
