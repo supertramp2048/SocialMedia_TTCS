@@ -94,7 +94,7 @@ const router = createRouter({
   // }
 })
 router.beforeEach(async (to, from, next)=>{
-  console.log("lấy user từ local");
+  //console.log("lấy user từ local");
   
   if (to.meta.requiresAuth){
   let token = Cookies.get('token')  

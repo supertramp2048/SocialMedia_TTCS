@@ -14,18 +14,20 @@
                 <p class="text-xs text-gray-500 mt-1">Chọn cuộc trò chuyện để xem chi tiết</p>
               </div>
               <div class="flex-1 overflow-y-auto divide-y divide-gray-100">
-                <div 
+                <router-link 
                 v-for="item in conversations" :key="item?.conversation_id"
-                class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 cursor-pointer">
+                :to="{path:'/nhan-tin', query:{id: item.user.id}}"
+                class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 cursor-pointer"
+                :class="otherId == item.user.id ? 'bg-sky-500':''"
+                >
                   <img 
-                  :src=item.user.avatar
+                  :src= item.user.avatar
                   class="h-10 w-10 rounded-full bg-sky-100 flex items-center justify-center text-xs font-semibold text-sky-600"></img>
                   <div class="flex-1">
                     <p class="text-sm font-semibold text-gray-900">{{item.user.name}}</p>
-                    <p class="text-xs text-gray-500">{{item.last_message.content}}</p>
+                    <p class="text-xs text-gray-500">{{item?.last_message?.content}}</p>
                   </div>
-                  <span class="text-[11px] text-gray-400">09:24</span>
-                </div>
+                </router-link>
               </div>
             </div>
           </div>
@@ -38,7 +40,8 @@
                 Danh sách chat
             </button>
           </div>
-          <ChatContainer @newMessage='handleNewMessage' :chats="chatHistory"></ChatContainer>
+          <SkeletonChatList class="col-span-1 md:col-span-7" v-if="isLoadingChatHistory"></SkeletonChatList>
+          <ChatContainer v-else @newMessage='handleNewMessage' :chats="chatHistory" :others="otherUser"></ChatContainer>
         </div>
       </div>
 
@@ -63,16 +66,21 @@
           </div>
 
           <div 
-
-          class="flex-1 overflow-y-auto divide-y divide-gray-100">
-            <div class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 cursor-pointer" @click="closeSidebar">
-              <div class="h-10 w-10 rounded-full bg-sky-100 flex items-center justify-center text-xs font-semibold text-sky-600">JD</div>
+          class="flex-1 overflow-y-auto divide-y divide-gray-100"
+          >
+            <router-link
+            v-for="item in conversations" :key="item?.conversation_id"
+            :to="{path:'/nhan-tin', query:{id: item.user.id}}"
+            :class="otherId == item.user.id ? 'bg-sky-500':''"
+            class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 cursor-pointer" @click="closeSidebar">
+              <img 
+              :src= item.user.avatar
+              class="h-10 w-10 rounded-full bg-sky-100 flex items-center justify-center text-xs font-semibold text-sky-600"></img>
               <div class="flex-1">
-                <p class="text-sm font-semibold text-gray-900">John Doe</p>
-                <p class="text-xs text-gray-500">Hey, dạo này bạn thế nào?</p>
+                <p class="text-sm font-semibold text-gray-900">{{item.user.name}}</p>
+                <p class="text-xs text-gray-500">{{item.last_message.content}}</p>
               </div>
-              <span class="text-[11px] text-gray-400">09:24</span>
-            </div>
+            </router-link>
           </div>
         </div>
       </div>
@@ -80,6 +88,7 @@
   </Layout>
 </template>
 <script setup>
+import SkeletonChatList from '../../../components/skeleton/skeletonChatList.vue'
 import { ref, onMounted, onBeforeUnmount, inject, watch } from 'vue'
 import { useAuthStore } from '../../../stores/auth'
 import api from '../../../../API/axios'
@@ -87,6 +96,7 @@ import Layout from '@/views/client/layout/layout.vue'
 import ChatContainer from './chatContainer.vue'
 import {useRoute, useRouter} from 'vue-router'
 const echo = inject('echo')
+const isLoadingChatHistory = ref(false)
 const isSidebarOpen = ref(false)
 const auth = useAuthStore()
 const route = useRoute()
@@ -97,8 +107,22 @@ const toggleSidebar = () => {
 const closeSidebar = () => {
   isSidebarOpen.value = false
 }
-watch(()=>route.query.id, (newVal)=>{
+watch(()=>route.query.id, async (newVal)=>{
   otherId.value= newVal
+  try {
+    isLoadingChatHistory.value = true
+    const res2 = await api.get(`/api/profiles/${otherId.value}`)
+    otherUser.value = res2.data
+
+    const res3 = await api.get(`/realtime/messages/${otherId.value}`)
+    //console.log("history ",res3.data);
+    chatHistory.value = res3.data
+  } catch (error) {
+    
+  }
+  finally{
+    isLoadingChatHistory.value = false
+  }
 })
 let chatChannel = null
   function handleNewMessage(obj){
@@ -118,7 +142,7 @@ const subscribeToChannel = () => {
 
   const userId = String(auth.user.id)
   const channelName = `App.Models.User.${userId}`
-  console.log('Subscribing to channel:', channelName, 'typeof =', typeof channelName)
+  //console.log('Subscribing to channel:', channelName, 'typeof =', typeof channelName)
 
   // Nếu đã từng subscribe thì rời channel cũ trước
   if (chatChannel) {
@@ -128,20 +152,20 @@ const subscribeToChannel = () => {
 
   chatChannel = echo.private(channelName)
     .subscribed(() => {
-      console.log('✅ Đã subscribe thành công channel:', channelName)
+      console.log(' Đã subscribe thành công channel:', channelName)
     })
     // event nhan duoc tu pusher
     .listen('.MessageSent', (payload) => {
-      console.log('✅ Đã nhận event .MessageSent:', payload)
+      console.log(' Đã nhận event .MessageSent:', payload)
       let newMessage = {
         content: payload.MessageText,
-        created_at: null,
+        created_at: payload.createAt,
         id: null,
         image_url: payload.imageUrl,
         receiver_id: payload.ReceiverId,
         receiver_id: auth.user.id
       }
-      console.log("obj message ", newMessage);
+      //console.log("obj message ", newMessage);
       chatHistory.value.push(newMessage)
       // TODO: thêm logic cập nhật UI tin nhắn ở đây
     })
@@ -152,7 +176,7 @@ const subscribeToChannel = () => {
   // Bật Pusher logging
   if (window.Pusher) {
     window.Pusher.logToConsole = true
-    console.log('📡 Pusher logging đã bật')
+    //console.log(' Pusher logging đã bật')
   }
 }
 let converationChannel = null
@@ -175,27 +199,32 @@ const  subscribeToChannelConversation = () => {
 
     converationChannel = echo.private(channelName)
     .subscribed(() => {
-      console.log("Đã subscribe thành công channel: ",channelName);
+     // console.log("Đã subscribe thành công channel: ",channelName);
     })
     .listen('.ConversationChange', (payload) => {
       console.log("da nhan event chang converation ",payload);
+      const idxOfOldItem = conversations.value.findIndex(item => item.conversation_id == payload.conversationId)
+      if(idxOfOldItem !== -1){
+        conversations.value[idxOfOldItem].last_message.content = payload.lastMessageContent
+      }
+      console.log("mang conversation ",conversations.value);
       
     })
 }
 
-
+const otherUser = ref()
 const conversations = ref([])
 const chatHistory = ref([])
 onMounted(async () => {
   // gọi API conversation (không phụ thuộc Echo)
   try {
+    isLoadingChatHistory.value = true
     const res = await api.get('/realtime/conversations')
-    console.log("conversation ",res.data );
+    // console.log("conversation ",res.data );
     conversations.value = res.data
-  } catch (error) {
-    console.error('Lỗi load conversations:', error)
-  }
-
+    const res2 = await api.get(`/api/profiles/${otherId.value}`)
+    otherUser.value = res2.data
+  
   // thử subscribe ngay nếu user đã có sẵn
   subscribeToChannel()
   subscribeToChannelConversation()
@@ -205,23 +234,30 @@ onMounted(async () => {
     () => auth.user && auth.user.id,
     (newVal, oldVal) => {
       if (newVal && newVal !== oldVal) {
-        console.log('🔄 auth.user.id thay đổi, subscribe lại channel')
+        // console.log('🔄 auth.user.id thay đổi, subscribe lại channel')
         subscribeToChannel()
       }
     }
   )
-  const res2 = await api.get(`/realtime/messages/${otherId.value}`)
-  console.log("history ",res2.data);
+  const res3 = await api.get(`/realtime/messages/${otherId.value}`)
+  //  console.log("history ",res3.data);
   
-  chatHistory.value = res2.data
-  
+  chatHistory.value = res3.data
+  } catch (error) {
+    console.error('Lỗi load conversations:', error)
+  }
+  finally{
+    isLoadingChatHistory.value = false
+  }
 })
 
 onBeforeUnmount(() => {
   if (echo && auth.user && auth.user.id) {
     const channelName = `App.Models.User.${auth.user.id}`
     echo.leave(channelName)
-    console.log('Đã rời khỏi channel:', channelName)
+    const channelConversationName = `converation.change.${auth.user.id}`
+    echo.leave(channelConversationName)
+    //  console.log('Đã rời khỏi channel:', channelName)
   }
   chatChannel = null
 })

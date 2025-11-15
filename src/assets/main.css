@@ -120,7 +120,9 @@
         margin-top: 4px;
         margin-left: 4px;
         }
-
+    .scroll-bottom-btn {
+      @apply absolute bottom-30 right-20 bg-white text-black px-3 py-2 rounded-full shadow-sm text-sm hover:bg-gradient-to-r from-gray-500 to-gray-100 transition;
+    }
     .btnEffect {
         @apply active:scale-95
     }
