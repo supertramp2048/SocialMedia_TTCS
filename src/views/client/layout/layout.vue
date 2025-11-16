@@ -29,10 +29,16 @@
               <button @click="showFormSearch = !showFormSearch" class="bg-sky-300 px-4 py-2 btnEffect rounded-2xl "> <i class="fa-solid fa-magnifying-glass"> </i> Tìm kiếm</button>
               <div class="flex items-center gap-4" v-if="auth.user">
                 <router-link
-                to='/bai-dang/viet-bai'
-                 class="btnEffect border border-gray-400 px-4 py-2 rounded-2xl"> 
-                  <i class="fa-solid fa-feather"></i> Viết bài 
-                  </router-link>
+                  to='/bai-dang/viet-bai'
+                  class="btnEffect border border-gray-400 px-4 py-2 rounded-2xl"> 
+                    <i class="fa-solid fa-feather"></i> Viết bài 
+                </router-link>
+                <router-link
+                to='/nhan-tin'
+                class="btnEffect border border-gray-400 px-4 py-2 rounded-2xl"
+                >
+                <i class="fa-brands fa-signal-messenger"></i>
+                </router-link>
                 <div class="relative flex">
                     <button @click="showUserMenu = !showUserMenu ">
                       <img :src="auth.user.avatar" class="w-[50px] h-[50px] rounded-full" alt="">

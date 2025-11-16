@@ -128,6 +128,11 @@
     </div>
     
   </section>
+  <FullImageViewer
+      :src="currentImage"
+      :visible="showViewer"
+      @close="showViewer = false"
+    />
 </template>
 
 <script setup>
@@ -136,6 +141,14 @@ import Loader from '../../../components/smallLoadingIcon.vue'
 import api from "../../../../API/axios"
 import { useAuthStore } from '@/stores/auth'
 import { useToast } from 'vue-toastification'
+import FullImageViewer from './imageView.vue'
+
+const showViewer = ref(false)
+const currentImage = ref("")
+const openViewer = (src) => {
+  currentImage.value = src
+  showViewer.value = true
+}
 
 const toast = useToast()
 const auth = useAuthStore()

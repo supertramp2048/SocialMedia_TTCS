@@ -120,7 +120,15 @@ watch(()=>route.query.id, async (newVal)=>{
 
     const res3 = await api.get(`/realtime/messages/${otherId.value}`)
     //console.log("history ",res3.data);
-    chatHistory.value = res3.data
+    const rawChatHistory = res3.data
+    rawChatHistory.forEach(item => {
+      if (typeof item.image_url === 'string' && item.image_url.trim() !== '') {
+        item.image_url = item.image_url.split(', ')
+      } else {
+        item.image_url = []   // không có ảnh thì gán mảng rỗng
+      }
+    })
+    chatHistory.value = rawChatHistory
   } catch (error) {
     
   }
@@ -173,7 +181,9 @@ const subscribeToChannel = () => {
         receiver_id: payload.ReceiverId,
       }
       //console.log("obj message ", newMessage);
-      chatHistory.value.push(newMessage)
+      if(payload.SenderId == otherId.value){
+        chatHistory.value.push(newMessage)
+      }
       // TODO: thêm logic cập nhật UI tin nhắn ở đây
     })
     .error((error) => {
@@ -208,15 +218,50 @@ const  subscribeToChannelConversation = () => {
     .subscribed(() => {
      // console.log("Đã subscribe thành công channel: ",channelName);
     })
-    .listen('.ConversationChange', (payload) => {
+    .listen('.ConversationChange', async (payload) => {
       console.log("da nhan event chang converation ",payload);
       const idxOfOldItem = conversations.value.findIndex(item => item.conversation_id == payload.conversationId)
       if(idxOfOldItem !== -1){
         conversations.value[idxOfOldItem].last_message.content = payload.lastMessageContent
       }
+      else{
+        const newObjConversation = {
+          conversation_id: payload.conversationId,
+          last_message: {
+            content: payload.lastMessageContent,           
+            created_at: null,
+            id: payload.lastMessageId,
+            receiver_id: payload.receiverId,
+            sender_id: payload.senderId
+          },
+          user: {
+            avatar: payload.SenderAvatar,
+            id: payload.senderId,
+            name: payload.SenderName
+          }
+        }
+        conversations.value.push(newObjConversation)
+      }
       console.log("mang conversation ",conversations.value);
       
     })
+}
+// ham chuyen attribute tu string thanh mang 
+const normalizeChatHistory = (raw) => {
+  if (!Array.isArray(raw)) return []
+
+  return raw.map((item) => {
+    // clone để tránh đụng trực tiếp vào res3.data (nếu sau này dùng lại)
+    const cloned = { ...item }
+
+    if (typeof cloned.image_url === 'string' && cloned.image_url.trim() !== '') {
+      cloned.image_url = cloned.image_url.split(', ')
+    } else {
+      cloned.image_url = []
+    }
+
+    return cloned
+  })
 }
 
 const otherUser = ref()
@@ -231,7 +276,18 @@ onMounted(async () => {
     conversations.value = res.data
     const res2 = await api.get(`/api/profiles/${otherId.value}`)
     otherUser.value = res2.data
+    const res3 = await api.get(`/realtime/messages/${otherId.value}`)
+  //  console.log("history ",res3.data);
   
+  const rawChatHistory = res3.data
+  rawChatHistory.forEach(item => {
+  if (typeof item.image_url === 'string' && item.image_url.trim() !== '') {
+    item.image_url = item.image_url.split(', ')
+  } else {
+    item.image_url = []   // không có ảnh thì gán mảng rỗng
+  }
+})
+  chatHistory.value = rawChatHistory
   // thử subscribe ngay nếu user đã có sẵn
   subscribeToChannel()
   subscribeToChannelConversation()
@@ -246,17 +302,7 @@ onMounted(async () => {
       }
     }
   )
-  const res3 = await api.get(`/realtime/messages/${otherId.value}`)
-  //  console.log("history ",res3.data);
   
-  chatHistory.value = res3.data
-  chatHistory.value.forEach(item => {
-  if (typeof item.image_url === 'string' && item.image_url.trim() !== '') {
-    item.image_url = item.image_url.split(', ')
-  } else {
-    item.image_url = []   // không có ảnh thì gán mảng rỗng
-  }
-})
   } catch (error) {
     console.error('Lỗi load conversations:', error)
   }

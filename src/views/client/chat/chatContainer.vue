@@ -11,7 +11,7 @@
       >
         <!-- Header nhỏ trong khung chat -->
         <div class="headerChat">
-          <div class="text-lg font-bold text-black">PhDhuy</div>
+          <div class="text-lg font-bold text-black">{{props.others?.data?.name}}</div>
         </div>
 
         <!-- Danh sách tin nhắn -->
@@ -36,13 +36,16 @@
               <div v-if="item.content">{{ item.content }}</div>
               
               <!-- Block hiển thị ảnh -->
+
+              <!-- Block hiển thị ảnh -->
               <div v-if="item.image_url && item.image_url.length > 0" class="mt-2">
                 <!-- 1 ảnh duy nhất -->
-                <div v-if="item.image_url.length === 1" class="rounded-xl overflow-hidden">
+                <div v-if="item.image_url.length === 1" class="rounded-xl overflow-hidden cursor-pointer">
                   <img 
                     :src="item.image_url[0]" 
                     class="w-full max-h-[280px] object-cover"
                     alt="Image"
+                    @click="openViewer(item.image_url[0])"
                   />
                 </div>
 
@@ -52,8 +55,9 @@
                     v-for="(url, idx) in item.image_url" 
                     :key="idx"
                     :src="url" 
-                    class="w-full h-[160px] object-cover"
+                    class="w-full h-[160px] object-cover cursor-pointer"
                     alt="Image"
+                    @click="openViewer(url)"
                   />
                 </div>
 
@@ -61,18 +65,21 @@
                 <div v-else-if="item.image_url.length === 3" class="grid grid-cols-2 gap-1 rounded-xl overflow-hidden">
                   <img 
                     :src="item.image_url[0]" 
-                    class="w-full h-[120px] object-cover"
+                    class="w-full h-[120px] object-cover cursor-pointer"
                     alt="Image"
+                    @click="openViewer(item.image_url[0])"
                   />
                   <img 
                     :src="item.image_url[1]" 
-                    class="w-full h-[120px] object-cover"
+                    class="w-full h-[120px] object-cover cursor-pointer"
                     alt="Image"
+                    @click="openViewer(item.image_url[1])"
                   />
                   <img 
                     :src="item.image_url[2]" 
-                    class="col-span-2 w-full h-[140px] object-cover"
+                    class="col-span-2 w-full h-[140px] object-cover cursor-pointer"
                     alt="Image"
+                    @click="openViewer(item.image_url[2])"
                   />
                 </div>
 
@@ -82,11 +89,12 @@
                     v-for="(url, idx) in getLimitedImages(item.image_url).slice(0, 3)" 
                     :key="idx"
                     :src="url" 
-                    class="w-full h-[120px] object-cover"
+                    class="w-full h-[120px] object-cover cursor-pointer"
                     alt="Image"
+                    @click="openViewer(url)"
                   />
-                  <!-- Ảnh thứ 4 với overlay -->
-                  <div class="relative w-full h-[120px]">
+                  <!-- Ảnh thứ 4 với overlay - Click để mở gallery -->
+                  <div class="relative w-full h-[120px] cursor-pointer" @click="openGallery(item.image_url, 3)">
                     <img 
                       :src="getLimitedImages(item.image_url)[3]" 
                       class="w-full h-full object-cover"
@@ -94,10 +102,13 @@
                     />
                     <div 
                       v-if="item.image_url.length > 4"
-                      class="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center"
+                      class="absolute inset-0 bg-black bg-opacity-60 flex flex-col items-center justify-center hover:bg-opacity-70 transition-all"
                     >
-                      <span class="text-white text-2xl font-semibold">
+                      <span class="text-white text-2xl font-semibold mb-1">
                         +{{ item.image_url.length - 4 }}
+                      </span>
+                      <span class="text-white text-xs opacity-90">
+                        Xem tất cả
                       </span>
                     </div>
                   </div>
@@ -112,8 +123,7 @@
       
       <!-- Ô nhập tin nhắn: sticky bottom, full width cột -->
       <div
-          class="chat-input-container relative"
-          style="width: 100%; max-width: 100%;"
+          class="chat-input-container w-full max-w-full sticky bottom-0 "
         >
           <div class="flex items-center gap-2 w-full px-3">
             <!-- Emoji + Picker -->
@@ -164,9 +174,9 @@
                   placeholder="Nhập tin nhắn..." 
                   :disabled="loading"
                 />
-                <button class="btnEffect" type="submit" :disabled="loading || (!contentMessage.trim() && files.length === 0)">
-                  <span v-if="loading">⏳</span>
-                  <span v-else>➤</span>
+                <button class="btnEffect flex justify-center items-center" type="submit" :disabled="loading || (!contentMessage.trim() && files.length === 0)">
+                  <MoonLoader v-if="loading" color="#0ea5e9" size="14px" />
+                  <i v-else class="fa-solid fa-paper-plane"></i> 
                 </button>
               </form>
             </div>
@@ -195,6 +205,13 @@
 
     </div>
   </div>
+  <FullImageViewer
+    :src="currentImage"
+    :images="galleryImages"
+    :startIndex="galleryStartIndex"
+    :visible="showViewer"
+    @close="showViewer = false"
+  />
 </template>
 
 <script setup>
@@ -203,7 +220,7 @@ import { useAuthStore } from "../../../stores/auth"
 import { useRoute } from 'vue-router'
 import api from '../../../../API/axios'
 import { useToast } from 'vue-toastification'
-
+import { MoonLoader } from "vue3-spinner"
 import vueFilePond from 'vue-filepond'
 import FilePondPluginImagePreview from 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.esm.js'
 
@@ -212,7 +229,27 @@ import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.css
 
 import { Picker, EmojiIndex } from "emoji-mart-vue-fast/src"
 import data from "emoji-mart-vue-fast/data/all.json"
+import FullImageViewer from './imageView.vue'
 import "emoji-mart-vue-fast/css/emoji-mart.css"
+const showViewer = ref(false)
+const currentImage = ref("")
+const galleryImages = ref([])
+const galleryStartIndex = ref(0)
+
+// Mở viewer cho 1 ảnh đơn (giữ nguyên behavior cũ)
+const openViewer = (src) => {
+  currentImage.value = src
+  galleryImages.value = [] // Clear gallery mode
+  showViewer.value = true
+}
+
+// Mở viewer cho gallery (tất cả ảnh)
+const openGallery = (images, startIndex = 0) => {
+  galleryImages.value = images
+  galleryStartIndex.value = startIndex
+  currentImage.value = "" // Clear single image mode
+  showViewer.value = true
+}
 
 const emojiIndex = new EmojiIndex(data)
 const isShowEmojiPicker = ref(false)
@@ -286,8 +323,8 @@ const formatDate = (date) => {
 }
 
 const props = defineProps({
-  chats: { type: Array, required: true },
-  others: { type: Object, required: true }
+  chats: { type: Array, default: () => [] },
+  others: { type: Object, default: () => ({}) }
 })
 
 const emit = defineEmits(['newMessage'])
@@ -380,8 +417,6 @@ async function sendMessage() {
       }
       
       isShowingImgInput.value = false
-      
-      toast.success('Đã gửi tin nhắn')
       scrollToBottom()
     }
   } catch (error) {
