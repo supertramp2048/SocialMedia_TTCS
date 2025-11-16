@@ -2,6 +2,11 @@ import './assets/main.css'
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
+// file pond
+
+import 'filepond/dist/filepond.min.css'
+import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.css'
+
 // thư viện popup
 import Toast from 'vue-toastification'
 import 'vue-toastification/dist/index.css'

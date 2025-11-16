@@ -21,7 +21,7 @@
                 :class="otherId == item.user.id ? 'bg-sky-500':''"
                 >
                   <img 
-                  :src= item.user.avatar
+                  :src= "item.user.avatar"
                   class="h-10 w-10 rounded-full bg-sky-100 flex items-center justify-center text-xs font-semibold text-sky-600"></img>
                   <div class="flex-1">
                     <p class="text-sm font-semibold text-gray-900">{{item.user.name}}</p>
@@ -74,11 +74,14 @@
             :class="otherId == item.user.id ? 'bg-sky-500':''"
             class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 cursor-pointer" @click="closeSidebar">
               <img 
-              :src= item.user.avatar
+              :src= "item.user.avatar"
               class="h-10 w-10 rounded-full bg-sky-100 flex items-center justify-center text-xs font-semibold text-sky-600"></img>
               <div class="flex-1">
                 <p class="text-sm font-semibold text-gray-900">{{item.user.name}}</p>
-                <p class="text-xs text-gray-500">{{item.last_message.content}}</p>
+                <p class="text-xs text-gray-500">
+                  <span v-if="item?.last_message?.content">{{item?.last_message?.content}}</span>
+                  <span v-else-if="!item?.last_message?.content && item?.image_url"> Đã gửi ảnh</span>
+                  </p>
               </div>
             </router-link>
           </div>
@@ -95,6 +98,7 @@ import api from '../../../../API/axios'
 import Layout from '@/views/client/layout/layout.vue'
 import ChatContainer from './chatContainer.vue'
 import {useRoute, useRouter} from 'vue-router'
+
 const echo = inject('echo')
 const isLoadingChatHistory = ref(false)
 const isSidebarOpen = ref(false)
@@ -126,6 +130,8 @@ watch(()=>route.query.id, async (newVal)=>{
 })
 let chatChannel = null
   function handleNewMessage(obj){
+    const convertedArray = obj.image_url ? obj.image_url.split(', ') : []
+    obj.image_url = convertedArray
     chatHistory.value.push(obj)
   }
 // HÀM ĐĂNG KÝ CHANNEL – tách riêng cho dễ gọi lại
@@ -157,13 +163,14 @@ const subscribeToChannel = () => {
     // event nhan duoc tu pusher
     .listen('.MessageSent', (payload) => {
       console.log(' Đã nhận event .MessageSent:', payload)
+      const arrayConverted = payload.imageUrl ? payload.imageUrl.split(', ') : []
+      payload.imageUrl = arrayConverted
       let newMessage = {
         content: payload.MessageText,
         created_at: payload.createAt,
         id: null,
         image_url: payload.imageUrl,
         receiver_id: payload.ReceiverId,
-        receiver_id: auth.user.id
       }
       //console.log("obj message ", newMessage);
       chatHistory.value.push(newMessage)
@@ -243,6 +250,13 @@ onMounted(async () => {
   //  console.log("history ",res3.data);
   
   chatHistory.value = res3.data
+  chatHistory.value.forEach(item => {
+  if (typeof item.image_url === 'string' && item.image_url.trim() !== '') {
+    item.image_url = item.image_url.split(', ')
+  } else {
+    item.image_url = []   // không có ảnh thì gán mảng rỗng
+  }
+})
   } catch (error) {
     console.error('Lỗi load conversations:', error)
   }

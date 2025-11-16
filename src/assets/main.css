@@ -126,5 +126,25 @@
     .btnEffect {
         @apply active:scale-95
     }
+    .filepond--item {
+      width: calc(33.33% - 0.5em) !important;
+      margin-bottom: 0.6em;
+    }
+    .emoji-mart-emoji span {
+      font-size: 20px !important;
+    }
+
+    @media (max-width: 768px) {
+      .filepond--item {
+        width: calc(50% - 0.5em) !important;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .filepond--item {
+        width: calc(100% - 0.5em) !important;
+      }
+    }
+
 }
 
