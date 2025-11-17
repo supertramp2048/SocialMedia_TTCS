@@ -17,7 +17,7 @@
                 <router-link 
                 v-for="item in conversations" :key="item?.conversation_id"
                 :to="{path:'/nhan-tin', query:{id: item.user.id}}"
-                class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 cursor-pointer"
+                class="flex items-center gap-3 px-4 py-3 hover:bg-sky-200 cursor-pointer"
                 :class="otherId == item.user.id ? 'bg-sky-500':''"
                 >
                   <img 
@@ -25,7 +25,8 @@
                   class="h-10 w-10 rounded-full bg-sky-100 flex items-center justify-center text-xs font-semibold text-sky-600"></img>
                   <div class="flex-1">
                     <p class="text-sm font-semibold text-gray-900">{{item.user.name}}</p>
-                    <p class="text-xs text-gray-500">{{item?.last_message?.content}}</p>
+                    <p v-if="item.last_message.sender_id != auth?.user?.id" class="text-xs text-gray-500">{{item?.last_message?.content}}</p>
+                    <p v-else class="text-xs text-gray-500" >Bạn: {{item?.last_message?.content}}</p>
                   </div>
                 </router-link>
               </div>
@@ -289,19 +290,9 @@ onMounted(async () => {
 })
   chatHistory.value = rawChatHistory
   // thử subscribe ngay nếu user đã có sẵn
-  subscribeToChannel()
-  subscribeToChannelConversation()
-  // nếu auth.user được set bất đồng bộ (vd: sau khi refresh mới restore từ localStorage),
-  // watch để khi có user.id thì auto subscribe
-  watch(
-    () => auth.user && auth.user.id,
-    (newVal, oldVal) => {
-      if (newVal && newVal !== oldVal) {
-        // console.log('🔄 auth.user.id thay đổi, subscribe lại channel')
-        subscribeToChannel()
-      }
-    }
-  )
+  // subscribeToChannel()
+  // subscribeToChannelConversation()
+  
   
   } catch (error) {
     console.error('Lỗi load conversations:', error)
@@ -310,6 +301,19 @@ onMounted(async () => {
     isLoadingChatHistory.value = false
   }
 })
+  // nếu auth.user được set bất đồng bộ (vd: sau khi refresh mới restore từ localStorage),
+  // watch để khi có user.id thì auto subscribe
+watch(
+    () => auth.user && auth.user.id,
+    (newVal, oldVal) => {
+      if (newVal && newVal !== oldVal) {
+        // console.log('🔄 auth.user.id thay đổi, subscribe lại channel')
+        subscribeToChannel()
+        subscribeToChannelConversation()
+      }
+    }
+    ,{immediate: true}
+  )
 
 onBeforeUnmount(() => {
   if (echo && auth.user && auth.user.id) {
