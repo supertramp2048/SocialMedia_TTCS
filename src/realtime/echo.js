@@ -1,11 +1,9 @@
 // src/echo.js
 import Echo from 'laravel-echo'
 import Pusher from 'pusher-js'
-import Cookies from 'js-cookie'
+import api from '../../API/axios' // Import axios instance đã config
 
 window.Pusher = Pusher
-
-// Bật Pusher logging để debug
 window.Pusher.logToConsole = true
 
 const echo = new Echo({
@@ -14,13 +12,22 @@ const echo = new Echo({
   cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
   forceTLS: true,
 
-  authEndpoint: `${import.meta.env.VITE_API_BASE}/broadcasting/auth`,
-
-  auth: {
-    headers: {
-      // Lấy token mới mỗi lần auth (không cache)
-      Authorization: `Bearer ${Cookies.get('token') }`,
-      Accept: 'application/json',
+  authorizer: (channel, options) => {
+    return {
+      authorize: (socketId, callback) => {
+        // ✅ Dùng axios instance đã có interceptor set token
+        api.post('/broadcasting/auth', {
+          socket_id: socketId,
+          channel_name: channel.name
+        })
+        .then(response => {
+          callback(null, response.data)
+        })
+        .catch(error => {
+          console.error('❌ Echo authorize error:', error)
+          callback(error, null)
+        })
+      }
     }
   }
 })
