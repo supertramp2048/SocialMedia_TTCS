@@ -25,8 +25,14 @@
                   class="h-10 w-10 rounded-full bg-sky-100 flex items-center justify-center text-xs font-semibold text-sky-600"></img>
                   <div class="flex-1">
                     <p class="text-sm font-semibold text-gray-900">{{item.user.name}}</p>
-                    <p v-if=" Number(item.last_message.sender_id) !== Number(auth?.user?.id)" class="text-xs text-gray-500">{{item?.last_message?.content}}</p>
-                    <p v-else class="text-xs text-gray-500" >Bạn: {{item?.last_message?.content}}</p>
+                    <div v-if="item?.last_message?.content">
+                      <p v-if=" Number(item.last_message.sender_id) !== Number(auth?.user?.id)" class="text-xs text-gray-500">{{item?.last_message?.content}}</p>
+                      <p v-else class="text-xs text-gray-500" >Bạn: {{item?.last_message?.content}}</p>
+                    </div>
+                    <div v-else>
+                      <p v-if=" Number(item.last_message.sender_id) !== Number(auth?.user?.id)" class="text-xs text-gray-500">Đã gửi ảnh</p>
+                      <p v-else class="text-xs text-gray-500" >Bạn: Đã gửi ảnh</p>
+                    </div>
                   </div>
                 </router-link>
               </div>

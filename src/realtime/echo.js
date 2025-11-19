@@ -15,7 +15,7 @@ const echo = new Echo({
   authorizer: (channel, options) => {
     return {
       authorize: (socketId, callback) => {
-        // ✅ Dùng axios instance đã có interceptor set token
+
         api.post('/broadcasting/auth', {
           socket_id: socketId,
           channel_name: channel.name
