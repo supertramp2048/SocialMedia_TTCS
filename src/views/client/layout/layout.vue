@@ -422,7 +422,7 @@ function generateNotificationText(item) {
       return `${senderName} đã vote bài viết của bạn`
     case 'follow':
       return `${senderName} đã theo dõi bạn`
-    case 'reply':
+    case 'reply_comment':
       return `${senderName} đã trả lời bình luận của bạn`
     default:
       return `${senderName} đã đăng bài viết mới`

@@ -14,13 +14,13 @@
                 <p class="text-xs text-gray-500 mt-1">Chọn cuộc trò chuyện để xem chi tiết</p>
               </div>
               <div class="flex-1 overflow-y-auto divide-y divide-gray-100">
-                <router-link 
+                <router-link
                 v-for="item in conversations" :key="item?.conversation_id"
                 :to="{path:'/nhan-tin', query:{id: item.user.id}}"
                 class="flex items-center gap-3 px-4 py-3 hover:bg-sky-200 cursor-pointer"
                 :class="otherId == item.user.id ? 'bg-sky-500':''"
                 >
-                  <img 
+                  <img
                   :src= "item.user.avatar"
                   class="h-10 w-10 rounded-full bg-sky-100 flex items-center justify-center text-xs font-semibold text-sky-600"></img>
                   <div class="flex-1">
@@ -66,7 +66,7 @@
             </button>
           </div>
 
-          <div 
+          <div
           class="flex-1 overflow-y-auto divide-y divide-gray-100"
           >
             <router-link
@@ -74,7 +74,7 @@
             :to="{path:'/nhan-tin', query:{id: item.user.id}}"
             :class="otherId == item.user.id ? 'bg-sky-500':''"
             class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 cursor-pointer" @click="closeSidebar">
-              <img 
+              <img
               :src= "item.user.avatar"
               class="h-10 w-10 rounded-full bg-sky-100 flex items-center justify-center text-xs font-semibold text-sky-600"></img>
               <div class="flex-1">
@@ -131,7 +131,7 @@ watch(()=>route.query.id, async (newVal)=>{
     })
     chatHistory.value = rawChatHistory
   } catch (error) {
-    
+
   }
   finally{
     isLoadingChatHistory.value = false
@@ -190,14 +190,14 @@ const subscribeToChannel = () => {
     .error((error) => {
       console.error('❌ Lỗi khi subscribe channel:', error)
     })
-    
+
   // Bật Pusher logging
   if (window.Pusher) {
     window.Pusher.logToConsole = true
     //console.log(' Pusher logging đã bật')
   }
 }
-let converationChannel = null
+let conversationChannel = null
 const  subscribeToChannelConversation = () => {
     if (!echo) {
     console.warn('Echo is not provided!')
@@ -209,18 +209,18 @@ const  subscribeToChannelConversation = () => {
     return
     }
     const userId = String(auth.user.id)
-    const channelName = `converation.change.${userId}`
-    if(converationChannel){
+    const channelName = `conversation.change.${userId}`
+    if(conversationChannel){
       echo.leave(channelName)
-      converationChannel = null
+      conversationChannel = null
     }
 
-    converationChannel = echo.private(channelName)
+    conversationChannel = echo.private(channelName)
     .subscribed(() => {
      // console.log("Đã subscribe thành công channel: ",channelName);
     })
     .listen('.ConversationChange', async (payload) => {
-      console.log("da nhan event chang converation ",payload);
+      console.log("da nhan event chang conversation ",payload);
       const idxOfOldItem = conversations.value.findIndex(item => item.conversation_id == payload.conversationId)
       if(idxOfOldItem !== -1){
         conversations.value[idxOfOldItem].last_message.content = payload.lastMessageContent
@@ -229,7 +229,7 @@ const  subscribeToChannelConversation = () => {
         const newObjConversation = {
           conversation_id: payload.conversationId,
           last_message: {
-            content: payload.lastMessageContent,           
+            content: payload.lastMessageContent,
             created_at: null,
             id: payload.lastMessageId,
             receiver_id: payload.receiverId,
@@ -244,10 +244,10 @@ const  subscribeToChannelConversation = () => {
         conversations.value.push(newObjConversation)
       }
       console.log("mang conversation ",conversations.value);
-      
+
     })
 }
-// ham chuyen attribute tu string thanh mang 
+// ham chuyen attribute tu string thanh mang
 const normalizeChatHistory = (raw) => {
   if (!Array.isArray(raw)) return []
 
@@ -279,7 +279,7 @@ onMounted(async () => {
     otherUser.value = res2.data
     const res3 = await api.get(`/realtime/messages/${otherId.value}`)
   //  console.log("history ",res3.data);
-  
+
   const rawChatHistory = res3.data
   rawChatHistory.forEach(item => {
   if (typeof item.image_url === 'string' && item.image_url.trim() !== '') {
@@ -292,8 +292,8 @@ onMounted(async () => {
   // thử subscribe ngay nếu user đã có sẵn
   // subscribeToChannel()
   // subscribeToChannelConversation()
-  
-  
+
+
   } catch (error) {
     console.error('Lỗi load conversations:', error)
   }
@@ -319,7 +319,7 @@ onBeforeUnmount(() => {
   if (echo && auth.user && auth.user.id) {
     const channelName = `App.Models.User.${auth.user.id}`
     echo.leave(channelName)
-    const channelConversationName = `converation.change.${auth.user.id}`
+    const channelConversationName = `conversation.change.${auth.user.id}`
     echo.leave(channelConversationName)
     //  console.log('Đã rời khỏi channel:', channelName)
   }
