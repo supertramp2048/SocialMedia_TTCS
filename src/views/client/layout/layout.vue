@@ -30,8 +30,8 @@
               <div class="flex items-center gap-4" v-if="auth.user">
                 <router-link
                   to='/bai-dang/viet-bai'
-                  class="btnEffect border border-gray-400 px-4 py-2 rounded-2xl"> 
-                    <i class="fa-solid fa-feather"></i> Viết bài 
+                  class="btnEffect border border-gray-400 px-4 py-2 rounded-2xl">
+                    <i class="fa-solid fa-feather"></i> Viết bài
                 </router-link>
                 <router-link
                 to='/nhan-tin'
@@ -39,14 +39,92 @@
                 >
                 <i class="fa-brands fa-signal-messenger"></i>
                 </router-link>
+
+               <!-- Notification icon -->
+              <div class="relative" ref="notificationMenuRef">
+                  <button
+                    @click.stop="toggleNotificationMenu"
+                    class="relative p-2 rounded-full hover:bg-gray-100 text-gray-600 hover:text-blue-600 transition-colors duration-200 focus:outline-none"
+                  >
+                    <i class="fa-regular fa-bell text-xl"></i>
+
+                    <span
+                      v-if="unreadCount > 0"
+                      class="absolute top-0 right-0 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-white transform translate-x-1/4 -translate-y-1/4 bg-red-500 rounded-full ring-2 ring-white"
+                    >
+                      {{ unreadCount }}
+                    </span>
+                  </button>
+
+                  <transition
+                    enter-active-class="transition ease-out duration-200"
+                    enter-from-class="opacity-0 translate-y-1"
+                    enter-to-class="opacity-100 translate-y-0"
+                    leave-active-class="transition ease-in duration-150"
+                    leave-from-class="opacity-100 translate-y-0"
+                    leave-to-class="opacity-0 translate-y-1"
+                  >
+                    <div
+                      v-if="showNotificationMenu"
+                      class="absolute right-0 mt-3 w-80 md:w-96 bg-white rounded-xl shadow-2xl ring-1 ring-black ring-opacity-5 overflow-hidden z-50 origin-top-right"
+                    >
+                      <div class="px-4 py-3 border-b border-gray-100 bg-white">
+                        <h3 class="font-bold text-gray-800">Thông báo</h3>
+                      </div>
+
+                      <div class="max-h-[400px] overflow-y-auto"
+                        @scroll.passive="handleScroll">
+                        <div v-if="notifications.length > 0">
+                          <div
+                            v-for="item in notifications"
+                            :key="item.id"
+                            @click="handleNotificationClick(item)"
+                            class="group relative px-4 py-3 hover:bg-gray-50 transition-colors cursor-pointer border-b border-gray-50 last:border-0 flex gap-3 items-start"
+                          >
+                            <div class="flex-shrink-0 mt-1">
+                              <div v-if="item.type === 'comment'" class="w-9 h-9 rounded-full bg-green-100 flex items-center justify-center text-green-600">
+                                <i class="fa-regular fa-comment"></i>
+                              </div>
+                              <div v-else-if="item.type === 'vote'" class="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+                                <i class="fa-solid fa-thumbs-up"></i>
+                              </div>
+                              <div v-else class="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center text-gray-500">
+                                <i class="fa-regular fa-bell"></i>
+                              </div>
+                            </div>
+
+                            <div class="flex-1 min-w-0">
+                              <p class="text-sm text-gray-800 leading-snug mb-1">
+                                {{ generateNotificationText(item) }}
+                              </p>
+                              <p class="text-xs text-gray-400 flex items-center gap-1">
+                                <i class="fa-regular fa-clock text-[10px]"></i>
+                                {{ formatDate(item.created_at) }}
+                              </p>
+                            </div>
+
+                            <div class="w-2 h-2 rounded-full bg-blue-500 mt-2 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                          </div>
+                        </div>
+
+                        <div v-else class="flex flex-col items-center justify-center py-8 text-gray-400">
+                          <i class="fa-regular fa-bell-slash text-3xl mb-2 text-gray-300"></i>
+                          <p class="text-sm">Không có thông báo nào</p>
+                        </div>
+                      </div>
+                    </div>
+                  </transition>
+                </div>
+
+                <!-- User Menu -->
                 <div class="relative flex">
                     <button @click="showUserMenu = !showUserMenu ">
                       <img :src="auth.user.avatar" class="w-[50px] h-[50px] rounded-full" alt="">
-                    </button>       
+                    </button>
                     <span
                       class="absolute bottom-1/2  -right-1/2 -translate-x-1/2 transform border-8 border-b-red-400 border-t-transparent border-l-transparent border-r-transparent transition-all duration-300 ease-in-out"
                       :class="showUserMenu ? 'translate-y-2 rotate-180 opacity-100' : 'translate-y-0 opacity-70'"
-                    ></span>        
+                    ></span>
                 <!-- Menu dropdown -->
                 <transition name="fade">
                   <div
@@ -59,7 +137,7 @@
                         <p class="font-bold text-gray-800">{{ auth.user.name }}</p>
                         <p class="text-sm text-gray-500">{{ auth.user.email }}</p>
                       </div>
-                      <button 
+                      <button
                         @click="goProfilePage(auth.user.id, auth.user.name)"
                         class=" btnEffect border rounded-2xl border-gray-300 py-0.5 px-2"
                       >
@@ -156,7 +234,7 @@
           type="button"
           class="px-3 py-2 text-sm text-gray-700 hover:text-sky-700 hover:bg-sky-50 rounded-md transition-colors"
           :class="{'bg-sky-300': chossenCate == category.id}"
-         
+
           :to="{ path: '/', query: { page:1, category:category.id, slug: category.slug, sort: 'hot' } }"
         >
           {{ category.name }}
@@ -214,20 +292,26 @@
         © 2025 - Spiderum Clone by Huy
       </div>
     </footer>
+    <ToastNotification ref="toastNotification" @toast-click="handleToastClick"/>
   </div>
 </template>
 
 <script setup lang="js">
-import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
+import { ref, computed, watch, inject, onMounted, onUnmounted, h } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '../../../stores/auth'
 import { useCategoryStore } from '../../../stores/categories'
 import api from "../../../../API/axios"
 import SearchForm from '../../../components/searchForm.vue'
+import ToastNotification from './ToastNotification.vue'
 // lay tat ca cac bien tu localStorage
 
 //-------------
+
+const echo = inject('echo')
+
 const showFormSearch = ref(false)
+const toastNotification = ref(null)
 const auth = useAuthStore()
 const categoriesStore = useCategoryStore()
 const router = useRouter()
@@ -251,7 +335,7 @@ function logout() {
     auth.logout?.()
     router.push('/')
   }
-   
+
 }
 // ---- MENU CATEGORY (giữ logic hiện có) ----
 const showMobileMenu = ref(false)
@@ -273,11 +357,198 @@ function goProfilePage(id, name) {
   })
 }
 
+const showNotificationMenu = ref(false)
+const notificationMenuRef = ref(false)
+const notifications = ref([])
+const unreadCount = ref(0)
+const pagination = ref({
+  current_page: 1,
+  last_page: 1,
+});
+const loadingMore = ref(false);
+// Lấy dữ liệu từ API
+async function loadNotifications(page = 1, append = false) {
+  if (loading.value) return;
+
+  loading.value = true;
+  try {
+    const response = await api.get('/realtime/notifications', {
+      params: { page }
+    });
+
+    const data = response.data;
+    if (append) {
+      notifications.value.push(...data.data);
+    } else {
+      notifications.value = data.data;
+    }
+
+    // Cập nhật phân trang
+    pagination.value.current_page = data.current_page;
+    pagination.value.last_page = data.last_page;
+
+    // Cập nhật số lượng chưa đọc
+    unreadCount.value = data.unread_count || 0;
+  } catch (err) {
+    console.error('Failed to load notifications:', err);
+  } finally {
+    loading.value = false;
+  }
+}
+
+// Xử lý sự kiện scroll để load thêm
+async function handleScroll(e) {
+  const container = e.target;
+  if (loadingMore.value) return;
+
+  // Kiểm tra nếu đã cuộn gần đến đáy
+  if (container.scrollTop + container.clientHeight >= container.scrollHeight - 50) {
+    if (pagination.value.current_page < pagination.value.last_page) {
+      loadingMore.value = true;
+      await loadNotifications(pagination.value.current_page + 1, true);
+      loadingMore.value = false;
+    }
+  }
+}
+
+
+// Hàm sinh text thông báo
+function generateNotificationText(item) {
+  const senderName = item.sender?.name || 'Ai đó'
+  switch(item.type) {
+    case 'comment':
+      return `${senderName} đã bình luận trên bài viết của bạn`
+    case 'vote':
+      return `${senderName} đã vote bài viết của bạn`
+    case 'follow':
+      return `${senderName} đã theo dõi bạn`
+    case 'reply':
+      return `${senderName} đã trả lời bình luận của bạn`
+    default:
+      return `${senderName} đã đăng bài viết mới`
+  }
+}
+
+// Hàm format thời gian hiển thị
+function formatDate(dateStr) {
+  const d = new Date(dateStr)
+  return d.toLocaleString('vi-VN', { hour12: false })
+}
+
 function handleClickOutside(e) {
   if (moreMenuRef.value && !moreMenuRef.value.contains(e.target)) closeMore()
+  if (notificationMenuRef.value && !notificationMenuRef.value.contains(e.target)) closeNotificationMenu()
 }
 onMounted(() => document.addEventListener('click', handleClickOutside))
 onUnmounted(() => document.removeEventListener('click', handleClickOutside))
+onMounted(() => {
+  loadNotifications()
+
+  if (auth.user) {
+    subscribeNotificationChannel(auth.user.id)
+  }
+
+  loadNotifications()
+})
+async function toggleNotificationMenu() {
+  showNotificationMenu.value = !showNotificationMenu.value
+
+  if (showNotificationMenu.value && unreadCount.value > 0) {
+    try {
+      // Gửi request lên server đánh dấu tất cả là read
+      await api.post('/realtime/notifications/mark-all-read')
+
+      // Cập nhật local
+      notifications.value = notifications.value.map(n => ({
+        ...n,
+        read_at: n.read_at || new Date().toISOString()
+      }))
+
+      // Cập nhật badge
+      unreadCount.value = 0
+    } catch (err) {
+      console.error('Failed to mark notifications as read:', err)
+    }
+  }
+}
+
+function closeNotificationMenu() {
+  showNotificationMenu.value = false
+}
+function handleToastClick(item) {
+  handleNotificationClick(item)
+  // Xử lý điều hướng hoặc hành động khác dựa trên payload
+}
+
+async function handleNotificationClick(item) {
+  try {
+
+    // Điều hướng dựa theo loại thông báo
+    switch(item.type) {
+      case 'comment':
+      case 'reply':
+      case 'vote':
+      case 'post':
+        if (item.post_id) {
+          // Dùng path trực tiếp
+          router.push(`/bai-dang?id=${item.post_id}`)
+        }
+        break
+      case 'follow':
+        if (item.sender?.id) {
+          // Path vẫn đúng với router hiện tại
+          router.push(`/nguoi-dung/${item.sender.name}?user_id=${item.sender.id}`)
+        }
+        break
+      default:
+        console.log('Unknown notification type')
+    }
+  } catch (err) {
+    console.error('Failed to handle notification click:', err)
+  }
+}
+
+// Đăng ký kênh Pusher
+function subscribeNotificationChannel(userId) {
+  const events = [
+    "PostCreatedNotification",
+    "VoteNotification",
+    "replyCommentNotification",
+    "FollowedNotification",
+    "CommentNotification"
+  ];
+
+  // 1. Khởi tạo kênh trước
+  const channel = echo.private(`notifications.${userId}`);
+
+  // 2. Lặp qua từng sự kiện để lắng nghe
+  events.forEach(eventName => {
+    channel.listen(eventName, (payload) => {
+      console.log(`🔔 New notification [${eventName}]:`, payload);
+
+      // Thêm vào danh sách thông báo ở FE
+      notifications.value.unshift({
+        id: crypto.randomUUID(),
+        post_id: payload.post_id,
+        type: payload.type,
+        title: payload.title,
+        created_at: payload.created_at,
+        read_at: null,
+        sender: payload.sender ?? null,
+      });
+
+      // Tăng số lượng badge
+      unreadCount.value++;
+
+      // Hiển thị toast notification
+      toastNotification.value?.showToast(
+        "Thông báo mới",
+        generateNotificationText(payload),
+        payload // Gửi toàn bộ payload để xử lý khi click
+      );
+    });
+  });
+}
 
 
 </script>
