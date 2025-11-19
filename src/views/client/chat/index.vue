@@ -216,7 +216,7 @@ const subscribeToChannel = () => {
     //console.log(' Pusher logging đã bật')
   }
 }
-let converationChannel = null
+let conversationChannel = null
 const  subscribeToChannelConversation = () => {
     if (!echo) {
     console.warn('Echo is not provided!')
@@ -228,18 +228,18 @@ const  subscribeToChannelConversation = () => {
     return
     }
     const userId = String(auth.user.id)
-    const channelName = `converation.change.${userId}`
-    if(converationChannel){
+    const channelName = `conversation.change.${userId}`
+    if(conversationChannel){
       echo.leave(channelName)
-      converationChannel = null
+      conversationChannel = null
     }
 
-    converationChannel = echo.private(channelName)
+    conversationChannel = echo.private(channelName)
     .subscribed(() => {
      // console.log("Đã subscribe thành công channel: ",channelName);
     })
     .listen('.ConversationChange', async (payload) => {
-      console.log("da nhan event chang converation ",payload);
+      console.log("da nhan event chang conversation ",payload);
       const idxOfOldItem = conversations.value.findIndex(item => item.conversation_id == payload.conversationId)
       if(idxOfOldItem !== -1){
         const last = conversations.value[idxOfOldItem].last_message
@@ -344,7 +344,7 @@ onBeforeUnmount(() => {
   if (echo && auth.user && auth.user.id) {
     const channelName = `App.Models.User.${auth.user.id}`
     echo.leave(channelName)
-    const channelConversationName = `converation.change.${auth.user.id}`
+    const channelConversationName = `conversation.change.${auth.user.id}`
     echo.leave(channelConversationName)
     //  console.log('Đã rời khỏi channel:', channelName)
   }
