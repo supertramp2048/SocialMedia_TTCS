@@ -1,0 +1,192 @@
+<template>
+  <div>
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-2xl font-bold text-gray-900">Categories</h1>
+      <button
+        @click="showCreateModal = true"
+        class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+      >
+        Create Category
+      </button>
+    </div>
+
+    <DataTable
+      :columns="columns"
+      :data="categoriesStore.categories"
+      :searchable="true"
+      search-placeholder="Search categories..."
+      @search="handleSearch"
+    >
+      <template #actions="{ row }">
+        <button
+          @click="handleEdit(row)"
+          class="text-blue-600 hover:text-blue-800"
+        >
+          Edit
+        </button>
+        <button
+          @click="handleDelete(row)"
+          class="ml-2 text-red-600 hover:text-red-800"
+        >
+          Delete
+        </button>
+      </template>
+    </DataTable>
+
+    <Pagination
+      v-if="categoriesStore.pagination.total > 0"
+      :current-page="categoriesStore.pagination.current_page"
+      :last-page="categoriesStore.pagination.last_page"
+      :total="categoriesStore.pagination.total"
+      :from="(categoriesStore.pagination.current_page - 1) * categoriesStore.pagination.per_page + 1"
+      :to="Math.min(categoriesStore.pagination.current_page * categoriesStore.pagination.per_page, categoriesStore.pagination.total)"
+      @page-change="handlePageChange"
+    />
+
+    <Modal
+      :is-open="showCreateModal || showEditModal"
+      :title="showEditModal ? 'Edit Category' : 'Create Category'"
+      @close="closeModal"
+      @confirm="handleConfirm"
+    >
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Name</label>
+          <input
+            v-model="form.name"
+            type="text"
+            required
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg"
+            placeholder="Category name"
+          />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Slug (optional)</label>
+          <input
+            v-model="form.slug"
+            type="text"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg"
+            placeholder="category-slug"
+          />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Description (optional)</label>
+          <textarea
+            v-model="form.description"
+            rows="3"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg"
+            placeholder="Category description"
+          ></textarea>
+        </div>
+      </div>
+    </Modal>
+
+    <Modal
+      :is-open="deleteModalOpen"
+      title="Delete Category"
+      @close="deleteModalOpen = false"
+      @confirm="confirmDelete"
+    >
+      <p>Are you sure you want to delete this category? This action cannot be undone.</p>
+    </Modal>
+  </div>
+</template>
+
+<script setup>
+import { ref, onMounted } from 'vue'
+import { useCategoriesStore } from '@/stores/categories'
+import { useToast } from 'vue-toastification'
+import DataTable from '@/components/common/DataTable.vue'
+import Pagination from '@/components/common/Pagination.vue'
+import Modal from '@/components/common/Modal.vue'
+
+const categoriesStore = useCategoriesStore()
+const toast = useToast()
+
+const columns = [
+  { key: 'name', label: 'Name' },
+  { key: 'slug', label: 'Slug' },
+  { key: 'description', label: 'Description' },
+  { key: 'created_at', label: 'Created' },
+]
+
+const showCreateModal = ref(false)
+const showEditModal = ref(false)
+const deleteModalOpen = ref(false)
+
+// JS thuần: chỉ cần ref(null)
+const selectedCategory = ref(null)
+
+const form = ref({
+  name: '',
+  slug: '',
+  description: '',
+})
+
+const handleSearch = (query) => {
+  // nếu có search thì anh thêm param ở đây
+  categoriesStore.fetchCategories({ page: 1 /*, search: query */ })
+}
+
+const handlePageChange = (page) => {
+  categoriesStore.fetchCategories({ page })
+}
+
+const handleEdit = (category) => {
+  selectedCategory.value = category
+  form.value = {
+    name: category.name,
+    slug: category.slug,
+    description: category.description || '',
+  }
+  showEditModal.value = true
+}
+
+const handleDelete = (category) => {
+  selectedCategory.value = category
+  deleteModalOpen.value = true
+}
+
+const closeModal = () => {
+  showCreateModal.value = false
+  showEditModal.value = false
+  form.value = {
+    name: '',
+    slug: '',
+    description: '',
+  }
+  selectedCategory.value = null
+}
+
+const handleConfirm = async () => {
+  try {
+    if (showEditModal.value && selectedCategory.value) {
+      await categoriesStore.updateCategory(selectedCategory.value.id, form.value)
+      toast.success('Category updated successfully')
+    } else {
+      await categoriesStore.createCategory(form.value)
+      toast.success('Category created successfully')
+    }
+    closeModal()
+  } catch (error) {
+    toast.error(error?.response?.data?.message || 'Failed to save category')
+  }
+}
+
+const confirmDelete = async () => {
+  if (!selectedCategory.value) return
+
+  try {
+    await categoriesStore.deleteCategory(selectedCategory.value.id)
+    toast.success('Category deleted successfully')
+    deleteModalOpen.value = false
+    selectedCategory.value = null
+  } catch (error) {
+    toast.error(error?.response?.data?.message || 'Failed to delete category')
+  }
+}
+
+onMounted(() => {
+  categoriesStore.fetchCategories()
+})
+</script>
