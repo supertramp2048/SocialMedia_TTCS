@@ -130,10 +130,15 @@ router.beforeEach(async (to, from, next) => {
     // Load user from storage if not loaded (non-blocking)
     if (!authStore.user && authStore.token) {
       // Don't await - let it load in background to avoid blocking navigation
-      authStore.fetchCurrentUser().catch((error) => {
+      if(!localStorage.getItem('user')){
+        authStore.fetchCurrentUser().catch((error) => {
         console.warn('Failed to fetch current user:', error)
         authStore.logout()
       })
+      }
+      else{
+        authStore.loadUserFromStorage()
+      }
     }
 
     // Check if route requires guest (not authenticated)

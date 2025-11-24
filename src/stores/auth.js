@@ -21,7 +21,7 @@ export const useAuthStore = defineStore('auth', () => {
       
       // Save token to cookie
       Cookies.set('token', response.token, {
-        expires: 7,
+        expires: 365,
         secure: false,
         sameSite: 'lax',
       })

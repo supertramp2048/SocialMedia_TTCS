@@ -18,6 +18,7 @@
         Comment Reports
       </button>
       <button
+        v-if="user?.role == 'admin' || user?.role == 'superadmin'"
         @click="activeTab = 'users'"
         :class="activeTab === 'users' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'"
         class="px-4 py-2 rounded-lg"
@@ -91,10 +92,11 @@ import { useToast } from 'vue-toastification'
 import DataTable from '@/components/common/DataTable.vue'
 import Pagination from '@/components/common/Pagination.vue'
 import ReportDetailModal from '../reports/ReportDetail.vue'
-
+import {useAuthStore} from '../../stores/auth'
 const showDetail = ref(false)
 const selectedReport = ref(null)
-
+const auth = useAuthStore()
+const user = ref(auth.user)
 const openReport = (row) => {
   if(activeTab.value == 'posts'){
     selectedReport.value = row
@@ -194,11 +196,15 @@ const handleResolve = async (report) => {
   try {
     if (activeTab.value === 'posts') {
       await reportsStore.resolvePostReport(report.evidence_post.id)
+      await reportsStore.deleteReportPost(report.report_id)
     } else if (activeTab.value === 'comments') {
       await reportsStore.resolveCommentReport(report.evidence_comment.id)
+      await reportsStore.deleteReportComment(report.report_id)
     } else {
       await reportsStore.resolveUserReport(report.id)
+      await reportsStore.deleteReportUser(report.report_id)
     }
+
     toast.success('Report resolved successfully')
   } catch (error) {
     toast.error(error?.response?.data?.message || 'Failed to resolve report')

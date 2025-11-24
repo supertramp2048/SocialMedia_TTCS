@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { reportsApi } from '@/api/reports'
-
+import { useAuthStore } from '../stores/auth'
 export const useReportsStore = defineStore('reports', () => {
   const postReports = ref([])
   const commentReports = ref([])
@@ -116,22 +116,29 @@ export const useReportsStore = defineStore('reports', () => {
   }
 
   async function fetchUserReports(params) {
-    loading.value = true
-    try {
-      const response = await reportsApi.getUserReports(params)
-      console.log("user report ",response.data)
-      userReports.value = response.data
-      pagination.value = {
-        current_page: response.current_page,
-        last_page: response.last_page,
-        per_page: response.per_page,
-        total: response.total,
+    const auth = useAuthStore()
+    if(auth.user.role=='admin'|| auth.user.role=='superadmin'){
+      loading.value = true
+      try {
+        const response = await reportsApi.getUserReports(params)
+        console.log("user report ",response.data)
+        userReports.value = response.data
+        pagination.value = {
+          current_page: response.current_page,
+          last_page: response.last_page,
+          per_page: response.per_page,
+          total: response.total,
+        }
+        return response
+      } catch (error) {
+        console.log(error.message)
+      } finally {
+        loading.value = false
       }
-      return response
-    } catch (error) {
-      console.log(error.message)
-    } finally {
-      loading.value = false
+    }
+    else{
+      userReports.value = null
+      return null
     }
   }
 

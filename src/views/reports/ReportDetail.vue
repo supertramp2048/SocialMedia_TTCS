@@ -138,97 +138,97 @@
     v-if="userHistory?.violations?.removed_posts?.length"
     class="pt-4 border-t border-gray-200"
   >
-    <p class="text-sm font-semibold text-gray-900 mb-2">
-      Bài viết đã bị gỡ ({{ userHistory.violations.removed_posts.length }})
-    </p>
-    <ul class="space-y-2 max-h-60 overflow-y-auto">
-      <li
-        v-for="postItem in userHistory.violations.removed_posts"
-        :key="postItem.id"
-        class="p-2 bg-white rounded border border-gray-200"
+      <p class="text-sm font-semibold text-gray-900 mb-2">
+        Bài viết đã bị gỡ ({{ userHistory.violations.removed_posts.length }})
+      </p>
+      <ul class="space-y-2 max-h-60 overflow-y-auto">
+        <li
+          v-for="postItem in userHistory.violations.removed_posts"
+          :key="postItem.id"
+          class="p-2 bg-white rounded border border-gray-200"
+        >
+          <p class="text-sm font-medium text-gray-900 line-clamp-2">
+            {{ postItem.title }}
+          </p>
+          <p class="text-xs text-gray-500 mt-1">
+            Đăng lúc: {{ formatDate(postItem.created_at) }}
+          </p>
+          <p class="text-xs text-gray-500">
+            Trạng thái: 
+            <span class="text-red-600" v-if="postItem.status === 'removed_by_mod'">
+              Đã bị gỡ bởi moderator
+            </span>
+            <span v-else>
+              {{ postItem.status }}
+            </span>
+          </p>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Bình luận đã bị gỡ -->
+    <div
+      v-if="userHistory?.violations?.removed_comments?.length"
+      class="pt-4 border-t border-gray-200"
+    >
+      <p class="text-sm font-semibold text-gray-900 mb-2">
+        Bình luận đã bị gỡ ({{ userHistory.violations.removed_comments.length }})
+      </p>
+      <ul class="space-y-2 max-h-60 overflow-y-auto">
+        <li
+          v-for="comment in userHistory.violations.removed_comments"
+          :key="comment.id"
+          class="p-2 bg-white rounded border border-gray-200"
+        >
+          <p class="text-xs text-gray-500">
+            {{ formatDate(comment.created_at) }}
+          </p>
+          <p class="text-sm text-gray-800 mt-1">
+            {{ comment.content }}
+          </p>
+        </li>
+      </ul>
+    </div>
+
+      <!-- Các báo cáo đang hoạt động -->
+      <div
+        v-if="userHistory?.violations?.active_user_reports?.length"
+        class="pt-4 border-t border-gray-200"
       >
-        <p class="text-sm font-medium text-gray-900 line-clamp-2">
-          {{ postItem.title }}
+        <p class="text-sm font-semibold text-gray-900 mb-2">
+          Số lượt báo cáo tài khoản này ({{ userHistory.violations.active_user_reports.length }})
         </p>
-        <p class="text-xs text-gray-500 mt-1">
-          Đăng lúc: {{ formatDate(postItem.created_at) }}
-        </p>
-        <p class="text-xs text-gray-500">
-          Trạng thái: 
-          <span class="text-red-600" v-if="postItem.status === 'removed_by_mod'">
-            Đã bị gỡ bởi moderator
-          </span>
-          <span v-else>
-            {{ postItem.status }}
-          </span>
-        </p>
-      </li>
-    </ul>
-  </div>
+        <ul class="space-y-2 max-h-60 overflow-y-auto">
+          <li
+            v-for="active in userHistory.violations.active_user_reports"
+            :key="active.report_id"
+            class="p-2 bg-white rounded border border-gray-200"
+          >
+            <p class="text-sm text-gray-800">
+              <span class="font-medium">Lý do:</span>
+              {{ active.reason }}
+            </p>
+            <p class="text-xs text-gray-500 mt-1">
+              Thời gian: {{ formatDate(active.reported_at) }}
+            </p>
+            <p class="text-xs text-gray-500">
+              Người báo cáo:
+              <span class="font-medium">
+                {{ active.reporter?.name }}
+              </span>
+            </p>
+          </li>
+        </ul>
+      </div>
 
-              <!-- Bình luận đã bị gỡ -->
-              <div
-                v-if="userHistory?.violations?.removed_comments?.length"
-                class="pt-4 border-t border-gray-200"
-              >
-                <p class="text-sm font-semibold text-gray-900 mb-2">
-                  Bình luận đã bị gỡ ({{ userHistory.violations.removed_comments.length }})
-                </p>
-                <ul class="space-y-2 max-h-60 overflow-y-auto">
-                  <li
-                    v-for="comment in userHistory.violations.removed_comments"
-                    :key="comment.id"
-                    class="p-2 bg-white rounded border border-gray-200"
-                  >
-                    <p class="text-xs text-gray-500">
-                      {{ formatDate(comment.created_at) }}
-                    </p>
-                    <p class="text-sm text-gray-800 mt-1">
-                      {{ comment.content }}
-                    </p>
-                  </li>
-                </ul>
-              </div>
-
-              <!-- Các báo cáo đang hoạt động -->
-              <div
-                v-if="userHistory?.violations?.active_user_reports?.length"
-                class="pt-4 border-t border-gray-200"
-              >
-                <p class="text-sm font-semibold text-gray-900 mb-2">
-                  Số lượt báo cáo tài khoản này ({{ userHistory.violations.active_user_reports.length }})
-                </p>
-                <ul class="space-y-2 max-h-60 overflow-y-auto">
-                  <li
-                    v-for="active in userHistory.violations.active_user_reports"
-                    :key="active.report_id"
-                    class="p-2 bg-white rounded border border-gray-200"
-                  >
-                    <p class="text-sm text-gray-800">
-                      <span class="font-medium">Lý do:</span>
-                      {{ active.reason }}
-                    </p>
-                    <p class="text-xs text-gray-500 mt-1">
-                      Thời gian: {{ formatDate(active.reported_at) }}
-                    </p>
-                    <p class="text-xs text-gray-500">
-                      Người báo cáo:
-                      <span class="font-medium">
-                        {{ active.reporter?.name }}
-                      </span>
-                    </p>
-                  </li>
-                </ul>
-              </div>
-
-              <!-- Nếu có reported_user nhưng chưa load xong history -->
-              <div
-                v-if="report.reported_user && !userHistory"
-                class="pt-4 text-sm text-gray-500"
-              >
-                Đang tải lịch sử vi phạm của người dùng...
-              </div>
-            </div>
+      <!-- Nếu có reported_user nhưng chưa load xong history -->
+      <div
+        v-if="report.reported_user && !userHistory"
+        class="pt-4 text-sm text-gray-500"
+      >
+        Đang tải lịch sử vi phạm của người dùng...
+      </div>
+    </div>
 
             <!-- Fallback -->
             <div
@@ -247,10 +247,17 @@
             >
               Gỡ bỏ nội dung 
             </button>
-            <button v-else
+            <button v-if="report.reported_user"
+            @click="showFormBan = !showFormBan"
             class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
             >
             Vô hiệu tài khoản người dùng
+            </button>
+            <button v-if="report.reported_user && userHistory?.user_info.banned_until != null"
+            @click="unBan(userHistory?.user_info.id)"
+            class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+            >
+            Gỡ bỏ khóa tài khoản
             </button>
             <button
               @click="handleDelete"
@@ -259,8 +266,20 @@
               Bỏ qua
             </button>
           </div>
+          <div v-if="showFormBan" class="mt-2">
+          <label >
+              Chọn số ngày khóa tài khoản này:
+              <input type="number" class="text-center" min="1" v-model="numOfDays">
+          </label>
+          <button
+          @click="banCurentUser(userHistory?.user_info.id)"
+          class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+          >Khóa tài khoản này {{numOfDays}} ngày
+          </button>
+          </div>
         </div>
       </div>
+
     </div>
   </Teleport>
 </template>
@@ -277,6 +296,40 @@ const props = defineProps({
   report: Object
 })
 
+
+const showFormBan = ref(false)
+const numOfDays = ref(Number(1))
+async function banCurentUser(id){
+  if(!confirm('Bạn có chắc muốn khóa tài khoản này ?')) return
+  try {
+    const res = await api.post(`/api/admin/users/${id}/ban`,{
+      duration_days: numOfDays.value
+    }
+    )
+    console.log(res.data);
+    if(res.status == 200){
+      await getAnUserReportedHistory(id)
+      toast.success('Khóa tài khoản thành công')
+    }
+  } catch (error) {
+    console.log(error);
+    toast.error(error.message)
+  }
+  
+}
+
+async function unBan(id) {
+  if(!confirm('Bạn muốn gở bỏ khóa đối với tài khoản này ?')) return
+  try {
+    const res = await api.post(`/api/admin/users/${id}/unban`)
+    if(res.status == 200){
+      await getAnUserReportedHistory(id)
+      toast.success("Gỡ bỏ lệnh khóa thành công")
+    }
+  } catch (error) {
+    toast.error(error.message)
+  }
+}
 const emit = defineEmits(['close', 'resolved'])
 
 const reportsStore = useReportsStore()
