@@ -40,18 +40,28 @@
         </div>
       </template>
       <template #cell-actions="{ row }">
+        <div class="flex flex-col">
         <button
           @click="handleDelete(row.report_id)"
-          class="text-red-600 hover:text-red-400"
+
+          class="text-red-600 hover:text-red-400 bg-white hover:bg-gray-100 shadow-2xl rounded-2xl"
         >
           Bỏ qua
         </button>
         <button
+          @click="openReport(row)"
+          class="text-sky-600 hover:text-sky-400 bg-white hover:bg-gray-100 shadow-2xl rounded-2xl"
+        >
+          Chi tiết
+        </button>
+        <button
+          v-if="activeTab !='users'"
           @click="handleResolve(row)"
-          class="ml-2 text-green-600 hover:text-green-800"
+          class="text-green-600 hover:text-green-800 bg-white hover:bg-gray-100 shadow-2xl rounded-2xl"
         >
           Gỡ bỏ nội dung vi phạm
         </button>
+        </div>
       </template>
     </DataTable>
 
@@ -65,6 +75,13 @@
       @page-change="handlePageChange"
     />
   </div>
+  <ReportDetailModal
+      v-if="selectedReport != null"
+      :show="showDetail"
+      :report="selectedReport"
+      @close="showDetail = false"
+      @resolved="handleResolved"
+    />
 </template>
 
 <script setup>
@@ -73,6 +90,26 @@ import { useReportsStore } from '@/stores/reports'
 import { useToast } from 'vue-toastification'
 import DataTable from '@/components/common/DataTable.vue'
 import Pagination from '@/components/common/Pagination.vue'
+import ReportDetailModal from '../reports/ReportDetail.vue'
+
+const showDetail = ref(false)
+const selectedReport = ref(null)
+
+const openReport = (row) => {
+  if(activeTab.value == 'posts'){
+    selectedReport.value = row
+    console.log("selected: ",selectedReport.value);
+  }
+  else if(activeTab.value == 'comments'){
+    selectedReport.value = row
+    console.log("selected: ",selectedReport.value);
+  }
+  else if(activeTab.value == 'users'){
+    selectedReport.value = row
+    console.log("selected: ",selectedReport.value);
+  }
+  showDetail.value = true
+}
 
 const reportsStore = useReportsStore()
 const toast = useToast()
@@ -81,12 +118,34 @@ const toast = useToast()
 // vẫn hiểu logic là 'posts' | 'comments' | 'users'
 const activeTab = ref('posts')
 
-const columns = [
-  { key: 'reason', label: 'Reason' },
-  { key: 'reporter.name', label: 'Reported By' },
-  { key: 'reported_at', label: 'Created' },
-  {key: 'actions', label: 'actions'}
-]
+const columns = computed(() => {
+  const base = [
+    { key: 'reason', label: 'Reason' },
+    { key: 'reporter.name', label: 'Reported By' },
+    { key: 'reported_at', label: 'Created' },
+    { key: 'actions', label: 'Actions' },
+  ];
+
+  if (activeTab.value === 'posts') {
+    return [
+      { key: 'evidence_post.title', label: 'Tiêu đề bài viết' },
+      ...base,
+    ];
+  }
+  else if (activeTab.value === 'comments') {
+    return [
+      { key: 'evidence_comment.content', label: 'Nội dung bình luận' },
+      ...base,
+    ];
+  }
+  else if (activeTab.value === 'users') {
+    return [
+      { key: 'reported_user.name', label: 'Người dùng' },
+      ...base,
+    ];
+  }
+  return base;
+});
 
 const currentReports = computed(() => {
   if (activeTab.value === 'posts') return reportsStore.postReports
@@ -129,13 +188,14 @@ const handleDelete = async (id) =>{
 }
 
 const handleResolve = async (report) => {
-  if (!confirm('Are you sure you want to resolve this report?')) return
-
+  if (!confirm('Bạn muốn gỡ bỏ nội dung này khỏi trang người dùng ?')) return
+  console.log("resolve: ",report);
+  
   try {
     if (activeTab.value === 'posts') {
-      await reportsStore.resolvePostReport(report.id)
+      await reportsStore.resolvePostReport(report.evidence_post.id)
     } else if (activeTab.value === 'comments') {
-      await reportsStore.resolveCommentReport(report.id)
+      await reportsStore.resolveCommentReport(report.evidence_comment.id)
     } else {
       await reportsStore.resolveUserReport(report.id)
     }

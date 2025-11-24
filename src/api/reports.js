@@ -15,6 +15,11 @@ export const reportsApi = {
     const response = await apiClient.get('/api/moderator/reports/users', { params })
     return response.data
   },
+
+  getAnUserHistoryReported: async (params) => {
+    const res = await apiClient.get(`/api/admin/users/${params}/moderation-history`)
+    return res.data
+  },
   deleteReportPost: async (reportId) => {
     const res = await apiClient.delete(`/api/moderator/reports/posts/${reportId}`)
   },
@@ -24,15 +29,14 @@ export const reportsApi = {
   deleteReportUser: async (reportId) => {
     const res = await apiClient.delete(`/api/moderator/reports/users/${reportId}`)
   },
-  resolvePostReport: async (reportId) => {
-    const response = await apiClient.delete(`/api/moderator/reports/users/${reportId}`)
+  resolvePostReport: async (postReportId) => {
+    const response = await apiClient.delete(`/api/posts/${postReportId}`)
     return response.data
   },
-  resolveCommentReport: async (reportId) => {
-    const response = await apiClient.delete(`/api/moderator/reports/comments/${reportId}`)
+  resolveCommentReport: async (commentReportId) => {
+    const response = await apiClient.delete(`api/comments/${commentReportId}`)
     return response.data
   },
-
   resolveUserReport: async (reportId) => {
     const response = await apiClient.delete(`/api/moderator/reports/users/${reportId}`)
     return response.data

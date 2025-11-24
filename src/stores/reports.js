@@ -34,7 +34,19 @@ export const useReportsStore = defineStore('reports', () => {
       loading.value = false
     }
   }
-
+  async function getAnUserReportedHistory(params) {
+    try {
+      loading.value = true
+      const res = await reportsApi.getAnUserHistoryReported(params)
+      return res
+    } catch (error) {
+      console.log(error);
+      
+    }
+    finally{
+      loading.value = false
+    }
+  }
   async function deleteReportPost(params) {
     try{
       loading.value = true
@@ -88,6 +100,7 @@ export const useReportsStore = defineStore('reports', () => {
     try {
       const response = await reportsApi.getCommentReports(params)
       commentReports.value = response.data
+      console.log("comment report ",response.data)
       pagination.value = {
         current_page: response.current_page,
         last_page: response.last_page,
@@ -106,6 +119,7 @@ export const useReportsStore = defineStore('reports', () => {
     loading.value = true
     try {
       const response = await reportsApi.getUserReports(params)
+      console.log("user report ",response.data)
       userReports.value = response.data
       pagination.value = {
         current_page: response.current_page,
@@ -154,6 +168,7 @@ export const useReportsStore = defineStore('reports', () => {
     userReports,
     pagination,
     loading,
+    getAnUserReportedHistory,
     deleteReportComment,
     deleteReportPost,
     deleteReportUser,
