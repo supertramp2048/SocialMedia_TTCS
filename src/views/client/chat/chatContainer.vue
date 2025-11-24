@@ -149,7 +149,7 @@
                   :showPreview="false"
                   title="Chọn biểu tượng cảm xúc"
                   emoji="point_up"
-                  class="w-[320px] h-[360px]"
+                  class="w-[320px] h-[360px] "
                   @select="insertEmoji"
                 />
               </div>
@@ -169,7 +169,8 @@
             <div class="chat-input-box flex-1">
               <form @submit.prevent="sendMessage">
                 <input
-                  v-model="contentMessage" 
+                  v-model="contentMessage"
+                  ref='messageInput' 
                   type="text" 
                   placeholder="Nhập tin nhắn..." 
                   :disabled="loading"
@@ -235,6 +236,22 @@ const showViewer = ref(false)
 const currentImage = ref("")
 const galleryImages = ref([])
 const galleryStartIndex = ref(0)
+// chuyen con tro xuong cuoi khi go chu vao o input
+    const messageInput = ref(null)
+    const handleInput = () => {
+      nextTick(() => {
+        moveCursorToEnd()
+      })
+    }
+
+    const moveCursorToEnd = () => {
+      const el = messageInput.value
+      if (!el) return
+
+      const length = el.value.length
+      el.focus()
+      el.setSelectionRange(length, length)
+    }
 
 // Mở viewer cho 1 ảnh đơn (giữ nguyên behavior cũ)
 const openViewer = (src) => {
@@ -256,6 +273,9 @@ const isShowEmojiPicker = ref(false)
 
 function insertEmoji(emoji) {
   contentMessage.value += emoji.native
+  nextTick(() => {
+  moveCursorToEnd();
+});
 }
 
 const isShowingImgInput = ref(false)

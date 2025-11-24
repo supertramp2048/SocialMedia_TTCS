@@ -23,8 +23,14 @@
                   class="h-10 w-10 rounded-full bg-sky-100 flex items-center justify-center text-xs font-semibold text-sky-600"></img>
                   <div class="flex-1">
                     <p class="text-sm font-semibold text-gray-900">{{item.user.name}}</p>
-                    <p v-if="item.last_message.sender_id != auth?.user?.id" class="text-xs text-gray-500">{{item?.last_message?.content}}</p>
-                    <p v-else class="text-xs text-gray-500" >Bạn: {{item?.last_message?.content}}</p>
+                    <div v-if="item?.last_message?.content">
+                      <p v-if=" Number(item.last_message.sender_id) !== Number(auth?.user?.id)" class="text-xs text-gray-500">{{item?.last_message?.content}}</p>
+                      <p v-else class="text-xs text-gray-500" >Bạn: {{item?.last_message?.content}}</p>
+                    </div>
+                    <div v-else>
+                      <p v-if=" Number(item.last_message.sender_id) !== Number(auth?.user?.id)" class="text-xs text-gray-500">Đã gửi ảnh</p>
+                      <p v-else class="text-xs text-gray-500" >Bạn: Đã gửi ảnh</p>
+                    </div>
                   </div>
                 </router-link>
               </div>
@@ -170,8 +176,21 @@ const subscribeToChannel = () => {
     // event nhan duoc tu pusher
     .listen('.MessageSent', (payload) => {
       console.log(' Đã nhận event .MessageSent:', payload)
-      const arrayConverted = payload.imageUrl ? payload.imageUrl.split(', ') : []
-      payload.imageUrl = arrayConverted
+
+      let imageArray = []
+
+      if (Array.isArray(payload.imageUrl)) {
+        // Backend đã gửi sẵn dạng mảng
+        imageArray = payload.imageUrl
+      } else if (typeof payload.imageUrl === 'string' && payload.imageUrl.trim() !== '') {
+        // Backend gửi dạng string "url1, url2"
+        imageArray = payload.imageUrl.split(', ')
+      } else {
+        // null / undefined / rỗng
+        imageArray = []
+      }
+      payload.imageUrl = imageArray
+
       let newMessage = {
         content: payload.MessageText,
         created_at: payload.createAt,
@@ -221,8 +240,14 @@ const  subscribeToChannelConversation = () => {
       console.log("da nhan event chang conversation ",payload);
       const idxOfOldItem = conversations.value.findIndex(item => item.conversation_id == payload.conversationId)
       if(idxOfOldItem !== -1){
-        conversations.value[idxOfOldItem].last_message.content = payload.lastMessageContent
-      }
+        const last = conversations.value[idxOfOldItem].last_message
+
+        last.content     = payload.lastMessageContent
+        last.id          = payload.lastMessageId
+        last.sender_id   = payload.senderId
+        last.receiver_id = payload.receiverId
+        last.created_at  = payload.lastMessageCreatedAt ?? last.created_at
+        }
       else{
         const newObjConversation = {
           conversation_id: payload.conversationId,
