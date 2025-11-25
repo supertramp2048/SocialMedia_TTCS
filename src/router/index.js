@@ -10,19 +10,19 @@ const router = createRouter({
       path: '/',
       name: 'home',
       component: HomeView,
-      meta: { requiresAuth: true } 
+      meta: { requiresAuth: true }
     },
     {
       path: '/bai-dang/viet-bai',
       name: 'Viết bài đăng',
       component: () => import('../views/client/createNewArticale/index.vue'),
-      meta: { requiresAuth: true } 
+      meta: { requiresAuth: true }
     },
     {
       path: '/bai-dang/sua-bai',
       name: 'Sửa bài đăng',
       component: () => import('../views/client/fixArtical/index.vue'),
-      meta: { requiresAuth: true } 
+      meta: { requiresAuth: true }
     },
     {
       path: '/dang-ky',
@@ -33,7 +33,7 @@ const router = createRouter({
       path: '/about',
       name: 'about',
       component: () => import('../views/client/about/index.vue'),
-      meta: { requiresAuth: true } 
+      meta: { requiresAuth: true }
     },
     {
       path: '/login',
@@ -44,43 +44,43 @@ const router = createRouter({
       path: '/bai-dang',
       name: 'Chi tiết bài đăng',
       component: () => import('../views/client/postDetail/index.vue'),
-      meta: { requiresAuth: true } 
+      meta: { requiresAuth: true }
     },
     {
       path: '/tim-kiem',
       name: 'Tìm kiếm',
       component: () => import('../views/client/searchPage/index.vue'),
-      meta: { requiresAuth: true } 
+      meta: { requiresAuth: true }
     },
     {
       path: '/nhan-tin',
       name: 'chat',
       component: () => import('../views/client/chat/index.vue'),
-      meta: { requiresAuth: true } 
+      meta: { requiresAuth: true }
     },
     {
       path: '/nguoi-dung/:name',
       name: 'Trang cá nhân',
       component: () => import('../views/client/profilePage/index.vue'),
-      meta: { requiresAuth: true } 
+      meta: { requiresAuth: true }
     },
     {
       path: '/password-reset/:token',
       name: 'Đặt lại mật khẩu',
       component: () => import('../views/client/forgotPassword/resetPassword.vue'),
-      meta: { requiresAuth: true } 
+      meta: { requiresAuth: true }
     },
     {
       path: '/quen-mat-khau',
       name: 'Quên mật khẩu',
       component: () => import('../views/client/forgotPassword/index.vue'),
-      meta: { requiresAuth: true } 
+      meta: { requiresAuth: true }
     },
     {
       path: '/nguoi-dung/cai-dat',
       name: 'Trang tùy chỉnh tài khoản',
       component: () => import('../views/client/userSetting/index.vue'),
-      meta: { requiresAuth: true } 
+      meta: { requiresAuth: true }
     }
   ],
   // scrollBehavior(to, from, savedPosition) {
@@ -95,12 +95,16 @@ const router = createRouter({
 })
 router.beforeEach(async (to, from, next)=>{
   //console.log("lấy user từ local");
-  
+
   if (to.meta.requiresAuth){
-  let token = Cookies.get('token')  
+  let token = Cookies.get('token')
   if(token){
     const auth = useAuthStore()
     auth.getUserFromLocal()
+<<<<<<< HEAD
+=======
+
+>>>>>>> long
   }
 }
   next()

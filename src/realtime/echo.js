@@ -20,7 +20,7 @@ const echo = new Echo({
       authorize: (socketId, callback) => {
         console.log('🔐 Authorizing channel:', channel.name)
         console.log('🔌 Socket ID:', socketId)
-        
+
         // ✅ Dùng axios instance đã có interceptor set token
         api.post('/broadcasting/auth', {
           socket_id: socketId,

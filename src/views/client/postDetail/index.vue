@@ -13,9 +13,9 @@
       <!-- Top Banner Ad -->
       <div class="flex justify-center py-8 bg-white">
         <div class="w-full max-w-[680px] px-4">
-          <img 
-            :src="post.data?.thumbnail_url" 
-            alt="Banner Ad" 
+          <img
+            :src="post.data?.thumbnail_url"
+            alt="Banner Ad"
             class="w-full h-auto rounded"
           />
         </div>
@@ -37,7 +37,7 @@
         <!-- Article Body -->
         <article class="prose prose-lg max-w-none" v-html="post.data?.content_html">
         </article>
-        
+
         <!-- upvote downvote report bài viết  -->
         <div class=" mt-3 flex justify-between border-b border-border-lighter mb-6">
           <div class="flex items-center gap-4 py-6 ">
@@ -84,12 +84,12 @@
 <!-- option báo cáo bài viết, tác giả or bài viết -->
 
             <div class="relative" ref="menuRef">
-              <button 
+              <button
                 v-if="auth?.user?.id != post?.data?.author?.id "
                 @click.stop="showOption = !showOption"
                 :aria-expanded="showOption"
                 aria-haspopup="menu"
-                class="p-1 ml-auto" 
+                class="p-1 ml-auto"
                 aria-label="More options">
                 <svg width="4" height="16" viewBox="0 0 4 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path
@@ -106,9 +106,9 @@
                   />
                 </svg>
               </button>
-              
+
               <!-- Sử dụng ReportMenu component -->
-              <ReportMenu 
+              <ReportMenu
                 v-if="showOption"
                 :items="postMenuItems"
                 align="right"
@@ -122,9 +122,9 @@
         <div class="flex items-center gap-4 mb-8">
           <UserDiv :user="post.data?.author" :date="null"  ></UserDiv>
           <div v-if="post?.data?.author?.id != auth?.user?.id ">
-            <button 
+            <button
               @click="followHandler"
-              v-if="post?.data?.is_following_author == false " 
+              v-if="post?.data?.is_following_author == false "
               :disabled="isLoading"
               :aria-busy="isLoading"
               class="relative flex items-center justify-center gap-2 btnEffect px-4 py-2.5 rounded border border-[#E3E3E3] text-sm text-text-primary disabled:opacity-60 disabled:cursor-not-allowed disabled:pointer-events-none">
@@ -134,7 +134,7 @@
                   <span class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"></span>
                 </span>
             </button>
-            <button 
+            <button
               v-else-if="post?.data?.is_following_author == true"
               @click="followHandler"
               :disabled="isLoading"
@@ -147,7 +147,7 @@
               </span>
             </button>
           </div>
-          
+
         </div>
       </div>
 
@@ -177,7 +177,7 @@
               </span>
             </div>
             <div class="flex justify-end mt-4">
-              <button 
+              <button
                 type="submit"
                 :disabled="commentSubmitting"
                 :aria-busy="commentSubmitting"
@@ -195,7 +195,7 @@
           <div v-else class="border-b border-border-lighter pb-6 mb-6">
             <p class="text-xl font-bold">Hãy đăng nhập để bình luận</p>
           </div>
-          
+
           <!-- Skeleton khi load lần đầu -->
           <SkeletonList
             v-if="isLoadingComments && parentComments.length === 0"
@@ -219,12 +219,12 @@
 
                 <!-- Menu báo cáo cho comment -->
                 <div class="relative" :ref="el => commentMenuRefs[comment.id] = el">
-                  <button 
+                  <button
                     v-if="auth?.user?.id != comment.author?.id "
                     @click.stop="toggleCommentMenu(comment.id)"
                     :aria-expanded="openMenuCommentId === comment.id"
                     aria-haspopup="menu"
-                    class="p-1 text-gray-400 hover:text-gray-600 transition-colors" 
+                    class="p-1 text-gray-400 hover:text-gray-600 transition-colors"
                     aria-label="Tùy chọn bình luận">
                     <svg width="4" height="16" viewBox="0 0 4 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path
@@ -241,9 +241,9 @@
                       />
                     </svg>
                   </button>
-                  
+
                   <!-- Sử dụng ReportMenu component -->
-                  <ReportMenu 
+                  <ReportMenu
                     v-if="openMenuCommentId === comment.id"
                     :items="getCommentMenuItems(comment)"
                     align="right"
@@ -251,7 +251,7 @@
                   />
                 </div>
               </div>
-            
+
               <div class="items-center gap-3 text-text-secondary text-opacity-75">
                 <div class="flex ml-[68px]">
                   <button
@@ -261,7 +261,7 @@
                   >
                     Trả lời
                   </button>
-                  
+
                   <button
                     v-if="user && Number(comment.author?.id) === Number(user?.id)"
                     class="text-[13px] font-bold p-[5px] rounded-2xl hover:bg-sky-300"
@@ -269,7 +269,7 @@
                   >
                     Sửa
                   </button>
-                  
+
                   <button
                     v-if="user && Number(comment.author?.id) === Number(user?.id)"
                     class="text-[13px] font-bold p-[5px] rounded-2xl hover:bg-sky-300"
@@ -341,19 +341,19 @@
               </div>
 
               <div class="ml-[68px]">
-                <button 
-                  @click="toggle(comment.id)" 
-                  v-if="comment.replies_count > 0" 
-                  class="text-[15px] font-bold text-blue-500" 
+                <button
+                  @click="toggle(comment.id)"
+                  v-if="comment.replies_count > 0"
+                  class="text-[15px] font-bold text-blue-500"
                 >
                   {{
                     show.includes(comment.id)
-                      ?  'Ẩn trả lời' 
+                      ?  'Ẩn trả lời'
                       : `${comment.replies_count} Trả lời`
                   }}
                 </button>
               </div>
-              
+
               <ChildComments
                 v-if="show.includes(comment.id)"
                 :parent_id="comment.id"
@@ -395,7 +395,7 @@
       </div>
       </template>
     </main>
-    
+
     <ReportModal
       v-model="showReportPostForm"
       :id="idReport"
@@ -407,12 +407,12 @@
 
 <script setup lang='js'>
 import Layout from '../layout/layout.vue'
-import { ref, computed, watch, onMounted, onUnmounted, onBeforeUnmount } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted, onBeforeUnmount, inject } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth';
 import { storeToRefs } from 'pinia'
 import api from "../../../../API/axios"
-import ReportModal from '../../../components/reportForm.vue' 
+import ReportModal from '../../../components/reportForm.vue'
 import ReportMenu from '../../../components/ReportMenu.vue'
 import SkeletonLoader from '../../../components/ui/SkeletonLoader.vue'
 import SkeletonList from '../../../components/skeleton/SkeletonList.vue'
@@ -434,14 +434,14 @@ const idReport = ref('')
 
 function reportPost(idPost){
   showReportPostForm.value = true
-  typeOfReport.value = 'posts' 
+  typeOfReport.value = 'posts'
   idReport.value = idPost
   showOption.value = false
 }
 
 function reportComment(idComment){
   showReportPostForm.value = true
-  typeOfReport.value = 'comments' 
+  typeOfReport.value = 'comments'
   idReport.value = idComment
   openMenuCommentId.value = null
 }
@@ -482,7 +482,7 @@ const postMenuItems = computed(() => [
 // Menu items cho từng comment
 function getCommentMenuItems(comment) {
   const isOwnComment = auth?.user?.id === comment.author?.id
-  
+
   return [
     {
       label: 'Báo cáo người dùng',
@@ -498,19 +498,20 @@ function getCommentMenuItems(comment) {
   ]
 }
 
-const replies = ref([])    
-const postSuggested = ref([])    
+const replies = ref([])
+const postSuggested = ref([])
 const route = useRoute()
 const apiUrl = import.meta.env.VITE_API_BASE
 const loading = ref(false)
 const isLoading = ref(false)
 const commentSubmitting = ref(false)
-
+const parentComments = ref([])
 const reloadKey = ref({})
+
 
 const auth = useAuthStore()
 const {user} = storeToRefs(auth)
-
+const echo = inject('echo');
 // hien form reply
 const showReply = ref([])
 function showReplyForm(id){
@@ -547,10 +548,10 @@ async function sendComment(content, post_id){
       post_id: post_id
     });
     console.log(res.data);
-    
+
     if (res.status === 201) {
       content_comment.value = '';
-      
+
       // Nếu backend trả về comment object trong response, unshift vào đầu mảng
       const newComment = res.data?.data ?? res.data;
       if (newComment && newComment.id) {
@@ -561,7 +562,7 @@ async function sendComment(content, post_id){
         objPaginationComment.value.page = 1;
         await getParentComments(Number(route.query.id));
       }
-      
+
       // Cập nhật comments_count
       if (typeof post.value?.data?.comments_count === 'number') {
         post.value.data.comments_count = (post.value.data.comments_count || 0) + 1;
@@ -677,7 +678,7 @@ async function deleteComment(id, parent_id){
   try {
     const res = await api.delete(`${apiUrl}/api/comments/${id}`)
     console.log(res.status);
-    
+
     if (res.status === 200 || res.status === 204) {
       if (parent_id == null) {
         // Xóa comment cha trong parentComments
@@ -737,7 +738,6 @@ let objPaginationComment = ref({
   page: 1,
   limit: 10,
 })
-const parentComments = ref([])
 
 // upvote bài viết
 async function upvote(postId){
@@ -747,7 +747,7 @@ async function upvote(postId){
     if (res.status === 200) {
       const next = Number(res.data?.vote_score ?? optimistic)
       post.value.data.vote_score = next
-      
+
       if (res.data?.user_vote != null) {
         post.value.data.user_vote = Number(res.data.user_vote)
       }
@@ -770,7 +770,7 @@ async function downvote(postId){
     if (res.status === 200) {
       const next = Number(res.data?.vote_score ?? optimistic)
       post.value.data.vote_score = next
-      
+
       if (res.data?.user_vote != null) {
         post.value.data.user_vote = Number(res.data.user_vote)
       }
@@ -785,7 +785,7 @@ async function downvote(postId){
   }
 }
 
-watch(() => route.query.id, 
+watch(() => route.query.id,
   async (newId) => {
     if(!newId) return
     const res = await api.get(`${apiUrl}/api/posts/${newId}`)
@@ -799,9 +799,9 @@ onMounted(async () => {
     const postId = Number(route.query.id)
     const res = await api.get(`${apiUrl}/api/posts/${postId}`)
     post.value = res.data
-  
-    const res1 = await api.get(`${apiUrl}/api/posts`, { 
-      params: { limit: 5, sort: 'hot', category: post.value.data.category?.id } 
+
+    const res1 = await api.get(`${apiUrl}/api/posts`, {
+      params: { limit: 5, sort: 'hot', category: post.value.data.category?.id }
     })
     postSuggested.value = res1.data.data.filter(item => item.id !== post.value.id)
 
@@ -809,11 +809,71 @@ onMounted(async () => {
   } catch (error) {
     alert("Hệ thống đang bảo trì")
   }
-  
+
   // Đăng ký click outside listener
   document.addEventListener('click', handleClickOutside)
-})
 
+  console.log('🚀 Kết nối Echo:', echo);
+  if (post.value?.data?.id) {
+    const channelName = `comment.${post.value.data.id}`; // Kênh public (dùng echo.channel)
+    // Nếu là kênh private (cần login mới xem được cmt) thì dùng echo.private
+    echo.private(channelName)
+      .listen('CommentSent', (event) => {
+        console.log('📨 Nhận sự kiện CommentSent:', event);
+
+        // 1. Chuẩn hóa dữ liệu
+        const newComment = {
+            id: event.id,
+            post_id: event.post_id,
+            parent_id: event.parent_id,
+            content: event.content,
+            created_at: event.created_at,
+            updated_at: event.created_at,
+            author: event.sender ? {
+                id: event.sender.id,
+                name: event.sender.name,
+                avatar: event.sender.avatar
+            } : null,
+            replies_count: 0
+        };
+        if(auth.user?.id === newComment.author.id){
+          // Bỏ qua nếu comment do chính user hiện tại gửi
+          return;
+        }
+        // 2. Xử lý hiển thị comment mới
+        if (!newComment.parent_id) {
+          // TRƯỜNG HỢP 1: COMMENT CHA MỚI
+          // Thêm vào đầu danh sách
+          parentComments.value.unshift(newComment);
+
+          // Tăng tổng số comment của bài viết
+          if (post.value?.data) {
+            post.value.data.comments_count = (post.value.data.comments_count || 0) + 1;
+          }
+
+        } else {
+          // TRƯỜNG HỢP 2: COMMENT CON (REPLY)
+          // Tìm comment cha của nó
+          const parent = parentComments.value.find(c => c.id === newComment.parent_id);
+
+          if (parent) {
+            // Tăng số lượng reply hiển thị ở nút "Xem trả lời"
+            parent.replies_count = (parent.replies_count || 0) + 1;
+
+            // Nếu danh sách con đang mở, kích hoạt reloadKey để ChildComponent tự fetch lại
+            if (show.value.includes(parent.id)) {
+              reloadKey.value[parent.id] = (reloadKey.value[parent.id] || 0) + 1;
+            }
+
+            // Tăng tổng số comment của bài viết
+            if (post.value?.data) {
+              post.value.data.comments_count = (post.value.data.comments_count || 0) + 1;
+            }
+          }
+        }
+      });
+    }
+  })
 async function followHandler(){
   try {
     isLoading.value = true
@@ -837,7 +897,7 @@ function handleClickOutside(e) {
   if (menuRef.value && !menuRef.value.contains(e.target)) {
     showOption.value = false
   }
-  
+
   // Đóng menu comment
   if (openMenuCommentId.value !== null) {
     const commentMenuEl = commentMenuRefs.value[openMenuCommentId.value]
@@ -853,7 +913,7 @@ const isLoadingComments = ref(false)
 
 async function getParentComments(postId) {
   console.log('goi ham get comment');
-  
+
   try {
     if (objPaginationComment.value.page === 1) {
       isLoadingComments.value = true
@@ -887,7 +947,7 @@ async function getParentComments(postId) {
 }
 
 async function loadMoreComments() {
-  
+
   if (isLoadingMore.value) return
   if (metaComment.value && metaComment.value.current_page >= metaComment.value.last_page) return
 
@@ -902,4 +962,13 @@ async function loadMoreComments() {
 onBeforeUnmount(() => {
   document.removeEventListener('click', handleClickOutside)
 })
+
+onUnmounted(() => {
+  const echo = inject('echo');
+  if (echo && post.value?.data?.id) {
+    const channelName = `comment.${post.value.data.id}`;
+    echo.leave(channelName);
+    console.log('🔌 Đã rời kênh:', channelName);
+  }
+});
 </script>
