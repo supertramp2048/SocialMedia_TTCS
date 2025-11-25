@@ -297,7 +297,7 @@
 </template>
 
 <script setup lang="js">
-import { ref, computed, watch, inject, onMounted, onUnmounted, h } from 'vue'
+import { ref, computed, watch, inject, onMounted, onUnmounted, } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '../../../stores/auth'
 import { useCategoryStore } from '../../../stores/categories'
@@ -486,7 +486,7 @@ async function handleNotificationClick(item) {
     // Điều hướng dựa theo loại thông báo
     switch(item.type) {
       case 'comment':
-      case 'reply':
+      case 'reply_comment':
       case 'vote':
       case 'post':
         if (item.post_id) {
