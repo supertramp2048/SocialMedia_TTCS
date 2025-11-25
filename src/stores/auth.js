@@ -23,6 +23,11 @@ export const useAuthStore = defineStore('auth', {
             }
         },
         async logout(){
+            try {
+                const res = await api.post('/api/logout')
+            } catch (error) {
+                alert(error.message)
+            }
             this.user = null,
             this.token = null,
             Cookies.remove('token')

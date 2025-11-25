@@ -251,7 +251,9 @@ const  subscribeToChannelConversation = () => {
         last.created_at  = payload.lastMessageCreatedAt ?? last.created_at
         }
       else{
-        const newObjConversation = {
+        let newObjConversation = {}
+        if(payload.senderId != auth.user.id){
+          newObjConversation = {
           conversation_id: payload.conversationId,
           last_message: {
             content: payload.lastMessageContent,           
@@ -264,6 +266,24 @@ const  subscribeToChannelConversation = () => {
             avatar: payload.SenderAvatar,
             id: payload.senderId,
             name: payload.SenderName
+           }
+          }
+        }
+        else{
+          newObjConversation = {
+          conversation_id: payload.conversationId,
+          last_message: {
+            content: payload.lastMessageContent,           
+            created_at: null,
+            id: payload.lastMessageId,
+            receiver_id: payload.receiverId,
+            sender_id: payload.senderId
+          },
+          user: {
+            avatar: otherUser.value.data.avatar,
+            id: otherUser.value.data.id,
+            name: otherUser.value.data.name
+           }
           }
         }
         conversations.value.push(newObjConversation)
@@ -302,6 +322,8 @@ onMounted(async () => {
     conversations.value = res.data
     const res2 = await api.get(`/api/profiles/${otherId.value}`)
     otherUser.value = res2.data
+    console.log("other ", otherUser.value);
+    
     const res3 = await api.get(`/realtime/messages/${otherId.value}`)
   //  console.log("history ",res3.data);
   
