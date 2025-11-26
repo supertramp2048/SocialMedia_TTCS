@@ -266,7 +266,7 @@
               Bỏ qua
             </button>
           </div>
-          <div v-if="showFormBan" class="mt-2">
+          <div v-if="showFormBan && report.reported_user" class="mt-2">
           <label >
               Chọn số ngày khóa tài khoản này:
               <input type="number" class="text-center" min="1" v-model="numOfDays">

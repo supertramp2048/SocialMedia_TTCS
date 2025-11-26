@@ -1,10 +1,25 @@
 <template>
   <div>
     <h1 class="text-2xl font-bold text-gray-900 mb-6">Posts</h1>
-
+    <div class="mb-4 flex space-x-4">
+      <button
+        @click="activeTab = 'notRemovedPost'"
+        :class="activeTab === 'notRemovedPost' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'"
+        class="px-4 py-2 rounded-lg"
+      >
+        Bài viết trên trang người dùng
+      </button>
+      <button
+        @click="activeTab = 'removedPost'"
+        :class="activeTab === 'removedPost' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'"
+        class="px-4 py-2 rounded-lg"
+      >
+        Bài viết đã gỡ
+      </button>
+    </div>
     <DataTable
       :columns="columns"
-      :data="postsStore.posts"
+      :data="displayedPosts"
       :searchable="true"
       search-placeholder="Search posts..."
       @search="handleSearch"
@@ -20,19 +35,26 @@
       <template #cell-status="{ row }">
         <Badge :label="row.status" :variant="getStatusVariant(row.status)" />
       </template>
-      <template #actions="{ row }">
+      <template #cell-actions="{ row }">
         <router-link
           :to="`/admin/posts/${row.id}`"
-          class="text-blue-600 hover:text-blue-800"
+          class="text-blue-600 hover:text-blue-800 rounded-2xl py-1 px-2 hover:bg-gray-400"
         >
-          View
+          Chi tiết
         </router-link>
         <button
-          v-if="row.status === 'published'"
+          v-if="activeTab == 'notRemovedPost'"
           @click="handleDelete(row)"
-          class="ml-2 text-red-600 hover:text-red-800"
+          class="ml-2 py-1 px-2 rounded-2xl text-red-600 hover:text-red-800 hover:bg-gray-400"
         >
-          Remove
+          Gỡ bỏ
+        </button>
+        <button
+          v-else
+          @click="handleRestore(row)"
+          class="ml-2 text-green-600 hover:text-green-800 rounded-2xl py-1 px-2 hover:bg-gray-400"
+        >
+          Khôi phục
         </button>
       </template>
     </DataTable>
@@ -53,32 +75,35 @@
       @close="deleteModalOpen = false"
       @confirm="confirmDelete"
     >
-      <p>Are you sure you want to remove this post? This action cannot be undone.</p>
+      <p>Bạn muốn gỡ bỏ bài đăng này ?</p>
     </Modal>
   </div>
+  <FullScreenLoading :show="postsStore.loading" message="Đang tải dữ liệu..." />
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { usePostsStore } from '@/stores/posts'
 import { useToast } from 'vue-toastification'
 import DataTable from '@/components/common/DataTable.vue'
 import Pagination from '@/components/common/Pagination.vue'
 import Modal from '@/components/common/Modal.vue'
 import Badge from '@/components/common/Badge.vue'
-
+import FullScreenLoading from '../../components/common/fullScreenLoading.vue'
+import Loading from 'vue-loading-overlay'
+const displayedPosts = ref([])
 const postsStore = usePostsStore()
 const toast = useToast()
-
+const activeTab = ref('notRemovedPost')
 const columns = [
   { key: 'title', label: 'Title' },
-  { key: 'user.name', label: 'Author' },
-  { key: 'status', label: 'Status' },
+  { key: 'author.name', label: 'Author' },
   { key: 'created_at', label: 'Created' },
+  {key: 'actions', label: 'Action'}
 ]
 
 const deleteModalOpen = ref(false)
-const selectedPost = ref()
+const selectedPost = ref({})
 
 const getStatusVariant = (status) => {
   if (status === 'published') return 'success'
@@ -91,18 +116,30 @@ const handleSearch = (query) => {
 }
 
 const handlePageChange = (page) => {
-  postsStore.fetchPosts({ page })
+  postsStore.fetchAllPosts({ page })
 }
 
 const handleDelete = (post) => {
   selectedPost.value = post
   deleteModalOpen.value = true
 }
-
+const handleRestore = async (post) => {
+  if(!confirm('Bạn muốn khôi phục lại bài viết đã gỡ bỏ này ?')) return
+  try {
+    await postsStore.restorePost(post.id)
+    toast.success('thanh cong')
+  } catch (error) {
+    console.log(error);
+    
+    toast.error('Co loi xay ra')
+  }
+}
 const confirmDelete = async () => {
   if (!selectedPost.value) return
 
   try {
+    console.log("selected pót ",selectedPost.value.id );
+    
     await postsStore.deletePost(selectedPost.value.id)
     toast.success('Post removed successfully')
     deleteModalOpen.value = false
@@ -112,8 +149,28 @@ const confirmDelete = async () => {
   }
 }
 
-onMounted(() => {
-  postsStore.fetchPosts()
+watch(activeTab, async (newVal) =>{
+  if(newVal == 'notRemovedPost'){
+    await postsStore.fetchAllPosts()
+    displayedPosts.value = postsStore.allPosts
+  }
+  else if(newVal == 'removedPost'){
+    await postsStore.fetchRemovedPost()
+    displayedPosts.value = postsStore.allRemovedPosts
+  }
+  console.log("change displayedPosts ",displayedPosts.value);
+  
+})
+
+onMounted( async () => {
+  await postsStore.fetchAllPosts()
+  if(activeTab.value == 'notRemovedPost'){
+    displayedPosts.value = postsStore.allPosts
+  }
+  else if(activeTab.value == 'removedPost'){
+    await postsStore.fetchRemovedPost()
+    displayedPosts.value = postsStore.removedPost
+  }
 })
 </script>
 

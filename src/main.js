@@ -5,6 +5,7 @@ import { createPinia } from 'pinia'
 import Toast from 'vue-toastification'
 import 'vue-toastification/dist/index.css'
 
+import 'vue-loading-overlay/dist/css/index.css'
 import App from './App.vue'
 import router from './router'
 import echo from './plugins/echo'

@@ -3,21 +3,28 @@ import apiClient from './apiClient'
 export const reportsApi = {
   getPostReports: async (params) => {
     const response = await apiClient.get('/api/moderator/reports/posts', { params })
+    console.log(response.data);
+    
     return response.data
   },
 
   getCommentReports: async (params) => {
     const response = await apiClient.get('/api/moderator/reports/comments', { params })
+    console.log(response.data);
+    
     return response.data
   },
 
   getUserReports: async (params) => {
     const response = await apiClient.get('/api/moderator/reports/users', { params })
+    console.log(response.data);
+    
     return response.data
   },
 
   getAnUserHistoryReported: async (params) => {
     const res = await apiClient.get(`/api/admin/users/${params}/moderation-history`)
+    
     return res.data
   },
   deleteReportPost: async (reportId) => {

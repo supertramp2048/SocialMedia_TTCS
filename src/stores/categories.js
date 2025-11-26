@@ -17,6 +17,8 @@ export const useCategoriesStore = defineStore('categories', () => {
     try {
       const response = await categoriesApi.getCategories(params)
       categories.value = response.data
+      console.log("categories ", categories.value);
+      
       pagination.value = {
         current_page: response.current_page,
         last_page: response.last_page,

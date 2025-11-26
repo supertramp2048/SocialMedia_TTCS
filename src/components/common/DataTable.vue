@@ -1,13 +1,15 @@
 <template>
   <div class="bg-white rounded-lg shadow overflow-hidden">
     <div v-if="searchable" class="p-4 border-b border-gray-200">
-      <input
-        v-model="searchQuery"
-        type="text"
-        :placeholder="searchPlaceholder"
-        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-        @input="handleSearch"
-      />
+      <form @submit="handleSearch">
+          <input
+            v-model="searchQuery"
+            type="text"
+            :placeholder="searchPlaceholder"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+      </form>
+      
     </div>
 
     <div class="overflow-x-auto">
@@ -55,7 +57,7 @@
               </slot>
             </td>
           </tr>
-          <tr v-if="data.length === 0">
+          <tr v-if="data?.length === 0 ">
             <td :colspan="columns.length + (actions ? 1 : 0)" class="px-6 py-4 text-center text-gray-500">
               No data available
             </td>
@@ -68,7 +70,11 @@
 
 <script setup>
 import { ref } from 'vue'
-
+import {onMounted} from 'vue'
+onMounted(() => {
+  console.log(props.data);
+  
+})
 const props = defineProps({
   columns: {
     type: Array,

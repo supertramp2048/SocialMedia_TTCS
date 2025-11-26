@@ -3,7 +3,7 @@
     <div class="flex justify-between items-center mb-6">
       <h1 class="text-2xl font-bold text-gray-900">Categories</h1>
       <button
-        @click="showCreateModal = true"
+        @click="openCreateModal"
         class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
       >
         Create Category
@@ -17,7 +17,8 @@
       search-placeholder="Search categories..."
       @search="handleSearch"
     >
-      <template #actions="{ row }">
+      <!-- Cột actions -->
+      <template #cell-actions="{ row }">
         <button
           @click="handleEdit(row)"
           class="text-blue-600 hover:text-blue-800"
@@ -39,10 +40,14 @@
       :last-page="categoriesStore.pagination.last_page"
       :total="categoriesStore.pagination.total"
       :from="(categoriesStore.pagination.current_page - 1) * categoriesStore.pagination.per_page + 1"
-      :to="Math.min(categoriesStore.pagination.current_page * categoriesStore.pagination.per_page, categoriesStore.pagination.total)"
+      :to="Math.min(
+        categoriesStore.pagination.current_page * categoriesStore.pagination.per_page,
+        categoriesStore.pagination.total
+      )"
       @page-change="handlePageChange"
     />
 
+    <!-- Modal tạo / sửa -->
     <Modal
       :is-open="showCreateModal || showEditModal"
       :title="showEditModal ? 'Edit Category' : 'Create Category'"
@@ -81,6 +86,7 @@
       </div>
     </Modal>
 
+    <!-- Modal xóa -->
     <Modal
       :is-open="deleteModalOpen"
       title="Delete Category"
@@ -93,7 +99,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { useCategoriesStore } from '@/stores/categories'
 import { useToast } from 'vue-toastification'
 import DataTable from '@/components/common/DataTable.vue'
@@ -107,24 +113,22 @@ const columns = [
   { key: 'name', label: 'Name' },
   { key: 'slug', label: 'Slug' },
   { key: 'description', label: 'Description' },
-  { key: 'created_at', label: 'Created' },
+  { key: 'actions', label: 'Actions' },
 ]
 
 const showCreateModal = ref(false)
 const showEditModal = ref(false)
 const deleteModalOpen = ref(false)
-
-// JS thuần: chỉ cần ref(null)
 const selectedCategory = ref(null)
 
-const form = ref({
+// Dùng reactive cho form
+const form = reactive({
   name: '',
   slug: '',
   description: '',
 })
 
 const handleSearch = (query) => {
-  // nếu có search thì anh thêm param ở đây
   categoriesStore.fetchCategories({ page: 1 /*, search: query */ })
 }
 
@@ -132,13 +136,19 @@ const handlePageChange = (page) => {
   categoriesStore.fetchCategories({ page })
 }
 
+const openCreateModal = () => {
+  selectedCategory.value = null
+  form.name = ''
+  form.slug = ''
+  form.description = ''
+  showCreateModal.value = true
+}
+
 const handleEdit = (category) => {
   selectedCategory.value = category
-  form.value = {
-    name: category.name,
-    slug: category.slug,
-    description: category.description || '',
-  }
+  form.name = category?.name ?? ''
+  form.slug = category?.slug ?? ''
+  form.description = category?.description ?? ''
   showEditModal.value = true
 }
 
@@ -150,21 +160,19 @@ const handleDelete = (category) => {
 const closeModal = () => {
   showCreateModal.value = false
   showEditModal.value = false
-  form.value = {
-    name: '',
-    slug: '',
-    description: '',
-  }
+  form.name = ''
+  form.slug = ''
+  form.description = ''
   selectedCategory.value = null
 }
 
 const handleConfirm = async () => {
   try {
     if (showEditModal.value && selectedCategory.value) {
-      await categoriesStore.updateCategory(selectedCategory.value.id, form.value)
+      await categoriesStore.updateCategory(selectedCategory.value.id, { ...form })
       toast.success('Category updated successfully')
     } else {
-      await categoriesStore.createCategory(form.value)
+      await categoriesStore.createCategory({ ...form })
       toast.success('Category created successfully')
     }
     closeModal()

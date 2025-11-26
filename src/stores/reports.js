@@ -22,10 +22,10 @@ export const useReportsStore = defineStore('reports', () => {
       console.log("post report ",postReports.value);
       
       pagination.value = {
-        current_page: response.current_page,
-        last_page: response.last_page,
-        per_page: response.per_page,
-        total: response.total,
+        current_page: response.meta.current_page,
+        last_page: response.meta.last_page,
+        per_page: response.meta.per_page,
+        total: response.meta.total,
       }
       return response
     } catch (error) {
@@ -102,10 +102,10 @@ export const useReportsStore = defineStore('reports', () => {
       commentReports.value = response.data
       console.log("comment report ",response.data)
       pagination.value = {
-        current_page: response.current_page,
-        last_page: response.last_page,
-        per_page: response.per_page,
-        total: response.total,
+        current_page: response.meta.current_page,
+        last_page: response.meta.last_page,
+        per_page: response.meta.per_page,
+        total: response.meta.total,
       }
       return response
     } catch (error) {
@@ -124,11 +124,11 @@ export const useReportsStore = defineStore('reports', () => {
         console.log("user report ",response.data)
         userReports.value = response.data
         pagination.value = {
-          current_page: response.current_page,
-          last_page: response.last_page,
-          per_page: response.per_page,
-          total: response.total,
-        }
+        current_page: response.meta.current_page,
+        last_page: response.meta.last_page,
+        per_page: response.meta.per_page,
+        total: response.meta.total,
+      }
         return response
       } catch (error) {
         console.log(error.message)

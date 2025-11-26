@@ -5,7 +5,7 @@ import { authApi } from '@/api/auth'
 
 export const useAuthStore = defineStore('auth', () => {
   const user = ref(null)
-  const token = ref(Cookies.get('token') || null)
+  const token = ref(Cookies.get('adminToken') || null)
 
   const isAuthenticated = computed(() => !!token.value && !!user.value)
   const isAdmin = computed(() => user.value?.role === 'admin' || user.value?.role === 'superadmin')
@@ -20,7 +20,7 @@ export const useAuthStore = defineStore('auth', () => {
       console.log("store: ",user.value);
       
       // Save token to cookie
-      Cookies.set('token', response.token, {
+      Cookies.set('adminToken', response.token, {
         expires: 365,
         secure: false,
         sameSite: 'lax',
@@ -41,7 +41,7 @@ export const useAuthStore = defineStore('auth', () => {
     } finally {
       token.value = null
       user.value = null
-      Cookies.remove('token')
+      Cookies.remove('adminToken')
       localStorage.removeItem('user')
     }
   }
@@ -56,7 +56,7 @@ export const useAuthStore = defineStore('auth', () => {
       // If fetch fails, clear auth
       token.value = null
       user.value = null
-      Cookies.remove('token')
+      Cookies.remove('adminToken')
       localStorage.removeItem('user')
       throw error
     }

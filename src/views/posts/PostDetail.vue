@@ -12,19 +12,20 @@
 
     <LoadingSpinner v-if="loading" />
 
-    <div v-else-if="post" class="bg-white rounded-lg shadow p-6">
+    <div v-else-if="post" class="bg-white rounded-lg shadow p-6 ">
+      <div>
+        <img :src="post.thumbnail_url" alt="thumbnail_url">
+      </div>
       <h2 class="text-2xl font-bold text-gray-900 mb-4">{{ post.title }}</h2>
       
       <div class="flex items-center space-x-4 mb-6">
-        <Badge :label="post.status" :variant="getStatusVariant(post.status)" />
         <span class="text-sm text-gray-600">
-          By {{ post.user?.name }} • {{ formatDate(post.created_at) }}
+          By {{ post.author?.name }} • {{ formatDate(post.created_at) }}
         </span>
       </div>
-
       <div
         v-html="post.content_html"
-        class="prose max-w-none mb-6"
+        class="prose max-w-none mb-6 overflow-scroll"
       ></div>
 
       <div class="mt-6 pt-6 border-t border-gray-200">
@@ -86,7 +87,10 @@ onMounted(async () => {
   const postId = parseInt(route.params.id)
   
   try {
-    post.value = await postsApi.getPost(postId)
+    const res = await postsApi.getPost(postId)
+    post.value = res.data
+    console.log("curent post ",post.value);
+    
   } catch (error) {
     console.error('Failed to fetch post:', error)
   } finally {
