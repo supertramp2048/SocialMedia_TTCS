@@ -77,21 +77,6 @@
               @change="onPickAvatar"
             />
           </div>
-
-          <!-- Nút Lưu thay đổi duy nhất -->
-          <!-- <button
-            @click="saveChanges"
-            :disabled="isAvatarLoading || isCoverLoading"
-            class="btnEffect border
-                  absolute -right-1 bottom-0 translate-x-full md:translate-x-2
-                  px-3 py-1.5 rounded-lg bg-white/90 text-slate-800
-                  border-white/70 shadow hover:bg-white
-                  focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 transition
-                  disabled:opacity-50 disabled:cursor-not-allowed"
-            type="button"
-          >
-            {{ (isAvatarLoading || isCoverLoading) ? 'Đang lưu...' : 'Lưu thay đổi' }}
-          </button> -->
         </div>
       </div>
     </div>
@@ -128,11 +113,6 @@
     </div>
     
   </section>
-  <FullImageViewer
-      :src="currentImage"
-      :visible="showViewer"
-      @close="showViewer = false"
-    />
 </template>
 
 <script setup>
@@ -141,7 +121,6 @@ import Loader from '../../../components/smallLoadingIcon.vue'
 import api from "../../../../API/axios"
 import { useAuthStore } from '@/stores/auth'
 import { useToast } from 'vue-toastification'
-import FullImageViewer from './imageView.vue'
 
 const showViewer = ref(false)
 const currentImage = ref("")

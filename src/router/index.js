@@ -101,7 +101,10 @@ router.beforeEach(async (to, from, next)=>{
   if(token){
     const auth = useAuthStore()
     auth.getUserFromLocal()
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin
   }
 }
   next()

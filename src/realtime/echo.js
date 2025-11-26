@@ -10,7 +10,7 @@ const echo = new Echo({
   broadcaster: 'pusher',
   key: import.meta.env.VITE_PUSHER_APP_KEY,
   cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
-  forceTLS: true, // ✅ Đổi thành false cho localhost
+  forceTLS: true, // Đổi thành false cho localhost
   wsHost: window.location.hostname, // Optional: nếu dùng Laravel Websockets
   wsPort: 6001, // Optional: nếu dùng Laravel Websockets
   disableStats: true, // Optional: tắt stats cho localhost
