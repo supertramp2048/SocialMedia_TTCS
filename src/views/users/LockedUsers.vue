@@ -33,18 +33,18 @@
           {{ formatDate(row.banned_until) }}
         </span>
       </template>
-      <template #actions="{ row }">
+      <template #cell-actions="{ row }">
         <router-link
           :to="`/admin/users/${row.id}`"
           class="text-blue-600 hover:text-blue-800"
         >
-          View
+          Chi tiết
         </router-link>
         <button
           @click="handleUnban(row)"
           class="ml-2 text-green-600 hover:text-green-800"
         >
-          Unban
+          Bỏ khóa
         </button>
       </template>
     </DataTable>
@@ -65,7 +65,7 @@
       @close="unbanModalOpen = false"
       @confirm="confirmUnban"
     >
-      <p>Are you sure you want to unban <strong>{{ selectedUser?.name }}</strong>?</p>
+      <p>Bạn muốn gỡ bỏ lệnh khóa tài khoản này <strong>{{ selectedUser?.name }}</strong>?</p>
     </Modal>
   </div>
 </template>
@@ -85,11 +85,10 @@ const toast = useToast()
 const columns = [
   { key: 'avatar', label: 'Avatar' },
   { key: 'name', label: 'Name' },
-  { key: 'email', label: 'Email' },
   { key: 'banned_until', label: 'Banned Until' },
   { key: 'created_at', label: 'Joined' },
   // Nếu DataTable của anh cần cột actions mới hiện slot #actions thì thêm:
-  // { key: 'actions', label: 'Actions' },
+  { key: 'actions', label: 'Actions' },
 ]
 
 const unbanModalOpen = ref(false)

@@ -17,6 +17,8 @@ export const usePostsStore = defineStore('posts', () => {
     loading.value = true
     try {
       const response = await postsApi.getAllPosts(params)
+      console.log("all posts: ",response);
+      
       allPosts.value = response.data
       //console.log('all posts',response);
       pagination.value = {

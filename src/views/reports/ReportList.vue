@@ -1,5 +1,10 @@
 <template>
   <div>
+    <button 
+    v-if="isSearched"
+    class="bg-red-300 px-1 py-2 rounded-2xl"
+    @click="deleteSearch"
+    >Xóa kết quả tìm kiếm</button>
     <h1 class="text-2xl font-bold text-gray-900 mb-6">Reports</h1>
 
     <div class="mb-4 flex space-x-4">
@@ -28,6 +33,7 @@
     </div>
 
     <DataTable
+      v-model="search" 
       :columns="columns"
       :data="currentReports"
       :searchable="true"
@@ -83,6 +89,7 @@
       @close="showDetail = false"
       @resolved="handleResolved"
     />
+    <FullScreenLoader :show="reportsStore.loading"></FullScreenLoader>
 </template>
 
 <script setup>
@@ -92,7 +99,10 @@ import { useToast } from 'vue-toastification'
 import DataTable from '@/components/common/DataTable.vue'
 import Pagination from '@/components/common/Pagination.vue'
 import ReportDetailModal from '../reports/ReportDetail.vue'
+import FullScreenLoader from '../../components/common/fullScreenLoading.vue'
 import {useAuthStore} from '../../stores/auth'
+const query = ref()
+const search = ref('')
 const showDetail = ref(false)
 const selectedReport = ref(null)
 const auth = useAuthStore()
@@ -154,15 +164,26 @@ const currentReports = computed(() => {
   if (activeTab.value === 'comments') return reportsStore.commentReports
   return reportsStore.userReports
 })
-
-const handleSearch = (query) => {
-  
+const isSearched = ref(false)
+const handleSearch = (user) => {
+  isSearched.value = true 
+  //console.log("tim kiem ",user);
+  query.value = user
   // còn tạm thời cứ load lại page 1
-  fetchReports(1)
+  fetchReports( 1, user)
 }
-
+const deleteSearch = () =>{
+  search.value = ''
+  handleSearch('')
+  isSearched.value=false
+}
 const handlePageChange = (page) => {
-  fetchReports(page)
+  if(query.value){
+    fetchReports(page,query.value)
+  }
+  else{
+    fetchReports(page)
+  }
 }
 
 const handleDelete = async (id) =>{
@@ -212,15 +233,19 @@ const handleResolve = async (report) => {
 }
 
 // cho page default = 1 để onMounted không cần truyền tham số
-const fetchReports = (page = 1) => {
+const fetchReports = (page = 1, query) => {
+  const params = { page }
+  if (query) params.user = query   // hoặc params.search = query
+
   if (activeTab.value === 'posts') {
-    reportsStore.fetchPostReports({ page })
+    reportsStore.fetchPostReports(params)
   } else if (activeTab.value === 'comments') {
-    reportsStore.fetchCommentReports({ page })
+    reportsStore.fetchCommentReports(params)
   } else {
-    reportsStore.fetchUserReports({ page })
+    reportsStore.fetchUserReports(params)
   }
 }
+
 
 watch(activeTab, () => {
   fetchReports(1)

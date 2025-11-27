@@ -6,6 +6,7 @@ export const useReportsStore = defineStore('reports', () => {
   const postReports = ref([])
   const commentReports = ref([])
   const userReports = ref([])
+  const searchResult = ref([])
   const pagination = ref({
     current_page: 1,
     last_page: 1,
@@ -142,6 +143,19 @@ export const useReportsStore = defineStore('reports', () => {
     }
   }
 
+
+  // tim kiem
+  // async function searchPostsReportByUser(params) {
+  //   try {
+  //     loading.value = true
+      
+  //   } catch (error) {
+      
+  //   }
+    
+  // }
+
+  
   async function resolvePostReport(reportId) {
     try {
       await reportsApi.resolvePostReport(reportId)

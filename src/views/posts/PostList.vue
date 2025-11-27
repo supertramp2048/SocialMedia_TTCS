@@ -1,6 +1,11 @@
 <template>
   <div>
     <h1 class="text-2xl font-bold text-gray-900 mb-6">Posts</h1>
+    <button 
+    v-if="isSearch"
+    class="bg-red-300 px-1 py-2 rounded-2xl m-1"
+    @click="deleteSearch"
+    >Xóa kết quả tìm kiếm</button>
     <div class="mb-4 flex space-x-4">
       <button
         @click="activeTab = 'notRemovedPost'"
@@ -18,6 +23,7 @@
       </button>
     </div>
     <DataTable
+      v-model="search" 
       :columns="columns"
       :data="displayedPosts"
       :searchable="true"
@@ -91,6 +97,7 @@ import Modal from '@/components/common/Modal.vue'
 import Badge from '@/components/common/Badge.vue'
 import FullScreenLoading from '../../components/common/fullScreenLoading.vue'
 import Loading from 'vue-loading-overlay'
+const isSearch = ref(false)
 const displayedPosts = ref([])
 const postsStore = usePostsStore()
 const toast = useToast()
@@ -111,10 +118,18 @@ const getStatusVariant = (status) => {
   return 'warning'
 }
 
-const handleSearch = (query) => {
-  postsStore.fetchPosts({ q: query, page: 1 })
+const handleSearch = async (query) => {  
+  const res = await postsStore.fetchAllPosts({page: 1, q: query })
+  isSearch.value = true
+  displayedPosts.value = res.data
 }
-
+const search = ref('')
+const deleteSearch = async() => {
+  search.value = ''
+  const res = await postsStore.fetchAllPosts()
+  displayedPosts.value = res.data
+  isSearch.value = false
+}
 const handlePageChange = (page) => {
   postsStore.fetchAllPosts({ page })
 }

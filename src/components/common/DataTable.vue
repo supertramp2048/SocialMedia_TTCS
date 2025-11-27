@@ -1,7 +1,7 @@
 <template>
   <div class="bg-white rounded-lg shadow overflow-hidden">
     <div v-if="searchable" class="p-4 border-b border-gray-200">
-      <form @submit="handleSearch">
+      <form @submit.prevent="handleSearch">
           <input
             v-model="searchQuery"
             type="text"
@@ -70,7 +70,7 @@
 
 <script setup>
 import { ref } from 'vue'
-import {onMounted} from 'vue'
+import {onMounted, watch} from 'vue'
 onMounted(() => {
   console.log(props.data);
   
@@ -96,17 +96,27 @@ const props = defineProps({
     type: String,
     default: 'Search...',
   },
+  modelValue: {
+    type: String,
+    default: '',
+  },
 })
 
-const emit = defineEmits(['search'])
+const emit = defineEmits(['search','update:modelValue'])
 
-const searchQuery = ref('')
-
+const searchQuery = ref(props.modelValue)
+watch(
+  () => props.modelValue,
+  (val) => {
+    searchQuery.value = val
+  }
+)
 const getValue = (obj, path) => {
   return path.split('.').reduce((o, p) => o?.[p], obj)
 }
 
 const handleSearch = () => {
+  emit('update:modelValue', searchQuery.value)
   emit('search', searchQuery.value)
 }
 </script>

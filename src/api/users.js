@@ -30,5 +30,13 @@ export const usersApi = {
     const response = await apiClient.get(`/api/admin/users/${userId}/moderation-history`)
     return response.data
   },
+  givePermission:async (userId,role) => {
+    const res = await apiClient.patch(`/api/superadmin/users/${userId}/role`, {role})
+    return res
+  },
+  getAllAmdinAccounts: async (params) => {
+    const res = await apiClient.get(`/api/superadmin/adminlist`,{params})
+    return res
+  }
 }
 
