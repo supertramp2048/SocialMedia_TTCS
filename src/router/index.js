@@ -93,21 +93,29 @@ const router = createRouter({
   //   }
   // }
 })
-router.beforeEach(async (to, from, next)=>{
-  //console.log("lấy user từ local");
+router.beforeEach((to, from, next) => {
+  const auth = useAuthStore()
+  const token = Cookies.get('token')
 
-  if (to.meta.requiresAuth){
-  let token = Cookies.get('token')
-  if(token){
-    const auth = useAuthStore()
-    auth.getUserFromLocal()
-<<<<<<< HEAD
-=======
+  // Nếu route cần đăng nhập
+  if (to.meta.requiresAuth) {
+    // Không có token -> đá về login
+    if (!token) {
+      auth.logout() // dọn localStorage, cookie, state
+      return next()
+    }
 
->>>>>>> long
+    // Có token nhưng store chưa có user -> load lại từ local
+    if (!auth.user) {
+      auth.getUserFromLocal()
+    }
   }
-}
+
+  // Nếu đã đăng nhập rồi mà vào /login hoặc /dang-ky thì cho về home
+  if ((to.path === '/login' || to.path === '/dang-ky') && token) {
+    return next('/')
+  }
+
   next()
-},
-)
+})
 export default router

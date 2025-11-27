@@ -353,7 +353,7 @@ function goProfilePage(id, name) {
   router.push({
     name: 'Trang cá nhân',          // phải đúng với name trong router
     params: { name },               // sẽ map vào :name
-    query: { user_id: id, page: 1, limit: 2, sort: 'hot' }
+    query: { user_id: id, page: 1, limit: 10, sort: 'hot' }
   })
 }
 

@@ -12,7 +12,7 @@ export const useAuthStore = defineStore('auth', {
                 const res = await api.post('/api/login', {email,password});
                 const { token, user } = res.data
                 Cookies.set('token', res.data.token,{
-                    expires: 7,            // thời hạn 7 ngày
+                    expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),            // thời hạn 7 ngày
                     secure: false,          // true nếu chạy HTTPS
                     sameSite: 'lax'         // tránh lỗi CORS
                 })

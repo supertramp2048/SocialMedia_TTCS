@@ -79,7 +79,7 @@ const posts = ref({ data: [] })
 const latestPost = ref({ data: [] })
 const featuredPosts = ref({ data: [] })
 // Phân trang
-const objPagination = ref({ page: 1, limit: 5, sort: 'hot' })
+const objPagination = ref({ page: 1, limit: 10, sort: 'hot' })
 const inputPage = ref(objPagination.value.page) // <--- thêm biến nhập tạm
 const numberOfPost = ref(0)
 const totalPages = computed(() => Math.max(1, Math.ceil(numberOfPost.value / objPagination.value.limit)))
