@@ -65,12 +65,14 @@ import Layout from '../layout/layout.vue'
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import api from "../../../../API/axios"
+import {useSettingStore} from '../../../stores/settingPage.js'
 import RightSider from "../Home/rightSider.vue"
 import Banner from "../Home/banner.vue"
 // loader cho trang
 import { globalLoading } from '../../../../API/axios'
 import Carousel from '../../../components/caroulselPost.vue'
 import SkeletonCard from '../../../components/skeleton/SkeletonCard.vue'
+const settingStore = useSettingStore()
 const router = useRouter()
 const route = useRoute()
 const apiUrl = import.meta.env.VITE_API_BASE
@@ -207,6 +209,7 @@ async function fetchExtras() {
 onMounted(async () => {
   await fetchPosts()
   await fetchExtras()
+  await settingStore.getSetting()
 })
 </script>
 

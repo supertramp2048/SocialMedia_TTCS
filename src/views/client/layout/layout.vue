@@ -9,11 +9,7 @@
             <!-- Logo + Nav -->
             <div class="flex items-center gap-8">
               <router-link to="/" class="flex items-center gap-2">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                  <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="#0EA5E9" stroke="#0EA5E9" stroke-width="2" stroke-linejoin="round"/>
-                  <path d="M2 17L12 22L22 17" stroke="#0EA5E9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  <path d="M2 12L12 17L22 12" stroke="#0EA5E9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
+                <img :src="settingStore?.logoURL?.logo_url" class="w-[50px] h-[50px]" alt="">
                 <span class="text-xl font-bold text-gray-900">spiderum</span>
               </router-link>
 
@@ -300,6 +296,7 @@
 import { ref, computed, watch, inject, onMounted, onUnmounted, } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '../../../stores/auth'
+import {useSettingStore} from '../../../stores/settingPage.js'
 import { useCategoryStore } from '../../../stores/categories'
 import api from "../../../../API/axios"
 import SearchForm from '../../../components/searchForm.vue'
@@ -309,7 +306,7 @@ import ToastNotification from './ToastNotification.vue'
 //-------------
 
 const echo = inject('echo')
-
+const settingStore = useSettingStore()
 const showFormSearch = ref(false)
 const toastNotification = ref(null)
 const auth = useAuthStore()
@@ -449,6 +446,12 @@ onMounted(() => {
   }
 
   loadNotifications()
+})
+onMounted(async () => {
+  await settingStore.getSetting()
+  console.log("logo ben home",settingStore.logoURL);
+  console.log("bg ben home",settingStore.backGroundURL);
+  console.log("foot ben home",settingStore.footer);
 })
 async function toggleNotificationMenu() {
   showNotificationMenu.value = !showNotificationMenu.value
