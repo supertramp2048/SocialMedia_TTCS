@@ -17,7 +17,22 @@
     >
       Xóa kết quả tìm kiếm
     </button>
-
+    <div class="mb-4 flex space-x-4">
+      <button
+        @click="activeTab = 'moderator'"
+        :class="activeTab === 'moderator' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'"
+        class="px-4 py-2 rounded-lg"
+      >
+        Moderator
+      </button>
+      <button
+        @click="activeTab = 'admin'"
+        :class="activeTab === 'admin' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'"
+        class="px-4 py-2 rounded-lg"
+      >
+        Admin
+      </button>
+    </div>
     <DataTable
       v-model="search" 
       :columns="columns"
@@ -122,7 +137,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useUsersStore } from '@/stores/users'
 import { useToast } from 'vue-toastification'
 import DataTable from '@/components/common/DataTable.vue'
@@ -137,11 +152,10 @@ const searchQuery = ref()
 const usersStore = useUsersStore()
 const toast = useToast()
 const isSearch = ref(false)
-
+const activeTab = ref('moderator')
 const columns = [
   { key: 'avatar', label: 'Avatar' },
   { key: 'name', label: 'Name' },
-  { key: 'role', label: 'Role' },
   { key: 'actions', label: 'Actions' }
 ]
 
@@ -179,6 +193,7 @@ const handleChangeRole = (user) => {
 }
 
 const confirmChangeRole = async () => {
+  const currentTap = activeTab.value
   if (!selectedUser.value) return
 
   try {
@@ -189,9 +204,9 @@ const confirmChangeRole = async () => {
     selectedRole.value = 'moderator'
     // Reload lại danh sách
     if (searchQuery.value) {
-      await usersStore.getAllAmdinAccounts({ q: searchQuery.value, page: usersStore.pagination.current_page })
+      await usersStore.getAllAmdinAccounts({ q: searchQuery.value, page: usersStore.pagination.current_page,role:currentTap })
     } else {
-      await usersStore.getAllAmdinAccounts({ page: usersStore.pagination.current_page })
+      await usersStore.getAllAmdinAccounts({ page: usersStore.pagination.current_page, role:currentTap })
     }
   } catch (error) {
     toast.error(error?.response?.data?.message || 'Failed to change role')
@@ -204,6 +219,7 @@ const handleRevoke = (user) => {
 }
 
 const confirmRevoke = async () => {
+  const currentTap = activeTab.value
   if (!selectedUser.value) return
 
   try {
@@ -214,21 +230,31 @@ const confirmRevoke = async () => {
     selectedUser.value = null
     // Reload lại danh sách
     if (searchQuery.value) {
-      await usersStore.getAllAmdinAccounts({ q: searchQuery.value, page: usersStore.pagination.current_page })
+      await usersStore.getAllAmdinAccounts({ q: searchQuery.value, page: usersStore.pagination.current_page,role:currentTap })
     } else {
-      await usersStore.getAllAmdinAccounts({ page: usersStore.pagination.current_page })
+      await usersStore.getAllAmdinAccounts({ page: usersStore.pagination.current_page,role:currentTap })
     }
   } catch (error) {
+    console.log(error);
+    
     toast.error(error?.response?.data?.message || 'Failed to revoke permission')
   }
 }
 
 function deleteSearch() {
+  const currentTap = activeTab.value
   search.value = ''
-  usersStore.getAllAmdinAccounts({ page: 1 })
+  usersStore.getAllAmdinAccounts({ page: 1,role: currentTap })
   isSearch.value = false
 }
-
+watch(activeTab, async (newval) => {
+  if(newval == 'moderator'){
+    await usersStore.getAllAmdinAccounts({ page: 1, role:'moderator' })
+  }
+  else if(newval == 'admin'){
+    await usersStore.getAllAmdinAccounts({page: 1, role:'admin'})
+  }
+} )
 onMounted(async () => {
   await usersStore.getAllAmdinAccounts({ page: 1, role:'moderator' })
 })

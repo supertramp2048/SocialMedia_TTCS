@@ -92,12 +92,26 @@ export const useUsersStore = defineStore('users', () => {
     }
     
   }
+  async function revokePermission(userId) {
+    const role = 'user'
+    try {
+      loading.value = true
+      const res = await usersApi.givePermission(userId,role)
+      console.log(res);
+      
+    } catch (error) {
+      console.log(error);
+    }
+    finally{
+      loading.value = false
+    }
+  }
   async function getAllAmdinAccounts(params) {
     loading.value = true
     try {
       const response = await usersApi.getAllAmdinAccounts(params)
       adminAccounts.value = response.data.data;
-      console.log("admin Account",response);
+      //console.log("admin Account",response);
       pagination.value = {
         current_page: response.data.meta.current_page,
         last_page: response.data.meta.last_page,
@@ -123,6 +137,7 @@ export const useUsersStore = defineStore('users', () => {
     unbanUser,
     givePermission,
     getAllAmdinAccounts,
+    revokePermission
   }
 })
 
