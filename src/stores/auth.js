@@ -36,13 +36,14 @@ export const useAuthStore = defineStore('auth', () => {
   async function logout() {
     try {
       await authApi.logout()
-    } catch (error) {
-      console.error('Logout error:', error)
-    } finally {
       token.value = null
       user.value = null
       Cookies.remove('adminToken')
       localStorage.removeItem('user')
+    } catch (error) {
+      console.error('Logout error:', error)
+    } finally {
+      
     }
   }
 

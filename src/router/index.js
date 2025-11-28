@@ -33,23 +33,31 @@ const router = createRouter({
         {
           path: 'dashboard',
           name: 'admin-dashboard',
+          // dashboard: chỉ cần đăng nhập, mọi role (mod/admin/superadmin) đều vào được
           component: () => import('@/views/dashboard/Dashboard.vue'),
         },
+
+        // ===== USERS - chỉ Admin trở lên =====
         {
           path: 'users',
           name: 'admin-users',
+          meta: { requiresAdmin: true },
           component: () => import('@/views/users/UserList.vue'),
         },
         {
           path: 'users/locked',
           name: 'admin-users-locked',
+          meta: { requiresAdmin: true },
           component: () => import('@/views/users/LockedUsers.vue'),
         },
         {
           path: 'users/:id',
           name: 'admin-user-detail',
+          meta: { requiresAdmin: true },
           component: () => import('@/views/users/UserDetail.vue'),
         },
+
+        // ===== STAFF - chỉ SuperAdmin =====
         {
           path: 'staff',
           name: 'admin-staff',
@@ -62,26 +70,34 @@ const router = createRouter({
           component: () => import('@/views/staff/CreateStaff.vue'),
           meta: { requiresSuperAdmin: true },
         },
+
+        // ===== POSTS / COMMENTS - Admin trở lên =====
         {
           path: 'posts',
           name: 'admin-posts',
+          meta: { requiresAdmin: true },
           component: () => import('@/views/posts/PostList.vue'),
         },
         {
           path: 'posts/locked',
           name: 'admin-posts-locked',
+          meta: { requiresAdmin: true },
           component: () => import('@/views/posts/LockedPosts.vue'),
         },
         {
           path: 'posts/:id',
           name: 'admin-post-detail',
+          meta: { requiresAdmin: true },
           component: () => import('@/views/posts/PostDetail.vue'),
         },
         {
           path: 'comments/hidden',
           name: 'admin-comments-hidden',
+          meta: { requiresAdmin: true },
           component: () => import('@/views/comments/HiddenComments.vue'),
         },
+
+        // ===== REPORTS - Moderator trở lên (mod + admin + superadmin) =====
         {
           path: 'reports',
           name: 'admin-reports',
@@ -94,24 +110,35 @@ const router = createRouter({
           component: () => import('@/views/reports/ReportDetail.vue'),
           meta: { requiresModerator: true },
         },
+
+        // ===== CATEGORIES - Admin trở lên =====
         {
           path: 'categories',
           name: 'admin-categories',
+          meta: { requiresAdmin: true },
           component: () => import('@/views/categories/CategoryList.vue'),
         },
+
+        // ===== APPEARANCE (setting trang) - Admin trở lên =====
         {
           path: 'appearance',
           name: 'admin-appearance',
+          meta: { requiresAdmin: true },
           component: () => import('@/views/appearance/Appearance.vue'),
+        },
+
+        // ===== ADVERTISEMENTS (quảng cáo) - Admin trở lên =====
+        {
+          path: 'advertisements',
+          name: 'admin-advertisements',
+          meta: { requiresAdmin: true },
+          component: () => import('@/views/advertisment/index.vue'),
         },
       ],
     },
     {
       path: '/:pathMatch(.*)*',
-      redirect: (to) => {
-        // Redirect 404 to login instead of dashboard to avoid infinite loop
-        return '/admin/login'
-      },
+      redirect: () => '/admin/login',
     },
   ],
 })
@@ -121,30 +148,27 @@ router.beforeEach(async (to, from, next) => {
   try {
     const authStore = useAuthStore()
 
-    // Prevent infinite redirects - if same path, just continue
+    // tránh loop vô hạn nếu cùng route
     if (to.path === from.path && to.name === from.name) {
       next()
       return
     }
 
-    // Load user from storage if not loaded (non-blocking)
+    // Load user nếu có token mà chưa có user
     if (!authStore.user && authStore.token) {
-      // Don't await - let it load in background to avoid blocking navigation
-      if(!localStorage.getItem('user')){
+      if (!localStorage.getItem('user')) {
         authStore.fetchCurrentUser().catch((error) => {
-        console.warn('Failed to fetch current user:', error)
-        authStore.logout()
-      })
-      }
-      else{
+          console.warn('Failed to fetch current user:', error)
+          authStore.logout()
+        })
+      } else {
         authStore.loadUserFromStorage()
       }
     }
 
-    // Check if route requires guest (not authenticated)
+    // Route dành cho guest (chưa đăng nhập)
     if (to.meta.requiresGuest) {
       if (authStore.isAuthenticated) {
-        // User is logged in, redirect to dashboard
         if (to.name !== 'admin-dashboard') {
           next({ name: 'admin-dashboard' })
         } else {
@@ -152,15 +176,13 @@ router.beforeEach(async (to, from, next) => {
         }
         return
       }
-      // User is not logged in, allow access to login page
       next()
       return
     }
 
-    // Check if route requires authentication
+    // Các route yêu cầu đăng nhập
     if (to.meta.requiresAuth) {
       if (!authStore.isAuthenticated) {
-        // User is not logged in, redirect to login
         if (to.name !== 'admin-login' && to.name !== 'admin-login-form') {
           next({ name: 'admin-login', query: { redirect: to.fullPath } })
         } else {
@@ -169,43 +191,47 @@ router.beforeEach(async (to, from, next) => {
         return
       }
 
-      // User is authenticated, check roles
-      // Check if route requires admin role
-      if (to.meta.requiresAdmin && !authStore.isAdmin) {
-        if (to.name !== 'admin-dashboard') {
-          next({ name: 'admin-dashboard' })
-        } else {
-          next()
+      // ===== Phân quyền theo role =====
+      // requiresAdmin: admin + superadmin
+      if (to.meta.requiresAdmin) {
+        if (!(authStore.isAdmin || authStore.isSuperAdmin)) {
+          if (to.name !== 'admin-dashboard') {
+            next({ name: 'admin-dashboard' })
+          } else {
+            next()
+          }
+          return
         }
-        return
       }
 
-      // Check if route requires moderator role
-      if (to.meta.requiresModerator && !authStore.isModerator) {
-        if (to.name !== 'admin-dashboard') {
-          next({ name: 'admin-dashboard' })
-        } else {
-          next()
+      // requiresModerator: moderator + admin + superadmin
+      if (to.meta.requiresModerator) {
+        if (!(authStore.isModerator || authStore.isAdmin || authStore.isSuperAdmin)) {
+          if (to.name !== 'admin-dashboard') {
+            next({ name: 'admin-dashboard' })
+          } else {
+            next()
+          }
+          return
         }
-        return
       }
 
-      // Check if route requires superadmin role
-      if (to.meta.requiresSuperAdmin && !authStore.isSuperAdmin) {
-        if (to.name !== 'admin-dashboard') {
-          next({ name: 'admin-dashboard' })
-        } else {
-          next()
+      // requiresSuperAdmin: chỉ superadmin
+      if (to.meta.requiresSuperAdmin) {
+        if (!authStore.isSuperAdmin) {
+          if (to.name !== 'admin-dashboard') {
+            next({ name: 'admin-dashboard' })
+          } else {
+            next()
+          }
+          return
         }
-        return
       }
     }
 
-    // No restrictions, allow navigation
     next()
   } catch (error) {
     console.error('Router error:', error)
-    // Fallback to login page on error, but prevent loop
     if (to.name !== 'admin-login' && to.name !== 'admin-login-form') {
       next({ name: 'admin-login' })
     } else {
@@ -215,4 +241,3 @@ router.beforeEach(async (to, from, next) => {
 })
 
 export default router
-

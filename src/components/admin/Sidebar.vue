@@ -40,7 +40,6 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import {
   HomeIcon,
@@ -54,7 +53,6 @@ import {
 } from '@heroicons/vue/24/outline'
 import { Bars3Icon, XMarkIcon } from '@heroicons/vue/24/solid'
 
-const route = useRoute()
 const authStore = useAuthStore()
 
 // Track window width for responsive behavior
@@ -107,8 +105,6 @@ onUnmounted(() => {
 })
 
 const sidebarClasses = computed(() => {
-  // On desktop (lg), always show sidebar
-  // On mobile, show/hide based on isOpen
   if (windowWidth.value >= 1024) {
     return 'translate-x-0'
   }
@@ -116,30 +112,39 @@ const sidebarClasses = computed(() => {
 })
 
 const menuItems = computed(() => {
-  const items = [
-    { path: '/admin/dashboard', label: 'Dashboard', icon: HomeIcon },
-    { path: '/admin/users', label: 'Users', icon: UsersIcon },
-    { path: '/admin/posts', label: 'Posts', icon: DocumentTextIcon },
-    { path: '/admin/comments/hidden', label: 'Comments', icon: ChatBubbleLeftRightIcon },
-  ]
+  const items = []
 
-  if (authStore.isModerator) {
+  // Tất cả role (mod/admin/superadmin) đều có Dashboard
+  items.push({ path: '/admin/dashboard', label: 'Dashboard', icon: HomeIcon })
+
+  // REPORTS - Moderator trở lên (mod + admin + superadmin)
+  if (authStore.isModerator || authStore.isAdmin || authStore.isSuperAdmin) {
     items.push({ path: '/admin/reports', label: 'Reports', icon: FlagIcon })
   }
 
-  if (authStore.isAdmin) {
+  // ADMIN - Admin trở lên (admin + superadmin)
+  if (authStore.isAdmin || authStore.isSuperAdmin) {
+    items.push({ path: '/admin/users', label: 'Users', icon: UsersIcon })
+    items.push({ path: '/admin/posts', label: 'Posts', icon: DocumentTextIcon })
+    items.push({
+      path: '/admin/comments/hidden',
+      label: 'Comments',
+      icon: ChatBubbleLeftRightIcon,
+    })
     items.push({ path: '/admin/categories', label: 'Categories', icon: FolderIcon })
+    items.push({ path: '/admin/appearance', label: 'Appearance', icon: PaintBrushIcon })
+    items.push({
+      path: '/admin/advertisements',
+      label: 'Advertisements',
+      icon: PaintBrushIcon,
+    })
   }
 
+  // SUPERADMIN - chỉ superadmin mới thấy Staff
   if (authStore.isSuperAdmin) {
     items.push({ path: '/admin/staff', label: 'Staff', icon: UserGroupIcon })
-  }
-
-  if (authStore.isAdmin) {
-    items.push({ path: '/admin/appearance', label: 'Appearance', icon: PaintBrushIcon })
   }
 
   return items
 })
 </script>
-

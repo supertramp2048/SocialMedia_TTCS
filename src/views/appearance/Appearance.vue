@@ -18,12 +18,21 @@
 
           <div class="flex items-center space-x-4">
             <div class="flex-1">
-              <input
-                type="file"
-                accept="image/*"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg"
-                @change="handleLogoChange"
-              />
+              <div class="relative">
+                <input
+                  id="logo-upload"
+                  type="file"
+                  accept="image/*"
+                  class="hidden"
+                  @change="handleLogoChange"
+                />
+                <label
+                  for="logo-upload"
+                  class="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm cursor-pointer transition-colors"
+                >
+                  Choose Image
+                </label>
+              </div>
               <p class="mt-1 text-sm text-gray-500">
                 Upload a logo for your site (png, jpg, svg - Max 2MB)
               </p>
@@ -45,12 +54,21 @@
 
           <div class="flex items-center space-x-4">
             <div class="flex-1">
-              <input
-                type="file"
-                accept="image/*"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg"
-                @change="handleBackgroundChange"
-              />
+              <div class="relative">
+                <input
+                  id="background-upload"
+                  type="file"
+                  accept="image/*"
+                  class="hidden"
+                  @change="handleBackgroundChange"
+                />
+                <label
+                  for="background-upload"
+                  class="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm cursor-pointer transition-colors"
+                >
+                  Choose Image
+                </label>
+              </div>
               <p class="mt-1 text-sm text-gray-500">
                 Upload a banner / background image (png, jpg, svg - Max 2MB)
               </p>
@@ -170,11 +188,31 @@
                 :key="index"
                 class="flex space-x-2"
               >
-                <input
+                <!-- <input
                   v-model="social.platform"
                   type="text"
                   class="w-32 px-3 py-2 border border-gray-300 rounded-lg text-sm"
                   placeholder="Platform (facebook, youtube...)"
+                /> -->
+                <label for="social-select">Mạng xã hội</label>
+                  <select id="social-select" v-model="social.platform" name="social" class="border px-3 py-2 rounded">
+                    <option value="">-- Chọn mạng xã hội --</option>
+                    <!-- Dùng mã unicode của Font Awesome + text -->
+                    <option value="'<i class='fa-brands fa-facebook-f'></i>'"> &#xf09a;  Facebook</option>
+                    <option value="'<i class='fa-brands fa-x-twitter'></i>'">&#xf099;  Twitter / X</option>
+                    <option value="'<i class='fa-brands fa-square-instagram'></i>'">&#xf16d;  Instagram</option>
+                    <option value="'<i class='fa-brands fa-youtube'></i>'">&#xf167;  YouTube</option>
+                    <option value="'<i class='fa-brands fa-linkedin'></i>'">&#xf0e1;  LinkedIn</option>
+                    <option value="'<i class='fa-brands fa-facebook-messenger'></i>'">&#xf39f; Messenger</option>
+                    <!-- Option cho user tự định nghĩa -->
+                    <option value="__custom__">Khác (tự nhập)</option>
+                  </select>
+                <input
+                  v-if="social.platform === '__custom__'"
+                  v-model="social.customPlatform"
+                  type="text"
+                  class="mt-2 w-32 px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                  placeholder="Nhập tên mạng xã hội"
                 />
                 <input
                   v-model="social.url"
@@ -306,7 +344,10 @@ const handleSave = async () => {
       footer_description: footerDescription.value,
       footer_copyright: footerCopyright.value,
       footer_links: footerLinks.value,
-      footer_socials: footerSocials.value,
+      footer_socials: footerSocials.value.map((s) => ({
+        platform: s.platform === '__custom__' ? s.customPlatform : s.platform,
+        url: s.url,
+      })),
     }
     await settingStore.updateFooter(payload)
 
@@ -333,3 +374,10 @@ onMounted(async () => {
   }
 })
 </script>
+<style scoped>
+#social-select,
+#social-select option {
+  font-family: "Font Awesome 7 Brands", "Font Awesome 7 Free", system-ui, sans-serif;
+}
+
+</style>

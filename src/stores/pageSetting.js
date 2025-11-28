@@ -95,13 +95,15 @@ export const useSettingStore = defineStore('setting', () => {
     errorFooter.value = null
     try {
       const res = await settingApi.getFooter()
+      console.log("footer ",res);
+      
       // API trả về object footer hoặc null
       if (res.data) {
         footer.value = {
-          footer_description: res.data.footer_description || '',
-          footer_copyright: res.data.footer_copyright || '',
-          footer_links: res.data.footer_links || [],
-          footer_socials: res.data.footer_socials || [],
+          footer_description: res.data.description || '',
+          footer_copyright: res.data.copyright || '',
+          footer_links: res.data.links || [],
+          footer_socials: res.data.socials || [],
         }
       } else {
         footer.value = {
@@ -114,7 +116,6 @@ export const useSettingStore = defineStore('setting', () => {
     } catch (error) {
       errorFooter.value = error
       console.error('Fetch footer error:', error)
-      throw error
     } finally {
       loadingFooter.value = false
     }

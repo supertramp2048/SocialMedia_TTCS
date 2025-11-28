@@ -129,7 +129,7 @@ const form = reactive({
 })
 
 const handleSearch = (query) => {
-  categoriesStore.fetchCategories({ page: 1 /*, search: query */ })
+  categoriesStore.fetchCategories({ page: 1 })
 }
 
 const handlePageChange = (page) => {

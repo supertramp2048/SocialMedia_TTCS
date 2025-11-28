@@ -17,13 +17,13 @@ export const useCategoriesStore = defineStore('categories', () => {
     try {
       const response = await categoriesApi.getCategories(params)
       categories.value = response.data
-      console.log("categories ", categories.value);
+      console.log("categories ", response);
       
       pagination.value = {
-        current_page: response.current_page,
-        last_page: response.last_page,
-        per_page: response.per_page,
-        total: response.total,
+        current_page: response.meta.current_page,
+        last_page: response.meta.last_page,
+        per_page: response.meta.per_page,
+        total: response.meta.total,
       }
       return response
     } catch (error) {
