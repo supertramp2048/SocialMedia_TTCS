@@ -9,7 +9,7 @@
             <!-- Logo + Nav -->
             <div class="flex items-center gap-8">
               <router-link to="/" class="flex items-center gap-2">
-                <img :src="settingStore?.logoURL?.logo_url" class="w-[50px] h-[50px]" alt="">
+                <img :src="settingVar?.logoURL" class="w-[50px] h-[50px]" alt="">
                 <span class="text-xl font-bold text-gray-900">spiderum</span>
               </router-link>
 
@@ -278,16 +278,15 @@
     <!-- Main -->
     <main>
 
-        <slot/>
+        <slot
+        :ads="adsStore?.allAds"
+        :setting="settingVar"
+        />
 
     </main>
 
     <!-- Footer -->
-    <footer class="bg-gray-50 border-t border-gray-200 mt-16">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 text-center text-gray-500 text-sm">
-        © 2025 - Spiderum Clone by Huy
-      </div>
-    </footer>
+    <FooterBar :footer="settingVar.footer"></FooterBar>
     <ToastNotification ref="toastNotification" @toast-click="handleToastClick"/>
   </div>
 </template>
@@ -296,8 +295,10 @@
 import { ref, computed, watch, inject, onMounted, onUnmounted, } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '../../../stores/auth'
+import {useAdsStore} from '../../../stores/advertisment.js'
 import {useSettingStore} from '../../../stores/settingPage.js'
 import { useCategoryStore } from '../../../stores/categories'
+import FooterBar from './footerBar.vue'
 import api from "../../../../API/axios"
 import SearchForm from '../../../components/searchForm.vue'
 import ToastNotification from './ToastNotification.vue'
@@ -313,6 +314,8 @@ const auth = useAuthStore()
 const categoriesStore = useCategoryStore()
 const router = useRouter()
 const route = useRoute()
+const settingVar =ref({})
+const adsStore = useAdsStore()
 const apiUrl = import.meta.env.VITE_API_BASE
 // hien thi cate dang chon
 const chossenCate = ref(null)
@@ -449,9 +452,17 @@ onMounted(() => {
 })
 onMounted(async () => {
   await settingStore.getSetting()
-  console.log("logo ben home",settingStore.logoURL);
-  console.log("bg ben home",settingStore.backGroundURL);
-  console.log("foot ben home",settingStore.footer);
+  const obj = {
+    logoURL: settingStore.logoURL.logo_url,
+    backGroundURL: settingStore.backGroundURL.background_url,
+    footer: settingStore.footer,
+  }
+  settingVar.value = obj
+  console.log("setting variable", settingVar.value);
+  
+  await adsStore.getAllAds()
+  console.log("allAds ",adsStore.allAds);
+  
 })
 async function toggleNotificationMenu() {
   showNotificationMenu.value = !showNotificationMenu.value
@@ -527,7 +538,7 @@ function subscribeNotificationChannel(userId) {
   // 2. Lặp qua từng sự kiện để lắng nghe
   events.forEach(eventName => {
     channel.listen(eventName, (payload) => {
-      console.log(`🔔 New notification [${eventName}]:`, payload);
+      console.log(` New notification [${eventName}]:`, payload);
 
       // Thêm vào danh sách thông báo ở FE
       notifications.value.unshift({

@@ -1,5 +1,5 @@
 <template>
-  <div class="max-w-[875px] mx-auto px-4 mb-16">
+  <div class="max-w-full mx-auto px-4 mb-16">
     <h2 class="font-bold text-sm text-text-primary mb-4">Bài viết nổi bật khác</h2>
 
     <div class="relative">
@@ -28,7 +28,7 @@
             v-for="post in postsForRender"
             :key="post.id"
             :to="{ path: '/bai-dang/', query: { id: post.id } }"
-            class="w-64 p-1 flex-shrink-0 snap-start
+            class="carousel-card w-[500px] p-1 flex-shrink-0 snap-start
                   rounded border border-border-lighter bg-white
                   hover:shadow transition-shadow
                   flex flex-col h-full self-stretch"
@@ -106,7 +106,7 @@ const props = defineProps({
   categoryId: { type: [Number, String], required: true },
   currentId: { type: [Number, String], default: null },
   // Số card hiển thị 1 trang (gợi ý: 1 mobile, 2 tablet, 3 desktop — sẽ auto tính)
-  minCardWidth: { type: Number, default: 256 }, // px, ~ w-64
+  minCardWidth: { type: Number, default: 500 }, // px, ~ w-64
   gap: { type: Number, default: 24 } // px, ~ gap-6
 })
 
@@ -196,13 +196,22 @@ function measure () {
   const tr = track.value
   if (!vp || !tr) return
 
-  // Lấy card đầu để đo width (w-64 = 256px). Cộng thêm gap.
-  const firstCard = tr.querySelector('.w-64')
-  const cardW = firstCard ? firstCard.getBoundingClientRect().width : props.minCardWidth
+  // Lấy card đầu có class 'carousel-card'
+  const firstCard = tr.querySelector('.carousel-card')
+  const cardW = firstCard
+    ? firstCard.getBoundingClientRect().width
+    : props.minCardWidth
+
   const vpW = vp.getBoundingClientRect().width
-  const perView = Math.max(1, Math.floor((vpW + props.gap) / (cardW + props.gap)))
+
+  const perView = Math.max(
+    1,
+    Math.floor((vpW + props.gap) / (cardW + props.gap))
+  )
+
   cardsPerView.value = perView
 }
+
 
 function clampPage () {
   if (currentPage.value > pageCount.value - 1) {

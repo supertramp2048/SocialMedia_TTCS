@@ -1,10 +1,10 @@
 
 <template>
-  <Layout>
+  <Layout v-slot="{ ads, setting }">
     <!-- Hero Section -->
-    <Banner></Banner>
+    <Banner :setting="setting"></Banner>
     <!-- Main Content -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+    <div class="max-w-9/12 mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
       <div class="grid lg:grid-cols-3 gap-8">
         <!-- Left Column - Main Content -->
         <div class="lg:col-span-2 space-y-8">
@@ -20,13 +20,7 @@
           </section>
 
           <!-- Banner Ad -->
-          <div class="bg-gradient-to-r from-orange-400 to-pink-500 rounded-lg overflow-hidden">
-            <div class="p-8 text-center text-white">
-              <h3 class="text-2xl md:text-3xl font-bold mb-2">THÁNG 9</h3>
-              <p class="text-xl md:text-2xl mb-4">BACK TO SCHOOL</p>
-              <p class="text-sm opacity-90">Khuyến mãi đặc biệt trong tháng này</p>
-            </div>
-          </div>
+          <BannerAds :ads="ads"></BannerAds>
           <!-- Latest Articles Grid -->
           <section>
             <div class="flex items-center justify-between mb-6">
@@ -39,13 +33,8 @@
             <Carousel v-else :posts="featuredPosts?.data"></Carousel>
             <!-- <GridPost :posts="featuredPosts" :pageLimit="null"></GridPost> -->
 
-            <div class="bg-gradient-to-r from-orange-400 to-pink-500 rounded-lg overflow-hidden">
-            <div class="p-8 text-center text-white">
-              <h3 class="text-2xl md:text-3xl font-bold mb-2">THÁNG 9</h3>
-              <p class="text-xl md:text-2xl mb-4">BACK TO SCHOOL</p>
-              <p class="text-sm opacity-90">Khuyến mãi đặc biệt trong tháng này</p>
-            </div>
-          </div>
+            <BannerAds :ads="ads"></BannerAds>
+
           <!-- grid post tất cả các post theo category id-->
           <div v-if="loadingPosts" class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             <SkeletonCard v-for="n in objPagination.limit || 6" :key="'sk-grid-'+n" />
@@ -68,6 +57,7 @@ import api from "../../../../API/axios"
 import {useSettingStore} from '../../../stores/settingPage.js'
 import RightSider from "../Home/rightSider.vue"
 import Banner from "../Home/banner.vue"
+import BannerAds from "../Home/bannerAds.vue"
 // loader cho trang
 import { globalLoading } from '../../../../API/axios'
 import Carousel from '../../../components/caroulselPost.vue'
@@ -209,7 +199,6 @@ async function fetchExtras() {
 onMounted(async () => {
   await fetchPosts()
   await fetchExtras()
-  await settingStore.getSetting()
 })
 </script>
 

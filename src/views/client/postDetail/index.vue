@@ -2,7 +2,7 @@
     <Layout>
         <div class="min-h-screen bg-white">
     <!-- Main Content -->
-    <main class="w-full">
+    <main class="w-9/12 m-auto">
       <SkeletonLoader
         v-if="isLoadingPage"
         variant="detail"
@@ -22,7 +22,7 @@
       </div>
 
       <!-- Article Content Container -->
-      <div class="max-w-[700px] mx-auto px-4 pb-16">
+      <div class="w-full mx-auto px-4 pb-16">
         <!-- Category -->
         <router-link class="inline-block text-sm text-text-secondary mb-4">
           {{ post.data?.category?.name  }}
@@ -35,7 +35,7 @@
         <UserDiv :user="post.data?.author" :date="post.data?.created_at"  ></UserDiv>
         <!-- Author Info -->
         <!-- Article Body -->
-        <article class="prose prose-lg max-w-none" v-html="post.data?.content_html">
+        <article class="prose prose-lg w-full" v-html="post.data?.content_html">
         </article>
 
         <!-- upvote downvote report bài viết  -->
@@ -155,7 +155,7 @@
       <SuggestedPost :categoryId="post?.data?.category?.id" :postId="post?.data?.id"></SuggestedPost>
 
       <!-- Comments Section -->
-      <div class="max-w-[768px] mx-auto px-4 mb-16">
+      <div class="max-w-full mx-auto px-4 mb-16">
         <div class="border border-border-lighter rounded shadow-card p-6">
           <!-- Comment Form -->
           <form

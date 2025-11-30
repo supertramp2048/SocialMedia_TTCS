@@ -1,6 +1,13 @@
 <template>
     <section class="relative bg-gradient-to-br from-sky-50 via-blue-50 to-sky-100 overflow-hidden">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24"
+      :style="{
+        backgroundImage: `url(${setting.backGroundURL})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }"
+      >
         <div class="grid lg:grid-cols-2 gap-8 items-center">
           <!-- Left Content -->
           <div class="space-y-6 text-center lg:text-left">
@@ -24,33 +31,10 @@
 
           <!-- Right Content - Mascot -->
           <div class="flex justify-center lg:justify-end">
-            <div class="relative w-64 h-64 md:w-80 md:h-80">
-              <svg viewBox="0 0 200 200" class="w-full h-full">
-                <!-- Blue blob background -->
-                <ellipse cx="100" cy="140" rx="80" ry="60" fill="#7DD3FC" opacity="0.3"/>
-                
-                <!-- Mascot body -->
-                <circle cx="100" cy="100" r="60" fill="#0EA5E9"/>
-                
-                <!-- Eyes -->
-                <ellipse cx="85" cy="90" rx="12" ry="16" fill="white"/>
-                <ellipse cx="115" cy="90" rx="12" ry="16" fill="white"/>
-                <circle cx="87" cy="92" r="6" fill="#1e293b"/>
-                <circle cx="117" cy="92" r="6" fill="#1e293b"/>
-                <circle cx="89" cy="90" r="3" fill="white"/>
-                <circle cx="119" cy="90" r="3" fill="white"/>
-                
-                <!-- Smile -->
-                <path d="M 80 110 Q 100 120 120 110" stroke="#1e293b" stroke-width="3" fill="none" stroke-linecap="round"/>
-                
-                <!-- Arms -->
-                <ellipse cx="50" cy="110" rx="8" ry="20" fill="#0EA5E9"/>
-                <ellipse cx="150" cy="110" rx="8" ry="20" fill="#0EA5E9"/>
-                
-                <!-- Legs -->
-                <ellipse cx="85" cy="160" rx="12" ry="8" fill="#0EA5E9"/>
-                <ellipse cx="115" cy="160" rx="12" ry="8" fill="#0EA5E9"/>
-              </svg>
+            <div
+            style=""
+             class="relative w-64 h-64 md:w-80 md:h-80">
+              
             </div>
           </div>
         </div>
@@ -71,4 +55,7 @@
 <script setup lang='js'>
     import { useAuthStore } from '../../../stores/auth'
     const auth = useAuthStore()
+    const props = defineProps({
+      setting : {type:Object, required: true}
+    })
 </script>
