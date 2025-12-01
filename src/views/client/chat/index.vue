@@ -15,6 +15,7 @@
                 <router-link
                 v-for="item in conversations" :key="item?.conversation_id"
                 :to="{path:'/nhan-tin', query:{id: item.user.id}}"
+                @click="markAsRead(item)"
                 class="flex items-center gap-3 px-4 py-3 hover:bg-sky-200 cursor-pointer"
                 :class="otherId == item.user.id ? 'bg-sky-500':''"
                 >
@@ -24,11 +25,34 @@
                   <div class="flex-1">
                     <p class="text-sm font-semibold text-gray-900">{{item.user.name}}</p>
                     <div v-if="item?.last_message?.content">
-                      <p v-if=" Number(item.last_message.sender_id) !== Number(auth?.user?.id)" class="text-xs text-gray-500">{{item?.last_message?.content}}</p>
+                      <p
+                        v-if="Number(item.last_message.sender_id) !== Number(auth?.user?.id)"
+                        class="text-xs pr-4 relative"
+                        :class="Number(item.last_message.id) !== Number(item.last_read_message_id)
+                            ? 'font-bold text-gray-900'
+                            : 'text-gray-500'"
+                      >
+                        {{item?.last_message?.content}}
+                      <span
+                        v-if="Number(item.last_message.id) !== Number(item.last_read_message_id)"
+                        class="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-2 ml-2 rounded-full bg-blue-500 inline-block"
+                      ></span>
+                      </p>
                       <p v-else class="text-xs text-gray-500" >Bạn: {{item?.last_message?.content}}</p>
                     </div>
                     <div v-else>
-                      <p v-if=" Number(item.last_message.sender_id) !== Number(auth?.user?.id)" class="text-xs text-gray-500">Đã gửi ảnh</p>
+                      <p
+                        v-if="Number(item.last_message.sender_id) !== Number(auth?.user?.id)"
+                        class="text-xs relative pr-4"
+                        :class="Number(item.last_message.id) !== Number(item.last_read_message_id)
+                            ? 'font-bold text-gray-900'
+                            : 'text-gray-500'"
+                      >Đã gửi ảnh
+                        <span
+                          v-if="Number(item.last_message.id) !== Number(item.last_read_message_id)"
+                          class="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-2 ml-2 rounded-full bg-blue-500 inline-blocks"
+                        ></span>
+                      </p>
                       <p v-else class="text-xs text-gray-500" >Bạn: Đã gửi ảnh</p>
                     </div>
                   </div>
@@ -82,8 +106,14 @@
               :src= "item.user.avatar"
               class="h-10 w-10 rounded-full bg-sky-100 flex items-center justify-center text-xs font-semibold text-sky-600"></img>
               <div class="flex-1">
-                <p class="text-sm font-semibold text-gray-900">{{item.user.name}}</p>
-                <p class="text-xs text-gray-500">
+                <p  class="text-sm"
+                  :class="Number(item.last_read_id) < Number(item.last_read_message_id)
+                  ? 'font-bold text-gray-900'
+                  : 'font-semibold text-gray-900'">{{item.user.name}}</p>
+                <p class="text-xs"
+                  :class="Number(item.last_read_id) !== Number(item.last_read_message_id)
+                  ? 'font-semibold text-gray-800'
+                  : 'text-gray-500'">
                   <span v-if="item?.last_message?.content">{{item?.last_message?.content}}</span>
                   <span v-else-if="!item?.last_message?.content && item?.image_url"> Đã gửi ảnh</span>
                   </p>
@@ -97,7 +127,7 @@
 </template>
 <script setup>
 import SkeletonChatList from '../../../components/skeleton/skeletonChatList.vue'
-import { ref, onMounted, onBeforeUnmount, inject, watch } from 'vue'
+import { ref, onMounted, onBeforeUnmount, inject, watch, markRaw } from 'vue'
 import { useAuthStore } from '../../../stores/auth'
 import api from '../../../../API/axios'
 import Layout from '@/views/client/layout/layout.vue'
@@ -215,81 +245,72 @@ const subscribeToChannel = () => {
   }
 }
 let conversationChannel = null
-const  subscribeToChannelConversation = () => {
-    if (!echo) {
-    console.warn('Echo is not provided!')
+const subscribeToChannelConversation = () => {
+  if (!echo || !auth.user || !auth.user.id) {
+    console.warn('Echo hoặc auth.user.id chưa có, không thể subscribe')
     return
-    }
+  }
 
-    if (!auth.user || !auth.user.id) {
-    console.warn('Chưa có auth.user hoặc auth.user.id, chưa subscribe được')
-    return
-    }
-    const userId = String(auth.user.id)
-    const channelName = `conversation.change.${userId}`
-    if(conversationChannel){
-      echo.leave(channelName)
-      conversationChannel = null
-    }
+  const userId = String(auth.user.id)
+  const channelName = `conversation.change.${userId}`
 
-    conversationChannel = echo.private(channelName)
+  if (conversationChannel) {
+    echo.leave(channelName)
+    conversationChannel = null
+  }
+
+  conversationChannel = echo.private(channelName)
     .subscribed(() => {
-     // console.log("Đã subscribe thành công channel: ",channelName);
+      console.log("Đã subscribe thành công channel: ", channelName)
     })
     .listen('.ConversationChange', async (payload) => {
-      console.log("da nhan event chang conversation ",payload);
-      const idxOfOldItem = conversations.value.findIndex(item => item.conversation_id == payload.conversationId)
-      if(idxOfOldItem !== -1){
-        const last = conversations.value[idxOfOldItem].last_message
+      console.log("Nhận event .ConversationChange:", payload)
 
-        last.content     = payload.lastMessageContent
-        last.id          = payload.lastMessageId
-        last.sender_id   = payload.senderId
-        last.receiver_id = payload.receiverId
-        last.created_at  = payload.lastMessageCreatedAt ?? last.created_at
-        }
-      else{
-        let newObjConversation = {}
-        if(payload.senderId != auth.user.id){
-          newObjConversation = {
-          conversation_id: payload.conversationId,
-          last_message: {
+      const exists = conversations.value.findIndex(c => c.conversation_id == payload.conversationId)
+
+      if (exists !== -1) {
+        // update conversation cũ, dùng map để Vue detect
+        const item = conversations.value[exists]
+        item.last_message = {
+            id: payload.lastMessageId,
             content: payload.lastMessageContent,
-            created_at: null,
-            id: payload.lastMessageId,
+            sender_id: payload.senderId,
             receiver_id: payload.receiverId,
-            sender_id: payload.senderId
-          },
-          user: {
-            avatar: payload.SenderAvatar,
-            id: payload.senderId,
-            name: payload.SenderName
-           }
-          }
+            created_at: payload.lastMessageCreatedAt ?? item.last_message?.created_at
         }
-        else{
-          newObjConversation = {
+        // giữ last_read_id nếu chưa có
+        item.last_read_id = item.last_read_id ?? 0
+
+        // Xóa conversation khỏi vị trí cũ và unshift lên đầu mảng
+        conversations.value.splice(exists, 1)  // xóa 1 phần tử tại index
+        conversations.value.unshift(item)     // thêm vào đầu mảng
+      } else {
+        // tạo conversation mới
+        let userObj = payload.senderId != auth.user.id
+          ? { avatar: payload.SenderAvatar, id: payload.senderId, name: payload.SenderName }
+          : { avatar: otherUser.value.data.avatar, id: otherUser.value.data.id, name: otherUser.value.data.name }
+
+        const newConv = {
           conversation_id: payload.conversationId,
           last_message: {
-            content: payload.lastMessageContent,           
-            created_at: null,
             id: payload.lastMessageId,
+            content: payload.lastMessageContent,
+            sender_id: payload.senderId,
             receiver_id: payload.receiverId,
-            sender_id: payload.senderId
+            created_at: payload.lastMessageCreatedAt ?? null
           },
-          user: {
-            avatar: otherUser.value.data.avatar,
-            id: otherUser.value.data.id,
-            name: otherUser.value.data.name
-           }
-          }
+          user: userObj,
+          last_read_id: 0 // mặc định chưa đọc
         }
-        conversations.value.push(newObjConversation)
-      }
-      console.log("mang conversation ",conversations.value);
 
+        conversations.value.unshift(newConv)
+      }
+    })
+    .error((error) => {
+      console.error('Lỗi khi subscribe conversation channel:', error)
     })
 }
+
 // ham chuyen attribute tu string thanh mang
 const normalizeChatHistory = (raw) => {
   if (!Array.isArray(raw)) return []
@@ -308,6 +329,10 @@ const normalizeChatHistory = (raw) => {
   })
 }
 
+const markAsRead = (item) => {
+  item.last_read_message_id = item.last_message.id
+}
+
 const otherUser = ref()
 const conversations = ref([])
 const chatHistory = ref([])
@@ -321,7 +346,7 @@ onMounted(async () => {
     const res2 = await api.get(`/api/profiles/${otherId.value}`)
     otherUser.value = res2.data
     console.log("other ", otherUser.value);
-    
+
     const res3 = await api.get(`/realtime/messages/${otherId.value}`)
   //  console.log("history ",res3.data);
 
@@ -332,7 +357,7 @@ onMounted(async () => {
   } else {
     item.image_url = []   // không có ảnh thì gán mảng rỗng
   }
-})
+  })
   chatHistory.value = rawChatHistory
   // thử subscribe ngay nếu user đã có sẵn
   // subscribeToChannel()
