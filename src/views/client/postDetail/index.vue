@@ -13,15 +13,17 @@
           <!-- Post Header Section -->
           <PostHeaderSection :post="post" />
 
-          <!-- Post Action Bar -->
+          <!-- Post Action Bar - Horizontal (Mobile) + Vertical Floating (Desktop) -->
           <div class="w-full mx-auto px-4">
             <PostActionBar
               :post="post"
               :post-menu-items="postMenuItems"
               :menu-ref="menuRef"
               v-model="showOption"
+              layout="vertical"
               @upvote="upvote"
               @downvote="downvote"
+              @scrollToComment="handleScroll"
             />
           </div>
 
@@ -35,9 +37,13 @@
           </div>
 
           <!-- Related Articles Section -->
-          <SuggestedPost :categoryId="post?.data?.category?.id" :postId="post?.data?.id"></SuggestedPost>
+          <SuggestedPost 
+            :categoryId="post?.data?.category?.id" 
+            :postId="post?.data?.id"
+          />
 
           <!-- Comments Section -->
+          <div ref="commentsSection">
           <CommentsSection
             :post="post"
             :parent-comments="parentComments"
@@ -66,6 +72,7 @@
             @load-more-comments="loadMoreComments"
             @toggle-comment-menu="toggleCommentMenu"
           />
+          </div>
         </template>
       </main>
 
@@ -92,7 +99,7 @@ import CommentsSection from '../../../components/post/CommentsSection.vue'
 import { usePostDetail } from '../../../composables/usePostDetail'
 import { usePostComments } from '../../../composables/usePostComments'
 import { usePostReportMenu } from '../../../composables/usePostReportMenu'
-
+import { ref } from 'vue'
 const route = useRoute()
 
 // Composable: Post Detail
@@ -149,6 +156,14 @@ const {
   getCommentMenuItems,
   toggleCommentMenu
 } = usePostReportMenu(post)
+const commentsSection = ref(null)
+function handleScroll(){
+  if (!commentsSection.value) return
+  commentsSection.value.scrollIntoView({
+    behavior: 'smooth',   // cuộn mượt
+    block: 'start'        // canh phần trên cùng
+  })
+}
 
 // Initialize
 onMounted(async () => {

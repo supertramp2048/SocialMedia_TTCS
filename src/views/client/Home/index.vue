@@ -44,7 +44,7 @@
         </div>
 
         <!-- <--Right Sidebar -->
-        <RightSider ></RightSider>
+        <RightSider :ads="ads?.sidebarRightAds" ></RightSider>
       </div>
     </div>
   </Layout>
