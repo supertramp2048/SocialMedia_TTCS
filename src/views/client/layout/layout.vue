@@ -276,7 +276,7 @@
 </div>
 
     <!-- Main -->
-    <main>
+    <main class="min-h-screen">
 
         <slot
         :ads="adsStore?.allAds"
