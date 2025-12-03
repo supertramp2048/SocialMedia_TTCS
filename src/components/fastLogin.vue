@@ -1,79 +1,5 @@
 <template>
-  <div class="flex min-h-screen flex-col justify-center px-6 py-12 lg:px-8 bg-white">
-    <div class="sm:mx-auto sm:w-full sm:max-w-sm">
-      <h2 class="mt-10 text-center text-2xl font-bold tracking-tight text-gray-900">
-        Đăng nhập vào tài khoản của bạn
-      </h2>
-    </div>
-
-    <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-      <form @submit.prevent="onSubmit" method="POST" class="space-y-6" novalidate>
-        <div>
-          <label for="email" class="block text-sm font-medium text-gray-900">Email </label>
-          <div class="mt-2">
-            <input
-              v-model.trim="email"
-              id="email"
-              type="email"
-              name="email"
-              required
-              autocomplete="email"
-              inputmode="email"
-              class="block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder:text-gray-400
-                     focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-              placeholder="you@example.com"
-              aria-invalid="false"
-            />
-          </div>
-        </div>
-
-        <div>
-          <div class="flex items-center justify-between">
-            <label for="password" class="block text-sm font-medium text-gray-900">Password</label>
-            <div class="text-sm">
-              <router-link to="/quen-mat-khau" class="font-semibold text-indigo-600 hover:text-indigo-500">
-                Quên mật khẩu?
-              </router-link>
-            </div>
-          </div>
-          <div class="mt-2">
-            <input
-              v-model="password"
-              id="password"
-              type="password"
-              name="password"
-              required
-              autocomplete="current-password"
-              class="block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder:text-gray-400
-                     focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-              placeholder="••••••••"
-              aria-invalid="false"
-            />
-          </div>
-        </div>
-
-        <p v-if="error" class="text-sm text-red-600" role="alert">{{ error }}</p>
-
-        <div>
-          <button
-            type="submit"
-            :disabled="loading"
-            :aria-busy="loading"
-            class="flex w-full justify-center items-center gap-2 rounded-md bg-indigo-600 px-3 py-2
-                   text-sm font-semibold text-white hover:bg-indigo-500
-                   focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-indigo-600
-                   disabled:opacity-60 disabled:cursor-not-allowed"
-          >
-            <span v-if="!loading">Sign in</span>
-            <span v-else class="inline-flex items-center" aria-live="polite">
-              <span class="mr-2">Signing in</span>
-              <span class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
-            </span>
-          </button>
-        </div>
-      </form>
-
-      <div class="mt-6">
+    <div class="mt-6">
         <div class="relative">
           <div class="absolute inset-0 flex items-center">
             <div class="w-full border-t border-gray-300"></div>
@@ -115,68 +41,24 @@
             3.285-1.23.645 1.653.24 2.873.12 3.176.765.84
             1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475
             5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015
-            3.286 0 .315.21.69.825.57C20.565 22.092 24
+3.286 0 .315.21.69.825.57C20.565 22.092 24
             17.592 24 12.297c0-6.627-5.373-12-12-12"/>
           </svg>
-          GitHub
+            GitHub
         </button>
         </div>
       </div>
-
-      <p class="mt-10 text-center text-sm text-gray-600">
-        Bạn chưa có tài khoản?
-        <router-link to="/dang-ky" class="text-indigo-600 font-medium hover:text-indigo-500">
-          Đăng ký
-        </router-link>
-      </p>
-    </div>
-  </div>
 </template>
-
-<script setup>
-import { ref, onUnmounted } from 'vue'
-import { useAuthStore } from '../../../stores/auth'
-import { useRouter } from 'vue-router'
-import { useToast } from 'vue-toastification'
-import Cookies from 'js-cookie'
-import api from '../../../../API/axios' // Giả sử bạn có import api client
-
-const auth = useAuthStore()
-const router = useRouter()
-const toast = useToast()
-
-const email = ref('')
-const password = ref('')
-const loading = ref(false)
-const error = ref('')
-
-async function onSubmit () {
-  if (!email.value || !password.value) {
-    error.value = 'Vui lòng nhập email và mật khẩu.'
-    return
-  }
-
-  loading.value = true
-  error.value = ''
-  try {
-      await auth.login(email.value, password.value)
-      if(auth.user){
-        toast.success('Đăng nhập thành công!')
-        router.push('/')
-      }
-      else{
-        toast.error('Đăng nhập thất bại. Vui lòng kiểm tra thông tin.')
-      }
-  } catch (err) {
-    const msg = err?.response?.data?.message || 'Đăng nhập thất bại. Vui lòng kiểm tra thông tin.'
-    error.value = msg
-    toast.error(msg)
-  } finally {
-    loading.value = false
-  }
-}
-
-// Hàm xử lý login Google
+<script setup lang='js'>
+import { onUnmounted } from 'vue';
+import { useToast } from 'vue-toastification';
+import { useRouter } from 'vue-router';
+import { useAuthStore } from '@/stores/auth';
+import Cookies from 'js-cookie';
+const toast = useToast();
+const router = useRouter();
+const auth = useAuthStore();
+    // Hàm xử lý login Google
 // 1. Hàm mở Popup
 function loginWithGoogle() {
     // URL Backend xử lý login Google
