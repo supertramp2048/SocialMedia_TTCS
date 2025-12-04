@@ -1,0 +1,204 @@
+import { defineStore } from 'pinia'
+import { ref } from 'vue'
+import { reportsApi } from '@/api/reports'
+import { useAuthStore } from '../stores/auth'
+export const useReportsStore = defineStore('reports', () => {
+  const postReports = ref([])
+  const commentReports = ref([])
+  const userReports = ref([])
+  const searchResult = ref([])
+  const pagination = ref({
+    current_page: 1,
+    last_page: 1,
+    per_page: 20,
+    total: 0,
+  })
+  const loading = ref(false)
+
+  async function fetchPostReports(params) {
+    loading.value = true
+    try {
+      const response = await reportsApi.getPostReports(params)
+      postReports.value = response.data
+      console.log("post report ",postReports.value);
+      
+      pagination.value = {
+        current_page: response.meta.current_page,
+        last_page: response.meta.last_page,
+        per_page: response.meta.per_page,
+        total: response.meta.total,
+      }
+      return response
+    } catch (error) {
+      console.log(error.message)
+    } finally {
+      loading.value = false
+    }
+  }
+  async function getAnUserReportedHistory(params) {
+    try {
+      loading.value = true
+      const res = await reportsApi.getAnUserHistoryReported(params)
+      return res
+    } catch (error) {
+      console.log(error);
+      
+    }
+    finally{
+      loading.value = false
+    }
+  }
+  async function deleteReportPost(params) {
+    try{
+      loading.value = true
+      const res = await reportsApi.deleteReportPost(params)
+        const newArr =  postReports.value.filter(item => item.report_id != params)
+        postReports.value = newArr
+      return res
+    }
+    catch(error){
+      throw(error)
+    }
+    finally{
+      loading.value = false
+    }
+  }
+
+  async function deleteReportComment(params) {
+    try{
+      loading.value = true
+      const res = await reportsApi.deleteReportComment(params)
+        const newArr =  commentReports.value.filter(item => item.report_id != params)
+        commentReports.value = newArr
+      return res
+    }
+    catch(error){
+      throw(error)
+    }
+    finally{
+      loading.value = false
+    }
+  }
+
+  async function deleteReportUser(params) {
+    try{
+      loading.value = true
+      const res = await reportsApi.deleteReportUser(params)
+        const newArr =  userReports.value.filter(item => item.report_id != params)
+        userReports.value = newArr
+      return res
+    }
+    catch(error){
+      throw(error)
+    }
+    finally{
+      loading.value = false
+    }
+  }
+
+  async function fetchCommentReports(params) {
+    loading.value = true
+    try {
+      const response = await reportsApi.getCommentReports(params)
+      commentReports.value = response.data
+      console.log("comment report ",response.data)
+      pagination.value = {
+        current_page: response.meta.current_page,
+        last_page: response.meta.last_page,
+        per_page: response.meta.per_page,
+        total: response.meta.total,
+      }
+      return response
+    } catch (error) {
+      console.log(error.message)
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function fetchUserReports(params) {
+    const auth = useAuthStore()
+    if(auth.user.role=='admin'|| auth.user.role=='superadmin'){
+      loading.value = true
+      try {
+        const response = await reportsApi.getUserReports(params)
+        console.log("user report ",response.data)
+        userReports.value = response.data
+        pagination.value = {
+        current_page: response.meta.current_page,
+        last_page: response.meta.last_page,
+        per_page: response.meta.per_page,
+        total: response.meta.total,
+      }
+        return response
+      } catch (error) {
+        console.log(error.message)
+      } finally {
+        loading.value = false
+      }
+    }
+    else{
+      userReports.value = null
+      return null
+    }
+  }
+
+
+  // tim kiem
+  // async function searchPostsReportByUser(params) {
+  //   try {
+  //     loading.value = true
+      
+  //   } catch (error) {
+      
+  //   }
+    
+  // }
+
+  
+  async function resolvePostReport(reportId) {
+    try {
+      await reportsApi.resolvePostReport(reportId)
+      await fetchPostReports()
+    } catch (error) {
+      console.log(error.message)
+    }
+  }
+
+  async function resolveCommentReport(reportId) {
+    try {
+      await reportsApi.resolveCommentReport(reportId)
+      await fetchCommentReports()
+    } catch (error) {
+      console.log(error.message)
+    }
+  }
+
+  async function resolveUserReport(reportId) {
+    try {
+      await reportsApi.resolveUserReport(reportId)
+      await fetchUserReports()
+    } catch (error) {
+      console.log(error.message)
+    }
+  }
+
+  return {
+    postReports,
+    commentReports,
+    userReports,
+    pagination,
+    loading,
+    getAnUserReportedHistory,
+    deleteReportComment,
+    deleteReportPost,
+    deleteReportUser,
+    fetchPostReports,
+    fetchCommentReports,
+    fetchUserReports,
+    resolvePostReport,
+    resolveCommentReport,
+    resolveUserReport,
+  }
+})
+
