@@ -10,7 +10,7 @@ export const useAuthStore = defineStore('auth', {
         async login(email, password){
             try {
                 const res = await api.post('/api/login', {email,password});
-                const { token, user } = res.data
+                const {token, user } = res.data
                 Cookies.set('token', res.data.token,{
                     expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),            // thời hạn 7 ngày
                     secure: false,          // true nếu chạy HTTPS
@@ -19,7 +19,7 @@ export const useAuthStore = defineStore('auth', {
                 localStorage.setItem('user', JSON.stringify(user))
                 this.user = user
             } catch (error) {
-                
+
             }
         },
         async logout(){
@@ -47,12 +47,12 @@ export const useAuthStore = defineStore('auth', {
         //         this.user = res.data
         //     } catch (error) {
         //         console.log(error);
-                
+
         //     }
         // },
         getUserFromLocal() {
             const raw = localStorage.getItem('user')
-            
+
             if (!raw) {
                 this.user = null
                 return null

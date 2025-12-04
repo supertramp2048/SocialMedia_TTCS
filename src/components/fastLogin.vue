@@ -41,7 +41,11 @@
             3.285-1.23.645 1.653.24 2.873.12 3.176.765.84
             1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475
             5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015
+<<<<<<< HEAD
             3.286 0 .315.21.69.825.57C20.565 22.092 24
+=======
+3.286 0 .315.21.69.825.57C20.565 22.092 24
+>>>>>>> long
             17.592 24 12.297c0-6.627-5.373-12-12-12"/>
           </svg>
             GitHub
@@ -50,6 +54,17 @@
       </div>
 </template>
 <script setup lang='js'>
+<<<<<<< HEAD
+=======
+import { onUnmounted } from 'vue';
+import { useToast } from 'vue-toastification';
+import { useRouter } from 'vue-router';
+import { useAuthStore } from '@/stores/auth';
+import Cookies from 'js-cookie';
+const toast = useToast();
+const router = useRouter();
+const auth = useAuthStore();
+>>>>>>> long
     // Hàm xử lý login Google
 // 1. Hàm mở Popup
 function loginWithGoogle() {
@@ -126,4 +141,8 @@ function handlePopupMessage(event) {
 onUnmounted(() => {
     window.removeEventListener('message', handlePopupMessage);
 });
+<<<<<<< HEAD
 </script>
+=======
+</script>
+>>>>>>> long
