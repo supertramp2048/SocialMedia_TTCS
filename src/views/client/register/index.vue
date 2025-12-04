@@ -72,7 +72,7 @@
                           :disabled="isLoading"
                           :aria-busy="isLoading"
                           type="submit"
-                          class="w-full relative flex items-center justify-center gap-2 text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800 disabled:opacity-60 disabled:cursor-not-allowed disabled:pointer-events-none">
+                          class="w-full relative flex items-center justify-center gap-2 text-white bg-sky-600 hover:bg-sky-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800 disabled:opacity-60 disabled:cursor-not-allowed disabled:pointer-events-none">
                           <span v-if="!isLoading">Create an account</span>
                           <span v-else class="inline-flex items-center" aria-live="polite">
                             <span class="mr-2">Đang tạo</span>

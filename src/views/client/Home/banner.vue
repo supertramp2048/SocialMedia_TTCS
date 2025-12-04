@@ -1,5 +1,5 @@
 <template>
-    <section class="relative bg-gradient-to-br from-sky-50 via-blue-50 to-sky-100 overflow-hidden">
+    <section class="relative  from-sky-50 via-blue-50 to-sky-100 overflow-hidden">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24"
       :style="{
         backgroundImage: `url(${setting.backGroundURL})`,

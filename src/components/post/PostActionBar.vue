@@ -2,16 +2,16 @@
   <!-- Horizontal Layout (Always visible on mobile, hidden on desktop when vertical mode) -->
   <div 
     :class="[
-      'mt-3 flex justify-between border-b border-border-lighter mb-6',
+      'mt-4 flex flex-col sm:flex-row sm:items-center justify-between border-b border-border-lighter mb-6 gap-4 sm:gap-6 px-2 sm:px-0',
       layout === 'vertical' ? 'lg:hidden' : ''
     ]"
   >
-    <div class="flex items-center gap-4 py-6">
+    <div class="flex flex-col xs:flex-row xs:items-center gap-3 sm:gap-4 py-4">
       <div class="flex items-center gap-2">
         <!-- nút upvote -->
         <button @click="handleUpvote">
           <svg
-            class="w-8 h-8 transition-colors duration-200"
+            class="w-7 h-7 sm:w-8 sm:h-8 transition-colors duration-200"
             :class="{
               'fill-sky-500': post?.data?.user_vote === 1,
               'fill-gray-400 hover:fill-sky-400': post?.data?.user_vote !== 1
@@ -29,7 +29,7 @@
       <!-- nút downvote -->
       <button @click="handleDownvote">
         <svg
-          class="w-8 h-8 transition-colors duration-200"
+          class="w-7 h-7 sm:w-8 sm:h-8 transition-colors duration-200"
           :class="{
             'fill-red-500': post?.data?.user_vote === -1,
             'fill-gray-400 hover:fill-red-400': post?.data?.user_vote !== -1
@@ -42,8 +42,8 @@
       </button>
 
       <!-- hiển thị số bình luận bài viết -->
-      <span class="text-text-muted">·</span>
-      <span class="text-base text-text-primary">{{ post.data?.comments_count }} bình luận</span>
+      <span class="text-text-muted hidden xs:inline">·</span>
+      <span class="text-sm sm:text-base text-text-primary">{{ post.data?.comments_count }} bình luận</span>
     </div>
 
     <!-- option báo cáo bài viết -->

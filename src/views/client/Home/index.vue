@@ -1,54 +1,73 @@
-
 <template>
   <Layout v-slot="{ ads, setting }">
     <!-- Hero Section -->
     <Banner :setting="setting"></Banner>
+    
     <!-- Main Content -->
-    <div class="max-w-9/12 mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
-      <div class="grid lg:grid-cols-3 gap-8">
+    <div class="w-full mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 md:py-8 lg:py-12 max-w-7xl">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+        
         <!-- Left Column - Main Content -->
-        <div class="lg:col-span-2 space-y-8">
+        <div class="lg:col-span-2 space-y-4 sm:space-y-6 lg:space-y-8">
+          
           <!-- Featured Posts Section -->
           <section>
-            <div class="flex items-center justify-between mb-6">
-              <h2 class="text-xl md:text-2xl font-bold text-gray-900 uppercase tracking-wide">Mới nhất trên Spiderum</h2>
+            <div class="flex items-center justify-between mb-3 sm:mb-4 md:mb-6">
+              <h2 class="text-sm sm:text-base md:text-xl lg:text-2xl font-bold text-gray-900 uppercase tracking-wide">
+                Mới nhất trên Spiderum
+              </h2>
             </div>
-            <div v-if="loadingExtras" class="grid gap-6 sm:grid-cols-2 lg:grid-cols-2">
+            <div v-if="loadingExtras" class="grid gap-4 sm:gap-6">
               <SkeletonCard v-for="n in 1" :key="'sk-latest-'+n" />
             </div>
             <GridPost v-else :posts="latestPost" :pageLimit="null"></GridPost>
           </section>
 
           <!-- Banner Ad -->
-          <BannerAds :ads="ads"></BannerAds>
+          <div class="my-4 sm:my-6 lg:my-8">
+            <BannerAds :ads="ads"></BannerAds>
+          </div>
+          
           <!-- Latest Articles Grid -->
           <section>
-            <div class="flex items-center justify-between mb-6">
-              <h2 class="text-xl md:text-2xl font-bold text-gray-900 uppercase tracking-wide">Nổi bật trong tuần</h2>
+            <div class="flex items-center justify-between mb-3 sm:mb-4 md:mb-6">
+              <h2 class="text-sm sm:text-base md:text-xl lg:text-2xl font-bold text-gray-900 uppercase tracking-wide">
+                Nổi bật trong tuần
+              </h2>
             </div>
+            
             <!-- so post noi bat -->
-            <div v-if="loadingExtras" class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            <div v-if="loadingExtras" class="grid gap-3 sm:gap-4 md:gap-6 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
               <SkeletonCard v-for="n in 4" :key="'sk-featured-'+n" />
             </div>
-            <Carousel v-else :posts="featuredPosts?.data"></Carousel>
-            <!-- <GridPost :posts="featuredPosts" :pageLimit="null"></GridPost> -->
+            <div v-else class="mb-4 sm:mb-6 lg:mb-8">
+              <Carousel :posts="featuredPosts?.data"></Carousel>
+            </div>
 
-            <BannerAds :ads="ads"></BannerAds>
+            <!-- Banner Ad -->
+            <div class="my-4 sm:my-6 lg:my-8">
+              <BannerAds :ads="ads"></BannerAds>
+            </div>
 
-          <!-- grid post tất cả các post theo category id-->
-          <div v-if="loadingPosts" class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            <SkeletonCard v-for="n in objPagination.limit || 6" :key="'sk-grid-'+n" />
-          </div>
-          <GridPost v-else :posts="posts" :pageLimit="totalPages"></GridPost>
+            <!-- grid post tất cả các post theo category id-->
+            <div v-if="loadingPosts" class="grid gap-3 sm:gap-4 md:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+              <SkeletonCard v-for="n in objPagination.limit || 6" :key="'sk-grid-'+n" />
+            </div>
+            <GridPost v-else :posts="posts" :pageLimit="totalPages"></GridPost>
           </section>
         </div>
 
-        <!-- <--Right Sidebar -->
-        <RightSider :ads="ads?.sidebarRightAds" ></RightSider>
+        <!-- Right Sidebar -->
+        <aside class="lg:col-span-1 hidden lg:block">
+          <div class="sticky top-4">
+            <RightSider :ads="ads?.sidebarRightAds"></RightSider>
+          </div>
+        </aside>
       </div>
     </div>
   </Layout>
 </template>
+
 <script setup lang="js">
 import Layout from '../layout/layout.vue'
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
@@ -201,7 +220,6 @@ onMounted(async () => {
   await fetchExtras()
 })
 </script>
-
 
 <style scoped>
 .line-clamp-2 {

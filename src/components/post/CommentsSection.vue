@@ -1,6 +1,6 @@
 <template>
-  <div class="max-w-full mx-auto px-4 mb-16">
-    <div class="border border-border-lighter rounded shadow-card p-6">
+  <div class="max-w-full mx-auto px-2 sm:px-4 mb-16">
+    <div class="border border-border-lighter rounded shadow-card p-4 sm:p-6">
       <!-- Comment Form -->
       <form
         v-if="user"

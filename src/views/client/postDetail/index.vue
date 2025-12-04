@@ -2,7 +2,7 @@
   <Layout>
     <div class="min-h-screen bg-white">
       <!-- Main Content -->
-      <main class="w-9/12 m-auto">
+      <main class="w-full max-w-[1100px] mx-auto px-4 sm:px-6 lg:px-4">
         <SkeletonLoader
           v-if="isLoadingPage"
           variant="detail"
