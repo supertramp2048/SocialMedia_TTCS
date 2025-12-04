@@ -162,6 +162,9 @@ async function onSubmit () {
       await auth.login(email.value, password.value)
       if(auth.user){
         toast.success('Đăng nhập thành công!')
+        if(auth.user.email_verified_at == null){
+          toast.info('Tài khoản của bạn chưa được xác thực')
+        }
         router.push('/')
       }
       else{

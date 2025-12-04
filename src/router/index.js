@@ -19,6 +19,12 @@ const router = createRouter({
       meta: { requiresAuth: true }
     },
     {
+      path: '/verify-email/:id/:hash',
+      name: 'Xác thực',
+      component: () => import('../views/client/verifyEmail/index.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
       path: '/bai-dang/sua-bai',
       name: 'Sửa bài đăng',
       component: () => import('../views/client/fixArtical/index.vue'),

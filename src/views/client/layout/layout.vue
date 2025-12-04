@@ -1,10 +1,10 @@
 <template>
   <div class="min-h-screen bg-white">
     <!-- Header -->
-    <header class="sticky top-0 z-50 bg-white border-b border-gray-200">
+    <header class="sticky top-0 z-[120] bg-white border-b border-gray-200">
       <div v-if="showFormSearch === false">
         <div class="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
-          <div class="flex items-center justify-between h-14 sm:h-16">
+          <div class="flex  items-center justify-between h-14 sm:h-16">
             <!-- Logo + Nav -->
             <div class="flex items-center gap-3 sm:gap-6 md:gap-8">
               <router-link to="/" class="flex items-center gap-1.5 sm:gap-2">
@@ -115,7 +115,7 @@
                 </div>
 
                 <!-- User Menu -->
-                <div class="relative flex">
+                <div class="relative z-50 flex">
                   <button @click="showUserMenu = !showUserMenu">
                     <img :src="auth.user.avatar" class="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full object-cover" alt="">
                   </button>
@@ -128,10 +128,13 @@
                   <transition name="fade">
                     <div
                       v-if="showUserMenu"
-                      class="fixed sm:absolute left-0 right-0 sm:left-auto sm:right-0 top-14 sm:top-full sm:mt-3 w-full sm:w-60 md:w-72 bg-white border border-gray-200 shadow-xl rounded-none sm:rounded-2xl overflow-hidden z-50"
+                      class="fixed sm:absolute z-[130] left-0 right-0 sm:left-auto sm:right-0 top-[4.5rem] sm:top-full sm:mt-3 w-full sm:w-60 md:w-72 bg-white border border-gray-200 shadow-xl rounded-none sm:rounded-2xl overflow-hidden"
                     >
                       <div class="p-3 sm:p-4 border-b flex flex-col border-gray-100 items-center gap-2 sm:gap-3">
-                        <img :src="auth.user.avatar" class="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover" alt="">
+                        <div class="relative">
+                          <img :src="auth.user.avatar" class="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover " alt="">
+                          <p v-if="auth.user.email_verified_at == null" class="absolute text-sm text-gray-100 bg-sky-400 block rounded-2xl px-1 w-[130px] -bottom-2 right-1/3"> Email chưa xác thực</p>
+                        </div>
                         <div class="text-center">
                           <p class="font-bold text-sm sm:text-base text-gray-800">{{ auth.user.name }}</p>
                           <p class="text-xs sm:text-sm text-gray-500 truncate max-w-[200px]">{{ auth.user.email }}</p>
@@ -145,15 +148,23 @@
                       </div>
 
                       <ul class="py-2 text-gray-700 text-sm">
-                        <li>
+
+                          <li v-if="auth.user.email_verified_at == null">
+                            <button @click="verifyUserEmail" class="w-full text-left px-4 sm:px-5 py-2 hover:bg-gray-100 flex items-center gap-2">
+                              Xác thực Email bạn đã đăng ký
+                            </button>
+                          </li>
+                        <!-- <li>
                           <button class="w-full text-left px-4 sm:px-5 py-2 hover:bg-gray-100 flex items-center gap-2">
                             <i class="fa-regular fa-pen-to-square text-sm"></i> Bài viết của tôi
                           </button>
-                        </li>
+                        </li> -->
                         <li>
-                          <button class="w-full text-left px-4 sm:px-5 py-2 hover:bg-gray-100 flex items-center gap-2">
+                          <router-link 
+                          to='/bai-dang/viet-bai'
+                          class="w-full text-left px-4 sm:px-5 py-2 hover:bg-gray-100 flex items-center gap-2">
                             <i class="fa-regular fa-file-lines text-sm"></i> Viết bài
-                          </button>
+                          </router-link>
                         </li>
                         <li>
                           <router-link
@@ -304,7 +315,8 @@ import FooterBar from './footerBar.vue'
 import api from "../../../../API/axios"
 import SearchForm from '../../../components/searchForm.vue'
 import ToastNotification from './ToastNotification.vue'
-
+import { useToast } from 'vue-toastification'
+const toast = useToast()
 const echo = inject('echo')
 const settingStore = useSettingStore()
 const showFormSearch = ref(false)
@@ -329,6 +341,16 @@ function logout() {
   if (window.confirm('Bạn có chắc chắn muốn đăng xuất?')){
     auth.logout?.()
     router.push('/')
+  }
+}
+
+async function verifyUserEmail() {
+  console.log("da bam ");
+  
+  const res = await auth.verifyUserEmail()
+  if(res.status == 200 ){
+    console.log("ress",res);
+    toast.info(`Chúng tôi đã gửi một email xác nhận tới tài khoản ${auth.user.email} `)
   }
 }
 

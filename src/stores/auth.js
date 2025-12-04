@@ -7,6 +7,13 @@ export const useAuthStore = defineStore('auth', {
         token: Cookies.get('token') || null
     }),
     actions:{
+        async resetUserInLocal() {
+            const res2 = await api.get('/api/user')
+            const user2 = res2.data
+            // console.log("user2 ",user2);  
+            localStorage.setItem('user', JSON.stringify(user2))
+            this.user = user2
+        },
         async login(email, password){
             try {
                 const res = await api.post('/api/login', {email,password});
@@ -16,8 +23,12 @@ export const useAuthStore = defineStore('auth', {
                     secure: false,          // true nếu chạy HTTPS
                     sameSite: 'lax'         // tránh lỗi CORS
                 })
-                localStorage.setItem('user', JSON.stringify(user))
-                this.user = user
+                const res2 = await api.get('/api/user')
+                const user2 = res2.data
+                // console.log("user2 ",user2);
+                
+                localStorage.setItem('user', JSON.stringify(user2))
+                this.user = user2
             } catch (error) {
 
             }
@@ -66,6 +77,14 @@ export const useAuthStore = defineStore('auth', {
                 return null
             }
         },
-
+        async verifyUserEmail(){
+            try {
+                const res = await api.post('/api/email/verification-notification')
+                return res
+            } catch (error) {
+                console.log(error);
+                return error
+            }
+        }
     }
 })
