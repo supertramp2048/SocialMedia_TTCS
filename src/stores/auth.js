@@ -3,6 +3,7 @@ import api from "../../API/axios"
 import Cookies from "js-cookie";
 export const useAuthStore = defineStore('auth', {
     state:() => ({
+        loading: false,
         user: null,
         token: Cookies.get('token') || null
     }),
@@ -79,11 +80,15 @@ export const useAuthStore = defineStore('auth', {
         },
         async verifyUserEmail(){
             try {
+                this.loading = true
                 const res = await api.post('/api/email/verification-notification')
                 return res
             } catch (error) {
                 console.log(error);
                 return error
+            }
+            finally{
+                this.loading = false
             }
         }
     }

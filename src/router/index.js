@@ -2,7 +2,9 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/client/Home/index.vue'
 import { useCategoryStore } from '@/stores/categories'
 import Cookies from "js-cookie";
+import { useToast } from 'vue-toastification';
 import { useAuthStore } from '@/stores/auth';
+const toast = useToast()
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -16,19 +18,19 @@ const router = createRouter({
       path: '/bai-dang/viet-bai',
       name: 'Viết bài đăng',
       component: () => import('../views/client/createNewArticale/index.vue'),
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true, requiresVerify: true }
     },
     {
       path: '/verify-email/:id/:hash',
       name: 'Xác thực',
       component: () => import('../views/client/verifyEmail/index.vue'),
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true  }
     },
     {
       path: '/bai-dang/sua-bai',
       name: 'Sửa bài đăng',
       component: () => import('../views/client/fixArtical/index.vue'),
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true, requiresVerify: true }
     },
     {
       path: '/dang-ky',
@@ -62,7 +64,7 @@ const router = createRouter({
       path: '/nhan-tin',
       name: 'chat',
       component: () => import('../views/client/chat/index.vue'),
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true, requiresVerify: true }
     },
     {
       path: '/nguoi-dung/:name',
@@ -114,9 +116,18 @@ router.beforeEach((to, from, next) => {
     // Có token nhưng store chưa có user -> load lại từ local
     if (!auth.user) {
       auth.getUserFromLocal()
+      return next()
     }
   }
-
+  if(to.meta.requiresVerify){
+    if(!auth.user.email_verified_at){
+      toast.error("Bạn cần xác minh tài khoản email để sử dụng tính năng này")
+      return next(false)
+    }
+    else{
+      return next()
+    }
+  }
   // Nếu đã đăng nhập rồi mà vào /login hoặc /dang-ky thì cho về home
   if ((to.path === '/login' || to.path === '/dang-ky') && token) {
     return next('/')

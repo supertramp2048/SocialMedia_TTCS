@@ -150,8 +150,9 @@
                       <ul class="py-2 text-gray-700 text-sm">
 
                           <li v-if="auth.user.email_verified_at == null">
-                            <button @click="verifyUserEmail" class="w-full text-left px-4 sm:px-5 py-2 hover:bg-gray-100 flex items-center gap-2">
-                              Xác thực Email bạn đã đăng ký
+                            <button @click="verifyUserEmail" :disabled="auth.loading" class="w-full disabled:cursor-not-allowed text-left px-4 sm:px-5 py-2 hover:bg-gray-100 flex items-center gap-2">
+                              <span v-if="auth.loading == false">Xác thực Email bạn đã đăng ký</span>
+                              <span class="flex leading-4 justify-between" v-else-if="auth.loading == true">Đang gửi email <MoonLoader class="ml-1" v-if="auth.loading" color="#0ea5e9" size="14px"></MoonLoader>  </span>
                             </button>
                           </li>
                         <!-- <li>
@@ -316,6 +317,7 @@ import api from "../../../../API/axios"
 import SearchForm from '../../../components/searchForm.vue'
 import ToastNotification from './ToastNotification.vue'
 import { useToast } from 'vue-toastification'
+import { MoonLoader } from "vue3-spinner"
 const toast = useToast()
 const echo = inject('echo')
 const settingStore = useSettingStore()

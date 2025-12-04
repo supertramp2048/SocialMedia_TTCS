@@ -2,28 +2,30 @@
   <!-- Loading skeleton for replies -->
   <SkeletonList v-if="loading" :rows="5" />
 
-  <!-- Sample Comment -->
+  <!-- Replies list -->
   <div v-else v-for="comment in replies" :key="comment.id" class="flex gap-3 mb-6">
+    <!-- khoảng trống avatar giống comment cha -->
     <div class="w-12 h-12 flex-shrink-0"></div>
+
     <div class="flex-1">
+      <!-- Header: user + menu 3 chấm -->
       <div class="flex justify-between items-center gap-2 mb-1">
-        <!-- userDiv -->
         <UserDivComment
           :authorId="post.data?.author?.id"
           :user="comment?.author"
           :date="new Date(comment?.updated_at || comment?.created_at)"
           :content="comment?.content"
           class="flex-1"
-        ></UserDivComment>
+        />
 
-        <!-- ✅ NEW: Menu báo cáo 3 chấm (thay thế nút "Báo cáo bình luận" cũ) -->
+        <!-- Menu 3 chấm cho comment con -->
         <div class="relative" :ref="el => childCommentMenuRefs[comment.id] = el">
-          <button 
-            v-if = "user && comment?.author?.id != user.id"
+          <button
+            v-if="user && comment?.author?.id != user.id"
             @click.stop="toggleChildCommentMenu(comment.id)"
             :aria-expanded="openChildMenuCommentId === comment.id"
             aria-haspopup="menu"
-            class="p-1 text-gray-400 hover:text-gray-600 transition-colors" 
+            class="p-1 text-gray-400 hover:text-gray-600 transition-colors"
             aria-label="Tùy chọn bình luận"
           >
             <svg width="4" height="16" viewBox="0 0 4 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -42,8 +44,7 @@
             </svg>
           </button>
 
-          <!-- ✅ NEW: Sử dụng ReportMenu component -->
-          <ReportMenu 
+          <ReportMenu
             v-if="openChildMenuCommentId === comment.id"
             :items="getChildCommentMenuItems(comment)"
             align="right"
@@ -52,9 +53,9 @@
         </div>
       </div>
 
+      <!-- Actions: Trả lời / Sửa / Xóa -->
       <div class="items-center gap-3 text-text-secondary text-opacity-75">
         <div class="flex ml-[68px]">
-          <!-- viet binh luan -->
           <button
             v-if="user"
             class="text-[13px] font-bold p-[5px] rounded-2xl hover:bg-sky-300"
@@ -62,7 +63,7 @@
           >
             Trả lời
           </button>
-          <!-- sua binh luan -->
+
           <button
             v-if="user && comment?.author?.id == user.id"
             class="text-[13px] font-bold p-[5px] rounded-2xl hover:bg-sky-300"
@@ -70,7 +71,7 @@
           >
             Sửa
           </button>
-          <!-- xoa binh luan  -->
+
           <button
             v-if="user && comment?.author?.id == user.id"
             class="text-[13px] font-bold p-[5px] rounded-2xl hover:bg-sky-300 disabled:opacity-60 disabled:cursor-not-allowed disabled:pointer-events-none"
@@ -86,7 +87,7 @@
           </button>
         </div>
 
-        <!-- form reply comment -->
+        <!-- Form reply cho comment con -->
         <form
           v-if="showReply.includes(comment?.id)"
           class="border-b border-border-lighter pb-6 mb-6"
@@ -121,9 +122,8 @@
             </button>
           </div>
         </form>
-        <!-- end form reply comment -->
 
-        <!-- form fix comment form -->
+        <!-- Form sửa comment con -->
         <form
           v-if="FixIndex.includes(comment?.id)"
           class="border-b border-border-lighter pb-6 mb-6"
@@ -158,9 +158,9 @@
             </button>
           </div>
         </form>
-        <!-- end fix comment form -->
       </div>
 
+      <!-- Nút mở thread con sâu hơn -->
       <div class="ml-[68px]">
         <button
           v-if="comment?.replies_count > 0"
@@ -171,6 +171,7 @@
         </button>
       </div>
 
+      <!-- Đệ quy ChildComments cho reply sâu hơn -->
       <ChildComments
         v-if="show.includes(comment?.id)"
         :key="`child-${comment.id}`"
@@ -180,31 +181,31 @@
     </div>
   </div>
 
-  <!-- ✅ NEW: ReportModal component -->
+  <!-- Modal report -->
   <ReportModal
     v-model="showReportPostForm"
     :id="idReport"
     :type="typeOfReport"
   />
-  <!-- end sample comment -->
 </template>
 
 <script setup lang="js">
-import { ref, watch, onMounted, onBeforeUnmount } from "vue"
-import api from "../../API/axios"
+import { ref, watch, onMounted, onBeforeUnmount, inject } from 'vue'
+import api from '../../API/axios'
 import { useAuthStore } from '@/stores/auth'
 import { storeToRefs } from 'pinia'
+
 import UserDivComment from '../components/userDivComment.vue'
 import ReportModal from '../components/reportForm.vue'
-// ✅ NEW: Import ReportMenu component
 import ReportMenu from '../components/ReportMenu.vue'
-import SkeletonList from './skeleton/SkeletonList.vue'
+import SkeletonList from '../components/skeleton/SkeletonList.vue'
+import ChildComments from '../components/childComments.vue'
 
 const props = defineProps({
   parent_id: { type: [Number, String], required: true },
   post: { type: Object, required: true }
 })
-
+const echo = inject('echo')
 const auth = useAuthStore()
 const { user } = storeToRefs(auth)
 
@@ -213,54 +214,46 @@ const replies = ref([])
 const loading = ref(false)
 const error = ref(null)
 
-// Inline submitting states per action
+// state loading cho từng action
 const replySubmittingId = ref(null)
 const fixSubmittingId = ref(null)
 const deleteSubmittingId = ref(null)
 
-// ✅ NEW: State cho menu báo cáo (độc lập với component cha)
+// Menu báo cáo
 const openChildMenuCommentId = ref(null)
 const childCommentMenuRefs = ref({})
 const showReportPostForm = ref(false)
 const typeOfReport = ref('')
 const idReport = ref('')
 
-// ✅ NEW: Toggle menu cho comment con
 function toggleChildCommentMenu(commentId) {
-  if (openChildMenuCommentId.value === commentId) {
-    openChildMenuCommentId.value = null
-  } else {
-    openChildMenuCommentId.value = commentId
-  }
+  openChildMenuCommentId.value =
+    openChildMenuCommentId.value === commentId ? null : commentId
 }
 
-// ✅ NEW: Báo cáo người dùng (tác giả comment)
 function reportChildAuthor(userId) {
   typeOfReport.value = 'users'
   idReport.value = userId
   showReportPostForm.value = true
-  openChildMenuCommentId.value = null // Đóng menu sau khi chọn
+  openChildMenuCommentId.value = null
 }
 
-// ✅ NEW: Báo cáo bình luận con
 function reportChildComment(commentId) {
   typeOfReport.value = 'comments'
   idReport.value = commentId
   showReportPostForm.value = true
-  openChildMenuCommentId.value = null // Đóng menu sau khi chọn
+  openChildMenuCommentId.value = null
 }
 
-// ✅ NEW: Tạo menu items cho từng comment con
 function getChildCommentMenuItems(comment) {
-  // Kiểm tra xem comment có phải của chính mình không
   const isOwnComment = Number(auth?.user?.id) === Number(comment?.author?.id)
-  
+
   return [
     {
       label: 'Báo cáo người dùng',
       icon: 'fa-regular fa-flag',
       action: () => reportChildAuthor(comment.author.id),
-      disabled: isOwnComment // ✅ Disable nếu là comment của mình
+      disabled: isOwnComment
     },
     {
       label: 'Báo cáo bình luận',
@@ -270,57 +263,53 @@ function getChildCommentMenuItems(comment) {
   ]
 }
 
-// ✅ NEW: Xử lý click outside để đóng menu
 function handleClickOutside(e) {
   if (openChildMenuCommentId.value !== null) {
-    const commentMenuEl = childCommentMenuRefs.value[openChildMenuCommentId.value]
-    if (commentMenuEl && !commentMenuEl.contains(e.target)) {
+    const el = childCommentMenuRefs.value[openChildMenuCommentId.value]
+    if (el && !el.contains(e.target)) {
       openChildMenuCommentId.value = null
     }
   }
 }
 
-// ✅ NEW: Xử lý phím Esc để đóng menu
 function handleEscape(e) {
   if (e.key === 'Escape' && openChildMenuCommentId.value !== null) {
     openChildMenuCommentId.value = null
   }
 }
 
-// show form de dien comment
+// UI state cho form reply/sửa + mở thread con
 const showReply = ref([])
+const FixIndex = ref([])
+const show = ref([])
+
+const content_reply_comment = ref('')
+const content_fixed_comment = ref('')
+
 function showReplyForm(id) {
-  const indexOfFix = FixIndex.value.indexOf(id)
-  if (indexOfFix !== -1) {
-    FixIndex.value.splice(indexOfFix, 1)
-  }
+  const idxFix = FixIndex.value.indexOf(id)
+  if (idxFix !== -1) FixIndex.value.splice(idxFix, 1)
+
   const i = showReply.value.indexOf(id)
   i === -1 ? showReply.value.push(id) : showReply.value.splice(i, 1)
 }
 
-// show form de sua comment
-const FixIndex = ref([])
-const content_fixed_comment = ref("")
-
 function fixComment(id, content) {
   content_fixed_comment.value = content
+
   const i = showReply.value.indexOf(id)
-  if (i !== -1) {
-    showReply.value.splice(i, 1)
-  }
-  const indexOfFix = FixIndex.value.indexOf(id)
-  indexOfFix === -1 ? FixIndex.value.push(id) : FixIndex.value.splice(indexOfFix, 1)
+  if (i !== -1) showReply.value.splice(i, 1)
+
+  const idxFix = FixIndex.value.indexOf(id)
+  idxFix === -1 ? FixIndex.value.push(id) : FixIndex.value.splice(idxFix, 1)
 }
 
-const show = ref([])
 function toggle(id) {
   const i = show.value.indexOf(id)
   i === -1 ? show.value.push(id) : show.value.splice(i, 1)
 }
 
-const content_reply_comment = ref("")
-
-// Fetch replies của props.parent_id
+// Fetch replies cho parent_id hiện tại
 async function fetchReplies(id = props.parent_id) {
   if (!id) return
   loading.value = true
@@ -336,14 +325,14 @@ async function fetchReplies(id = props.parent_id) {
   }
 }
 
-// Gửi reply và refetch đúng cấp
+// Gửi reply cho comment ở level này
 async function sendReplyComment(content, postId, parent_id) {
   if (!content?.trim()) return
 
   try {
     replySubmittingId.value = parent_id
     const res = await api.post(`${apiUrl}/api/comments`, {
-      content: content,
+      content,
       post_id: postId,
       parent_id
     })
@@ -351,7 +340,7 @@ async function sendReplyComment(content, postId, parent_id) {
     if (res.status === 201) {
       await fetchReplies(props.parent_id)
 
-      content_reply_comment.value = ""
+      content_reply_comment.value = ''
       const i = showReply.value.indexOf(parent_id)
       if (i !== -1) showReply.value.splice(i, 1)
 
@@ -367,28 +356,26 @@ async function sendReplyComment(content, postId, parent_id) {
     }
     if (status === 422) {
       const errs = error.response.data?.errors || {}
-      const firstErr = Object.values(errs).flat?.()[0] ||
+      const firstErr =
+        (Object.values(errs).flat?.()[0]) ||
         'Dữ liệu không hợp lệ (thiếu content / post_id / parent_id).'
       alert(firstErr)
       return
     }
     console.error(error)
     alert('Có lỗi xảy ra, vui lòng thử lại sau.')
-  }
-  finally {
+  } finally {
     replySubmittingId.value = null
   }
 }
 
-// sua comment
+// Sửa comment ở level này
 async function sendFixedComment(content, id, parent_id) {
   if (!content?.trim()) return
 
   try {
     fixSubmittingId.value = id
-    const res = await api.patch(`${apiUrl}/api/comments/${id}`, {
-      content: content
-    })
+    const res = await api.patch(`${apiUrl}/api/comments/${id}`, { content })
 
     if (res.status === 200 || res.status === 201) {
       const index = replies.value.findIndex(c => c.id === id)
@@ -397,7 +384,7 @@ async function sendFixedComment(content, id, parent_id) {
         replies.value[index].updated_at = new Date().toISOString()
       }
 
-      content_fixed_comment.value = ""
+      content_fixed_comment.value = ''
       const i = FixIndex.value.indexOf(id)
       if (i !== -1) FixIndex.value.splice(i, 1)
     }
@@ -409,20 +396,20 @@ async function sendFixedComment(content, id, parent_id) {
     }
     if (status === 422) {
       const errs = error.response.data?.errors || {}
-      const firstErr = Object.values(errs).flat?.()[0] ||
+      const firstErr =
+        (Object.values(errs).flat?.()[0]) ||
         'Dữ liệu không hợp lệ.'
       alert(firstErr)
       return
     }
     console.error(error)
     alert('Có lỗi xảy ra, vui lòng thử lại sau.')
-  }
-  finally {
+  } finally {
     fixSubmittingId.value = null
   }
 }
 
-// xoa comment
+// Xóa comment ở level này
 async function deleteComment(id, parent_id) {
   if (!confirm('Bạn chắc muốn xoá bình luận này?')) return
 
@@ -434,7 +421,6 @@ async function deleteComment(id, parent_id) {
       if (index !== -1) {
         replies.value.splice(index, 1)
       }
-
       alert('Xoá bình luận thành công!')
     }
   } catch (error) {
@@ -445,23 +431,78 @@ async function deleteComment(id, parent_id) {
     }
     console.error(error)
     alert('Xoá bình luận thất bại.')
-  }
-  finally {
+  } finally {
     deleteSubmittingId.value = null
   }
 }
 
-// ✅ NEW: Mount/unmount event listeners
+// child comment listener
+
+function setupChildEchoListener(postId) {
+  if (!echo || !postId) return
+
+  const channelName = `comment.${postId}`
+  const channel = echo.private(channelName)
+
+  channel.listen('CommentSent', (event) => {
+    const newComment = {
+      id: event.id,
+      post_id: event.post_id,
+      parent_id: event.parent_id,
+      content: event.content,
+      created_at: event.created_at,
+      updated_at: event.created_at,
+      author: event.sender ? {
+        id: event.sender.id,
+        name: event.sender.name,
+        avatar: event.sender.avatar
+      } : null,
+      replies_count: 0
+    }
+
+    if (auth.user?.id === newComment.author?.id) {
+      return
+    }
+
+    // Reply trực tiếp của parent_id mà component này đang xử lý
+    if (newComment.parent_id == props.parent_id) {
+      replies.value.unshift(newComment)
+      return
+    }
+
+    // Reply sâu hơn (reply của 1 comment trong replies hiện tại)
+    const parent = replies.value.find(c => c.id === newComment.parent_id)
+    if (parent) {
+      parent.replies_count = (parent.replies_count || 0) + 1
+
+      // Nếu đang mở block replies cho comment này, chủ yếu là để ChildComments con hiển thị
+      if (!show.value.includes(parent.id)) {
+        // tuỳ anh: có thể tự mở, hoặc chỉ tăng count
+        // show.value.push(parent.id)
+      }
+    }
+  })
+
+  return channel
+}
+
+
+let childChannel = null
+
 onMounted(() => {
   document.addEventListener('click', handleClickOutside)
   document.addEventListener('keydown', handleEscape)
+  childChannel = setupChildEchoListener(props.post.id)
 })
 
 onBeforeUnmount(() => {
   document.removeEventListener('click', handleClickOutside)
   document.removeEventListener('keydown', handleEscape)
+  if (echo && props.post?.id) {
+    echo.leave(`comment.${props.post.id}`)
+  }
 })
 
-// Watch parent_id và fetch replies
+
 watch(() => props.parent_id, fetchReplies, { immediate: true })
 </script>

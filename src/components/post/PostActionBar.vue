@@ -2,16 +2,22 @@
   <!-- Horizontal Layout (Always visible on mobile, hidden on desktop when vertical mode) -->
   <div 
     :class="[
-      'mt-4 flex flex-col sm:flex-row sm:items-center justify-between border-b border-border-lighter mb-6 gap-4 sm:gap-6 px-2 sm:px-0',
+      'mt-4 flex items-center justify-between border-b border-border-lighter mb-6 px-4 sm:px-0 py-3 sm:py-4',
       layout === 'vertical' ? 'lg:hidden' : ''
     ]"
   >
-    <div class="flex flex-col xs:flex-row xs:items-center gap-3 sm:gap-4 py-4">
-      <div class="flex items-center gap-2">
-        <!-- nút upvote -->
-        <button @click="handleUpvote">
+    <!-- Left side: Vote buttons + Comment count -->
+    <div class="flex items-center gap-3 sm:gap-4 flex-1">
+      <!-- Vote controls -->
+      <div class="flex items-center gap-2 sm:gap-3">
+        <!-- Upvote button -->
+        <button 
+          @click="handleUpvote"
+          class="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-lg hover:bg-gray-100 transition-colors"
+          aria-label="Upvote"
+        >
           <svg
-            class="w-7 h-7 sm:w-8 sm:h-8 transition-colors duration-200"
+            class="w-5 h-5 sm:w-6 sm:h-6 transition-colors duration-200"
             :class="{
               'fill-sky-500': post?.data?.user_vote === 1,
               'fill-gray-400 hover:fill-sky-400': post?.data?.user_vote !== 1
@@ -22,41 +28,52 @@
             <path d="M8.80974 5.27744L3.18474 14.294H14.4761L8.80974 5.27744ZM8.80974 1.92725L17.6609 16.0725H0L8.80974 1.92725Z" />
           </svg>
         </button>
-        <span class="font-semibold text-base">
+
+        <!-- Vote score -->
+        <span class="font-semibold text-sm sm:text-base min-w-[24px] text-center">
           {{ post?.data?.vote_score > 0 ? post.data.vote_score : 0 }}
         </span>
-      </div>
-      <!-- nút downvote -->
-      <button @click="handleDownvote">
-        <svg
-          class="w-7 h-7 sm:w-8 sm:h-8 transition-colors duration-200"
-          :class="{
-            'fill-red-500': post?.data?.user_vote === -1,
-            'fill-gray-400 hover:fill-red-400': post?.data?.user_vote !== -1
-          }"
-          viewBox="0 0 18 18"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path d="M9.19027 12.7223L14.8153 3.70574H3.5239L9.19027 12.7223ZM9.19027 16.0725L0.339157 1.92725L18 1.92725L9.19027 16.0725Z" />
-        </svg>
-      </button>
 
-      <!-- hiển thị số bình luận bài viết -->
-      <span class="text-text-muted hidden xs:inline">·</span>
-      <span class="text-sm sm:text-base text-text-primary">{{ post.data?.comments_count }} bình luận</span>
+        <!-- Downvote button -->
+        <button 
+          @click="handleDownvote"
+          class="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-lg hover:bg-gray-100 transition-colors"
+          aria-label="Downvote"
+        >
+          <svg
+            class="w-5 h-5 sm:w-6 sm:h-6 transition-colors duration-200"
+            :class="{
+              'fill-red-500': post?.data?.user_vote === -1,
+              'fill-gray-400 hover:fill-red-400': post?.data?.user_vote !== -1
+            }"
+            viewBox="0 0 18 18"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path d="M9.19027 12.7223L14.8153 3.70574H3.5239L9.19027 12.7223ZM9.19027 16.0725L0.339157 1.92725L18 1.92725L9.19027 16.0725Z" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Separator + Comment count -->
+      <div class="flex items-center gap-2 sm:gap-3">
+        <span class="text-gray-300 hidden sm:inline">·</span>
+        <span class="text-xs sm:text-sm text-text-muted whitespace-nowrap">
+          {{ post.data?.comments_count }} bình luận
+        </span>
+      </div>
     </div>
 
-    <!-- option báo cáo bài viết -->
-    <div class="relative" :ref="el => { if (menuRef) menuRef.value = el }">
+    <!-- Right side: Report menu -->
+    <div class="relative flex-shrink-0 ml-2" :ref="el => { if (menuRef) menuRef.value = el }">
       <button
         v-if="auth?.user?.id != post?.data?.author?.id"
         @click.stop="showOption = !showOption"
         :aria-expanded="showOption"
         aria-haspopup="menu"
-        class="p-1 ml-auto"
+        class="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-lg hover:bg-gray-100 transition-colors"
         aria-label="More options"
       >
-        <svg width="4" height="16" viewBox="0 0 4 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg width="4" height="16" viewBox="0 0 4 16" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-1">
           <path
             d="M2 4C0.89543 4 -4.82823e-08 3.10457 0 2C4.82823e-08 0.89543 0.895431 -4.82823e-08 2 0C3.10457 4.82823e-08 4 0.895431 4 2C4 3.10457 3.10457 4 2 4Z"
             fill="#111827"
@@ -72,7 +89,7 @@
         </svg>
       </button>
 
-      <!-- Sử dụng ReportMenu component -->
+      <!-- Report Menu Component -->
       <ReportMenu
         v-if="showOption"
         :items="postMenuItems"
@@ -88,7 +105,7 @@
       v-if="layout === 'vertical'"
       ref="floatingBar"
       :class="[
-        'hidden lg:flex flex-col items-center gap-3 bg-white rounded-lg shadow-lg border border-gray-200 p-3',
+        'hidden lg:flex flex-col items-center gap-2 bg-white rounded-xl shadow-lg border border-gray-200 p-2.5',
         'fixed z-40 transition-all duration-300',
         isVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'
       ]"
@@ -97,11 +114,11 @@
       <!-- Upvote Button -->
       <button 
         @click="handleUpvote"
-        class="group flex flex-col items-center"
+        class="group flex items-center justify-center w-10 h-10 rounded-lg hover:bg-gray-50 transition-colors"
         aria-label="Upvote"
       >
         <svg
-          class="w-7 h-7 transition-colors duration-200"
+          class="w-6 h-6 transition-colors duration-200"
           :class="{
             'fill-sky-500': post?.data?.user_vote === 1,
             'fill-gray-400 group-hover:fill-sky-400': post?.data?.user_vote !== 1
@@ -114,18 +131,18 @@
       </button>
 
       <!-- Vote Score -->
-      <span class="font-bold text-base text-gray-800">
+      <span class="font-bold text-sm text-gray-800 py-1">
         {{ post?.data?.vote_score > 0 ? post.data.vote_score : 0 }}
       </span>
 
       <!-- Downvote Button -->
       <button 
         @click="handleDownvote"
-        class="group flex flex-col items-center"
+        class="group flex items-center justify-center w-10 h-10 rounded-lg hover:bg-gray-50 transition-colors"
         aria-label="Downvote"
       >
         <svg
-          class="w-7 h-7 transition-colors duration-200"
+          class="w-6 h-6 transition-colors duration-200"
           :class="{
             'fill-red-500': post?.data?.user_vote === -1,
             'fill-gray-400 group-hover:fill-red-400': post?.data?.user_vote !== -1
@@ -138,23 +155,25 @@
       </button>
 
       <!-- Separator -->
-      <div class="w-8 h-px bg-gray-300 my-1"></div>
+      <div class="w-full h-px bg-gray-200 my-1"></div>
 
       <!-- Comment Count -->
-      <div
-       @click="scrollToCommentSection"
-       class="flex flex-col items-center gap-1">
+      <button
+        @click="scrollToCommentSection"
+        class="flex flex-col items-center justify-center gap-1 w-10 h-10 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+        aria-label="Go to comments"
+      >
         <svg 
-          class="w-6 h-6 fill-gray-500"
+          class="w-5 h-5 fill-gray-500"
           viewBox="0 0 24 24"
           xmlns="http://www.w3.org/2000/svg"
         >
           <path d="M20 2H4C2.9 2 2 2.9 2 4V22L6 18H20C21.1 18 22 17.1 22 16V4C22 2.9 21.1 2 20 2ZM20 16H6L4 18V4H20V16Z"/>
         </svg>
-        <span class="text-xs text-gray-600 font-medium">
+        <span class="text-xs text-gray-600 font-medium leading-none">
           {{ post.data?.comments_count }}
         </span>
-      </div>
+      </button>
     </div>
   </Teleport>
 </template>
@@ -188,7 +207,7 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['update:modelValue', 'upvote', 'downvote'])
+const emit = defineEmits(['update:modelValue', 'upvote', 'downvote', 'scrollToComment'])
 
 const auth = useAuthStore()
 const floatingBar = ref(null)

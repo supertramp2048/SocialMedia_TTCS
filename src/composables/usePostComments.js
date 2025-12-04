@@ -291,70 +291,150 @@ export function usePostComments(post) {
 
   // Setup Echo listener for CommentSent
   function setupEchoListener(postId) {
-    if (!echo || !postId) return
+  if (!echo || !postId) return
 
-    const channelName = `comment.${postId}`
-    const channel = echo.private(channelName)
+  const channelName = `comment.${postId}`
+  const channel = echo.private(channelName)
 
-    channel.listen('CommentSent', (event) => {
-      console.log('📨 Nhận sự kiện CommentSent:', event)
+  channel.listen('CommentSent', (event) => {
+    console.log('📨 Nhận sự kiện CommentSent:', event)
 
-      // 1. Chuẩn hóa dữ liệu
-      const newComment = {
-        id: event.id,
-        post_id: event.post_id,
-        parent_id: event.parent_id,
-        content: event.content,
-        created_at: event.created_at,
-        updated_at: event.created_at,
-        author: event.sender ? {
-          id: event.sender.id,
-          name: event.sender.name,
-          avatar: event.sender.avatar
-        } : null,
-        replies_count: 0
+    const newComment = {
+      id: event.id,
+      post_id: event.post_id,
+      parent_id: event.parent_id,
+      content: event.content,
+      created_at: event.created_at,
+      updated_at: event.created_at,
+      author: event.sender ? {
+        id: event.sender.id,
+        name: event.sender.name,
+        avatar: event.sender.avatar,
+      } : null,
+      replies_count: 0,
+    }
+
+    // Bỏ qua comment do chính user hiện tại gửi (đã xử lý local)
+    if (auth.user?.id === newComment.author?.id) {
+      return
+    }
+
+    // 1. Comment cha mới
+    if (!newComment.parent_id) {
+      parentComments.value.unshift(newComment)
+
+      if (post.value?.data) {
+        post.value.data.comments_count = (post.value.data.comments_count || 0) + 1
+      }
+      return
+    }
+
+    // 2. Reply cho 1 comment cha (level 1)
+    const parent = parentComments.value.find(c => c.id === newComment.parent_id)
+
+    if (parent) {
+      // tăng replies_count cho nút "X Trả lời"
+      parent.replies_count = (parent.replies_count || 0) + 1
+
+      // nếu đang mở thread này thì ChildComments sẽ remount và fetch lại
+      if (show.value.includes(parent.id)) {
+        reloadKey.value[parent.id] = (reloadKey.value[parent.id] || 0) + 1
       }
 
-      if (auth.user?.id === newComment.author?.id) {
-        // Bỏ qua nếu comment do chính user hiện tại gửi
-        return
+      if (post.value?.data) {
+        post.value.data.comments_count = (post.value.data.comments_count || 0) + 1
       }
 
-      // 2. Xử lý hiển thị comment mới
-      if (!newComment.parent_id) {
-        // TRƯỜNG HỢP 1: COMMENT CHA MỚI
-        // Thêm vào đầu danh sách
-        parentComments.value.unshift(newComment)
+      return
+    }
 
-        // Tăng tổng số comment của bài viết
-        if (post.value?.data) {
-          post.value.data.comments_count = (post.value.data.comments_count || 0) + 1
-        }
+    // 3. Reply cho reply (deep-level)
+    // Với kiến trúc hiện tại (ChildComments tự fetch theo parent_id),
+    // ở đây chúng ta chỉ có thể cập nhật tổng số comment,
+    // còn UI thread sâu sẽ thấy comment mới sau khi user tương tác lại
+    // hoặc khi reload thread (tuỳ anh muốn trigger thêm gì sau này).
 
-      } else {
-        // TRƯỜNG HỢP 2: COMMENT CON (REPLY)
-        // Tìm comment cha của nó
-        const parent = parentComments.value.find(c => c.id === newComment.parent_id)
+    if (post.value?.data) {
+      post.value.data.comments_count = (post.value.data.comments_count || 0) + 1
+    }
+  })
 
-        if (parent) {
-          // Tăng số lượng reply hiển thị ở nút "Xem trả lời"
-          parent.replies_count = (parent.replies_count || 0) + 1
+  return channel
+}
 
-          // Nếu danh sách con đang mở, kích hoạt reloadKey để ChildComponent tự fetch lại
-          if (show.value.includes(parent.id)) {
-            reloadKey.value[parent.id] = (reloadKey.value[parent.id] || 0) + 1
-          }
+  // echo listener for child comment
 
-          // Tăng tổng số comment của bài viết
-          if (post.value?.data) {
-            post.value.data.comments_count = (post.value.data.comments_count || 0) + 1
-          }
-        }
+  function setupEchoListener(postId) {
+  if (!echo || !postId) return
+
+  const channelName = `comment.${postId}`
+  const channel = echo.private(channelName)
+
+  channel.listen('CommentSent', (event) => {
+    console.log('📨 Nhận sự kiện CommentSent:', event)
+
+    const newComment = {
+      id: event.id,
+      post_id: event.post_id,
+      parent_id: event.parent_id,
+      content: event.content,
+      created_at: event.created_at,
+      updated_at: event.created_at,
+      author: event.sender ? {
+        id: event.sender.id,
+        name: event.sender.name,
+        avatar: event.sender.avatar,
+      } : null,
+      replies_count: 0,
+    }
+
+    // Bỏ qua comment do chính user hiện tại gửi (đã xử lý local)
+    if (auth.user?.id === newComment.author?.id) {
+      return
+    }
+
+    // 1. Comment cha mới
+    if (!newComment.parent_id) {
+      parentComments.value.unshift(newComment)
+
+      if (post.value?.data) {
+        post.value.data.comments_count = (post.value.data.comments_count || 0) + 1
       }
-    })
+      return
+    }
 
-    return channel
-  }
+    // 2. Reply cho 1 comment cha (level 1)
+    const parent = parentComments.value.find(c => c.id === newComment.parent_id)
+
+    if (parent) {
+      // tăng replies_count cho nút "X Trả lời"
+      parent.replies_count = (parent.replies_count || 0) + 1
+
+      // nếu đang mở thread này thì ChildComments sẽ remount và fetch lại
+      if (show.value.includes(parent.id)) {
+        reloadKey.value[parent.id] = (reloadKey.value[parent.id] || 0) + 1
+      }
+
+      if (post.value?.data) {
+        post.value.data.comments_count = (post.value.data.comments_count || 0) + 1
+      }
+
+      return
+    }
+
+    // 3. Reply cho reply (deep-level)
+    // Với kiến trúc hiện tại (ChildComments tự fetch theo parent_id),
+    // ở đây chúng ta chỉ có thể cập nhật tổng số comment,
+    // còn UI thread sâu sẽ thấy comment mới sau khi user tương tác lại
+    // hoặc khi reload thread (tuỳ anh muốn trigger thêm gì sau này).
+
+    if (post.value?.data) {
+      post.value.data.comments_count = (post.value.data.comments_count || 0) + 1
+    }
+  })
+
+  return channel
+}
 
   // Cleanup Echo listener
   function cleanupEchoListener(postId) {
