@@ -19,7 +19,11 @@
             <th
               v-for="column in columns"
               :key="column.key"
+<<<<<<< HEAD
               class="px-6 py-3 border border-gray-400 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+=======
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+>>>>>>> oldrepo/adminFrontOnly
             >
               {{ column.label }}
             </th>

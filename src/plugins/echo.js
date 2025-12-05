@@ -1,6 +1,10 @@
 import Echo from 'laravel-echo'
 import Pusher from 'pusher-js'
+<<<<<<< HEAD
 import apiClient from '../api/apiClient'
+=======
+import apiClient from '@/api/apiClient'
+>>>>>>> oldrepo/adminFrontOnly
 
 // Make Pusher available globally
 window.Pusher = Pusher
@@ -95,6 +99,10 @@ function createMockEcho() {
     leave: () => {},
   }
 }
+<<<<<<< HEAD
 
+=======
+window.echo = echo // Make Echo available globally
+>>>>>>> oldrepo/adminFrontOnly
 export default echo
 

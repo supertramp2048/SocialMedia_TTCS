@@ -103,10 +103,17 @@ const postsStore = usePostsStore()
 const toast = useToast()
 const activeTab = ref('notRemovedPost')
 const columns = [
+<<<<<<< HEAD
   { key: 'title', label: 'Tiêu đề bài viết' },
   { key: 'author.name', label: 'Tác giả' },
   { key: 'created_at', label: 'Ngày tạo' },
   {key: 'actions', label: 'Xử lý'}
+=======
+  { key: 'title', label: 'Title' },
+  { key: 'author.name', label: 'Author' },
+  { key: 'created_at', label: 'Created' },
+  {key: 'actions', label: 'Action'}
+>>>>>>> oldrepo/adminFrontOnly
 ]
 
 const deleteModalOpen = ref(false)
