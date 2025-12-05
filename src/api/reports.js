@@ -7,13 +7,13 @@ export const reportsApi = {
   },
   getCommentReports: async (params) => {
     const response = await apiClient.get('/api/moderator/reports/comments', { params })
-    console.log(response.data);
+    //console.log(response.data);
     return response.data
   },
 
   getUserReports: async (params) => {
     const response = await apiClient.get('/api/moderator/reports/users', { params })
-    console.log(response.data);
+    //console.log(response.data);
     
     return response.data
   },

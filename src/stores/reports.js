@@ -20,7 +20,7 @@ export const useReportsStore = defineStore('reports', () => {
     try {
       const response = await reportsApi.getPostReports(params)
       postReports.value = response.data
-      console.log("post report ",postReports.value);
+      //console.log("post report ",postReports.value);
       
       pagination.value = {
         current_page: response.meta.current_page,
@@ -30,7 +30,7 @@ export const useReportsStore = defineStore('reports', () => {
       }
       return response
     } catch (error) {
-      console.log(error.message)
+      //console.log(error.message)
     } finally {
       loading.value = false
     }
@@ -101,7 +101,7 @@ export const useReportsStore = defineStore('reports', () => {
     try {
       const response = await reportsApi.getCommentReports(params)
       commentReports.value = response.data
-      console.log("comment report ",response.data)
+      //console.log("comment report ",response.data)
       pagination.value = {
         current_page: response.meta.current_page,
         last_page: response.meta.last_page,
@@ -122,7 +122,7 @@ export const useReportsStore = defineStore('reports', () => {
       loading.value = true
       try {
         const response = await reportsApi.getUserReports(params)
-        console.log("user report ",response.data)
+        //console.log("user report ",response.data)
         userReports.value = response.data
         pagination.value = {
         current_page: response.meta.current_page,
