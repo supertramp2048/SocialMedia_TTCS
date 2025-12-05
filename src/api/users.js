@@ -8,10 +8,6 @@ export const usersApi = {
 
   getUser: async (id) => {
     const response = await apiClient.get(`/api/profiles/${id}`)
-<<<<<<< HEAD
-    //console.log("ressss ",response.data)
-=======
->>>>>>> oldrepo/adminFrontOnly
     return response.data
   },
 

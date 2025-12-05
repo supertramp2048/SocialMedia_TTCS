@@ -1,20 +1,12 @@
 <template>
   <div>
     <div class="flex justify-between items-center mb-6">
-<<<<<<< HEAD
       <h1 class="text-2xl font-bold text-gray-900">Tài khoản chưa bị khóa</h1>
-=======
-      <h1 class="text-2xl font-bold text-gray-900">Users</h1>
->>>>>>> oldrepo/adminFrontOnly
       <router-link
         to="/admin/users/locked"
         class="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700"
       >
-<<<<<<< HEAD
         Xem các tài khoản đã khóa
-=======
-        View Locked Users
->>>>>>> oldrepo/adminFrontOnly
       </router-link>
     </div>
     <button
@@ -61,11 +53,7 @@
           Khóa tài khoản
         </button>
         <button
-<<<<<<< HEAD
           v-if="row.role !== 'superadmin' && CurrentAcc?.role == 'superadmin' "
-=======
-          v-if="row.role !== 'superadmin'"
->>>>>>> oldrepo/adminFrontOnly
           @click="handleGivePermit(row)"
           class="ml-2 text-green-600 hover:text-green-800"
         >
@@ -94,22 +82,14 @@
         <p>Bạn muốn khóa tài khoản này có tên <strong>{{ selectedUser?.name }}</strong>?</p>
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-2">
-<<<<<<< HEAD
             Chọn số ngày khóa tài khoản  - Để trống nếu muốn khóa tài khoản trong 10 năm
-=======
-            Duration (days) - Leave empty for permanent ban
->>>>>>> oldrepo/adminFrontOnly
           </label>
           <input
             v-model.number="banDuration"
             type="number"
             min="1"
             class="w-full px-4 py-2 border border-gray-300 rounded-lg"
-<<<<<<< HEAD
             placeholder="Khóa 10 năm"
-=======
-            placeholder="Permanent ban"
->>>>>>> oldrepo/adminFrontOnly
           />
         </div>
       </div>
@@ -154,30 +134,19 @@ import Pagination from '@/components/common/Pagination.vue'
 import FullLoading from '../../components/common/fullScreenLoading.vue'
 import Modal from '@/components/common/Modal.vue'
 import Badge from '@/components/common/Badge.vue'
-<<<<<<< HEAD
 import {useAuthStore} from '../../stores/auth'
-=======
->>>>>>> oldrepo/adminFrontOnly
 import { UserIcon } from '@heroicons/vue/24/outline'
 const search = ref('')
 const searchQuery = ref()
 const usersStore = useUsersStore()
-<<<<<<< HEAD
 const auth = useAuthStore()
 const CurrentAcc = ref(auth.user)
-=======
->>>>>>> oldrepo/adminFrontOnly
 const toast = useToast()
 const isSearch = ref(false)
 const columns = [
   { key: 'avatar', label: 'Avatar' },
-<<<<<<< HEAD
   { key: 'name', label: 'Tên' },
   {key: 'actions', label: 'Xử lý'}
-=======
-  { key: 'name', label: 'Name' },
-  {key: 'actions', label: 'Actions'}
->>>>>>> oldrepo/adminFrontOnly
 ]
 
 const banModalOpen = ref(false)

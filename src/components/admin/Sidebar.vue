@@ -115,24 +115,15 @@ const menuItems = computed(() => {
   const items = []
 
   // Tất cả role (mod/admin/superadmin) đều có Dashboard
-<<<<<<< HEAD
   items.push({ path: '/admin/dashboard', label: 'Trang chính', icon: HomeIcon })
 
   // REPORTS - Moderator trở lên (mod + admin + superadmin)
   if (authStore.isModerator || authStore.isAdmin || authStore.isSuperAdmin) {
     items.push({ path: '/admin/reports', label: 'Báo cáo', icon: FlagIcon })
-=======
-  items.push({ path: '/admin/dashboard', label: 'Dashboard', icon: HomeIcon })
-
-  // REPORTS - Moderator trở lên (mod + admin + superadmin)
-  if (authStore.isModerator || authStore.isAdmin || authStore.isSuperAdmin) {
-    items.push({ path: '/admin/reports', label: 'Reports', icon: FlagIcon })
->>>>>>> oldrepo/adminFrontOnly
   }
 
   // ADMIN - Admin trở lên (admin + superadmin)
   if (authStore.isAdmin || authStore.isSuperAdmin) {
-<<<<<<< HEAD
     items.push({ path: '/admin/users', label: 'Tài khoản user', icon: UsersIcon })
     items.push({ path: '/admin/posts', label: 'Bài đăng user', icon: DocumentTextIcon })
     
@@ -141,31 +132,13 @@ const menuItems = computed(() => {
     items.push({
       path: '/admin/advertisements',
       label: 'Quảng cáo',
-=======
-    items.push({ path: '/admin/users', label: 'Users', icon: UsersIcon })
-    items.push({ path: '/admin/posts', label: 'Posts', icon: DocumentTextIcon })
-    items.push({
-      path: '/admin/comments/hidden',
-      label: 'Comments',
-      icon: ChatBubbleLeftRightIcon,
-    })
-    items.push({ path: '/admin/categories', label: 'Categories', icon: FolderIcon })
-    items.push({ path: '/admin/appearance', label: 'Appearance', icon: PaintBrushIcon })
-    items.push({
-      path: '/admin/advertisements',
-      label: 'Advertisements',
->>>>>>> oldrepo/adminFrontOnly
       icon: PaintBrushIcon,
     })
   }
 
   // SUPERADMIN - chỉ superadmin mới thấy Staff
   if (authStore.isSuperAdmin) {
-<<<<<<< HEAD
     items.push({ path: '/admin/staff', label: 'Nhân viên', icon: UserGroupIcon })
-=======
-    items.push({ path: '/admin/staff', label: 'Staff', icon: UserGroupIcon })
->>>>>>> oldrepo/adminFrontOnly
   }
 
   return items

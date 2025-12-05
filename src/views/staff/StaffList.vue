@@ -155,13 +155,8 @@ const isSearch = ref(false)
 const activeTab = ref('moderator')
 const columns = [
   { key: 'avatar', label: 'Avatar' },
-<<<<<<< HEAD
   { key: 'name', label: 'Tên' },
   { key: 'actions', label: 'Hành động' }
-=======
-  { key: 'name', label: 'Name' },
-  { key: 'actions', label: 'Actions' }
->>>>>>> oldrepo/adminFrontOnly
 ]
 
 const changeRoleModalOpen = ref(false)
@@ -178,16 +173,12 @@ const getRoleVariant = (role) => {
 const handleSearch = (query) => {
   searchQuery.value = query
   isSearch.value = true
-<<<<<<< HEAD
   if(activeTab.value == 'moderator'){
     usersStore.getAllAmdinAccounts({ user: query, page: 1,role:'moderator' })
   }
   else if(activeTab.value == 'admin'){
     usersStore.getAllAmdinAccounts({ user: query, page: 1,role:'admin' })
   }
-=======
-  usersStore.getAllAmdinAccounts({ q: query, page: 1 })
->>>>>>> oldrepo/adminFrontOnly
 }
 
 const handlePageChange = (page) => {

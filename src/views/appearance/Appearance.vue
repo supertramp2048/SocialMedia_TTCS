@@ -1,10 +1,6 @@
 <template>
   <div>
-<<<<<<< HEAD
     <h1 class="text-2xl font-bold text-gray-900 mb-6">Cài đặt giao diện web</h1>
-=======
-    <h1 class="text-2xl font-bold text-gray-900 mb-6">Appearance Settings</h1>
->>>>>>> oldrepo/adminFrontOnly
 
     <div class="bg-white rounded-lg shadow p-6">
       <div class="space-y-6">
@@ -18,11 +14,7 @@
 
         <!-- LOGO -->
         <div>
-<<<<<<< HEAD
           <label class="block text-sm font-medium text-gray-700 mb-2">Logo trang web</label>
-=======
-          <label class="block text-sm font-medium text-gray-700 mb-2">Site Logo</label>
->>>>>>> oldrepo/adminFrontOnly
 
           <div class="flex items-center space-x-4">
             <div class="flex-1">
@@ -38,19 +30,11 @@
                   for="logo-upload"
                   class="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm cursor-pointer transition-colors"
                 >
-<<<<<<< HEAD
                   Chọn ảnh 
                 </label>
               </div>
               <p class="mt-1 text-sm text-gray-500">
                 Tải ảnh logo cho trang web (png, jpg, svg - Max 2MB)
-=======
-                  Choose Image
-                </label>
-              </div>
-              <p class="mt-1 text-sm text-gray-500">
-                Upload a logo for your site (png, jpg, svg - Max 2MB)
->>>>>>> oldrepo/adminFrontOnly
               </p>
             </div>
 
@@ -82,19 +66,11 @@
                   for="background-upload"
                   class="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm cursor-pointer transition-colors"
                 >
-<<<<<<< HEAD
                   Chọn ảnh 
                 </label>
               </div>
               <p class="mt-1 text-sm text-gray-500">
                 Tải ảnh banner / background image (png, jpg, svg - Max 2MB)
-=======
-                  Choose Image
-                </label>
-              </div>
-              <p class="mt-1 text-sm text-gray-500">
-                Upload a banner / background image (png, jpg, svg - Max 2MB)
->>>>>>> oldrepo/adminFrontOnly
               </p>
             </div>
 
@@ -111,28 +87,11 @@
           </div>
         </div>
 
-<<<<<<< HEAD
-=======
-        <!-- PRIMARY COLOR (hiện chỉ lưu local, chưa có API backend) -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Primary Color</label>
-          <input
-            v-model="primaryColor"
-            type="color"
-            class="h-10 w-20 border border-gray-300 rounded"
-          />
-        </div>
-
->>>>>>> oldrepo/adminFrontOnly
         <!-- FOOTER CONTENT -->
         <div class="space-y-4">
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">
-<<<<<<< HEAD
               Mô tả ở Footer 
-=======
-              Footer Description
->>>>>>> oldrepo/adminFrontOnly
             </label>
             <textarea
               rows="3"
@@ -165,11 +124,7 @@
                 class="text-sm text-blue-600 hover:underline"
                 @click="addFooterLink"
               >
-<<<<<<< HEAD
                 + Thêm liên kết
-=======
-                + Add link
->>>>>>> oldrepo/adminFrontOnly
               </button>
             </div>
 
@@ -206,11 +161,7 @@
           <div>
             <div class="flex items-center justify-between mb-2">
               <label class="block text-sm font-medium text-gray-700">
-<<<<<<< HEAD
                 Liên kết mạng xã hội ở footer
-=======
-                Footer Socials
->>>>>>> oldrepo/adminFrontOnly
               </label>
               <button
                 type="button"
@@ -227,15 +178,12 @@
                 :key="index"
                 class="flex space-x-2"
               >
-<<<<<<< HEAD
-=======
                 <!-- <input
                   v-model="social.platform"
                   type="text"
                   class="w-32 px-3 py-2 border border-gray-300 rounded-lg text-sm"
                   placeholder="Platform (facebook, youtube...)"
                 /> -->
->>>>>>> oldrepo/adminFrontOnly
                 <label for="social-select">Mạng xã hội</label>
                   <select id="social-select" v-model="social.platform" name="social" class="border px-3 py-2 rounded">
                     <option value="">-- Chọn mạng xã hội --</option>
@@ -281,13 +229,8 @@
             :disabled="isSaving"
             @click="handleSave"
           >
-<<<<<<< HEAD
             <span v-if="isSaving">Đang lưu...</span>
             <span v-else>Lưu thay đổi</span>
-=======
-            <span v-if="isSaving">Saving...</span>
-            <span v-else>Save Changes</span>
->>>>>>> oldrepo/adminFrontOnly
           </button>
         </div>
       </div>

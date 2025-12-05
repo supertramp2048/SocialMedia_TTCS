@@ -3,7 +3,6 @@
     <!-- Bên trái: summary, ẩn trên mobile -->
     <div class="hidden sm:block">
       <p class="text-sm text-gray-700">
-<<<<<<< HEAD
         Đang hiện từ bản ghi
         <span class="font-medium">{{ from }}</span>
         đến
@@ -11,15 +10,6 @@
         trên tổng
         <span class="font-medium">{{ total }}</span>
         bản ghi
-=======
-        Showing
-        <span class="font-medium">{{ from }}</span>
-        to
-        <span class="font-medium">{{ to }}</span>
-        of
-        <span class="font-medium">{{ total }}</span>
-        results
->>>>>>> oldrepo/adminFrontOnly
       </p>
     </div>
 

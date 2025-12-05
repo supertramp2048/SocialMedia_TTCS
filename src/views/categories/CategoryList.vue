@@ -1,20 +1,12 @@
 <template>
   <div>
     <div class="flex justify-between items-center mb-6">
-<<<<<<< HEAD
       <h1 class="text-2xl font-bold text-gray-900">Danh mục</h1>
-=======
-      <h1 class="text-2xl font-bold text-gray-900">Categories</h1>
->>>>>>> oldrepo/adminFrontOnly
       <button
         @click="openCreateModal"
         class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
       >
-<<<<<<< HEAD
         Tạo danh mục mới
-=======
-        Create Category
->>>>>>> oldrepo/adminFrontOnly
       </button>
     </div>
 
@@ -118,17 +110,10 @@ const categoriesStore = useCategoriesStore()
 const toast = useToast()
 
 const columns = [
-<<<<<<< HEAD
   { key: 'name', label: 'Tên danh mục' },
   { key: 'slug', label: 'Slug' },
   { key: 'description', label: 'Mô tả' },
   { key: 'actions', label: 'Xử lý' },
-=======
-  { key: 'name', label: 'Name' },
-  { key: 'slug', label: 'Slug' },
-  { key: 'description', label: 'Description' },
-  { key: 'actions', label: 'Actions' },
->>>>>>> oldrepo/adminFrontOnly
 ]
 
 const showCreateModal = ref(false)

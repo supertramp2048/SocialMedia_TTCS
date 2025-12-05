@@ -1,42 +1,15 @@
 <template>
   <div>
     <button 
-<<<<<<< HEAD
     v-if="isSearched"
     class="bg-red-300 px-1 py-2 rounded-2xl"
     @click="deleteSearch"
-=======
-      v-if="isSearched"
-      class="bg-red-300 px-1 py-2 rounded-2xl"
-      @click="deleteSearch"
->>>>>>> oldrepo/adminFrontOnly
     >Xóa kết quả tìm kiếm</button>
     <h1 class="text-2xl font-bold text-gray-900 mb-6">Reports</h1>
 
     <div class="mb-4 flex space-x-4">
       <button
         @click="activeTab = 'posts'"
-<<<<<<< HEAD
-        :class="activeTab === 'posts' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'"
-        class="px-4 py-2 rounded-lg"
-      >
-        Báo cáo bài viết 
-      </button>
-      <button
-        @click="activeTab = 'comments'"
-        :class="activeTab === 'comments' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'"
-        class="px-4 py-2 rounded-lg"
-      >
-        Báo cáo bình luận 
-      </button>
-      <button
-        v-if="user?.role == 'admin' || user?.role == 'superadmin'"
-        @click="activeTab = 'users'"
-        :class="activeTab === 'users' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'"
-        class="px-4 py-2 rounded-lg"
-      >
-        Báo cáo người dùng
-=======
         class="px-4 py-2 rounded-lg relative transition-all duration-200"
         :class="activeTab === 'posts' ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'"
       >
@@ -76,7 +49,6 @@
         >
           {{ reportStats.users > 99 ? '99+' : reportStats.users }}
         </span>
->>>>>>> oldrepo/adminFrontOnly
       </button>
     </div>
 
@@ -95,7 +67,6 @@
         </div>
       </template>
       <template #cell-actions="{ row }">
-<<<<<<< HEAD
         <div class="flex flex-col">
         <button
           @click="handleDelete(row.report_id)"
@@ -117,28 +88,6 @@
         >
           Gỡ bỏ nội dung vi phạm
         </button>
-=======
-        <div class="flex flex-col space-y-2">
-            <button
-              @click="handleDelete(row.report_id)"
-              class="text-red-600 hover:text-red-400 bg-white hover:bg-gray-100 shadow-sm rounded-lg px-2 py-1 text-sm border border-gray-200"
-            >
-              Bỏ qua
-            </button>
-            <button
-              @click="openReport(row)"
-              class="text-sky-600 hover:text-sky-400 bg-white hover:bg-gray-100 shadow-sm rounded-lg px-2 py-1 text-sm border border-gray-200"
-            >
-              Chi tiết
-            </button>
-            <button
-              v-if="activeTab !='users'"
-              @click="handleResolve(row)"
-              class="text-green-600 hover:text-green-800 bg-white hover:bg-gray-100 shadow-sm rounded-lg px-2 py-1 text-sm border border-gray-200"
-            >
-              Gỡ bỏ nội dung
-            </button>
->>>>>>> oldrepo/adminFrontOnly
         </div>
       </template>
     </DataTable>
@@ -153,10 +102,6 @@
       @page-change="handlePageChange"
     />
   </div>
-<<<<<<< HEAD
-=======
-
->>>>>>> oldrepo/adminFrontOnly
   <ReportDetailModal
       v-if="selectedReport != null"
       :show="showDetail"
@@ -164,11 +109,7 @@
       @close="showDetail = false"
       @resolved="handleResolved"
     />
-<<<<<<< HEAD
-    <FullScreenLoader :show="reportsStore.loading"></FullScreenLoader>
-=======
   <FullScreenLoader :show="reportsStore.loading"></FullScreenLoader>
->>>>>>> oldrepo/adminFrontOnly
 </template>
 
 <script setup>
@@ -180,70 +121,16 @@ import Pagination from '@/components/common/Pagination.vue'
 import ReportDetailModal from '../reports/ReportDetail.vue'
 import FullScreenLoader from '../../components/common/fullScreenLoading.vue'
 import {useAuthStore} from '../../stores/auth'
-<<<<<<< HEAD
-=======
-
->>>>>>> oldrepo/adminFrontOnly
 const query = ref()
 const search = ref('')
 const showDetail = ref(false)
 const selectedReport = ref(null)
 const auth = useAuthStore()
 const user = ref(auth.user)
-<<<<<<< HEAD
-const openReport = (row) => {
-  if(activeTab.value == 'posts'){
-    selectedReport.value = row
-    console.log("selected: ",selectedReport.value);
-  }
-  else if(activeTab.value == 'comments'){
-    selectedReport.value = row
-    console.log("selected: ",selectedReport.value);
-  }
-  else if(activeTab.value == 'users'){
-    selectedReport.value = row
-    console.log("selected: ",selectedReport.value);
-  }
-  showDetail.value = true
-}
-
-const reportsStore = useReportsStore()
-const toast = useToast()
-
-// JS thuần: chỉ truyền giá trị, không khai báo kiểu
-// vẫn hiểu logic là 'posts' | 'comments' | 'users'
-const activeTab = ref('posts')
-
-const columns = computed(() => {
-  const base = [
-    { key: 'reason', label: 'Lí do' },
-    { key: 'reporter.name', label: 'Báo cáo bởi ' },
-    { key: 'reported_at', label: 'Ngày tạo' },
-    { key: 'actions', label: 'Xử lý' },
-  ];
-
-  if (activeTab.value === 'posts') {
-    return [
-      { key: 'evidence_post.title', label: 'Tiêu đề bài viết' },
-      ...base,
-    ];
-  }
-  else if (activeTab.value === 'comments') {
-    return [
-      { key: 'evidence_comment.content', label: 'Nội dung bình luận' },
-      ...base,
-    ];
-  }
-  else if (activeTab.value === 'users') {
-    return [
-      { key: 'reported_user.name', label: 'Người dùng' },
-      ...base,
-    ];
-=======
 const reportsStore = useReportsStore()
 const toast = useToast()
 const activeTab = ref('posts')
-const isSearched = ref(false)
+//const isSearched = ref(false)
 
 // --- [NEW] State quản lý số lượng chấm đỏ ---
 const reportStats = ref({
@@ -272,7 +159,6 @@ const columns = computed(() => {
     return [{ key: 'evidence_comment.content', label: 'Nội dung bình luận' }, ...base];
   } else if (activeTab.value === 'users') {
     return [{ key: 'reported_user.name', label: 'Người dùng' }, ...base];
->>>>>>> oldrepo/adminFrontOnly
   }
   return base;
 });
@@ -282,7 +168,6 @@ const currentReports = computed(() => {
   if (activeTab.value === 'comments') return reportsStore.commentReports
   return reportsStore.userReports
 })
-<<<<<<< HEAD
 const isSearched = ref(false)
 const handleSearch = (user) => {
   isSearched.value = true 
@@ -291,48 +176,25 @@ const handleSearch = (user) => {
   // còn tạm thời cứ load lại page 1
   fetchReports( 1, user)
 }
-=======
-
-const handleSearch = (val) => {
-  isSearched.value = true 
-  query.value = val
-  fetchReports(1, val)
-}
-
->>>>>>> oldrepo/adminFrontOnly
 const deleteSearch = () =>{
   search.value = ''
   handleSearch('')
   isSearched.value=false
 }
-<<<<<<< HEAD
-const handlePageChange = (page) => {
-  if(query.value){
-    fetchReports(page,query.value)
-  }
-  else{
-=======
 
 const handlePageChange = (page) => {
   if(query.value){
     fetchReports(page,query.value)
   } else {
->>>>>>> oldrepo/adminFrontOnly
     fetchReports(page)
   }
 }
 
 const handleDelete = async (id) =>{
-<<<<<<< HEAD
-  console.log("id of report ",id);
-  
-=======
->>>>>>> oldrepo/adminFrontOnly
   if(!confirm('Bạn muốn bỏ qua báo cáo này ?')) return
   try {
     if(activeTab.value == 'posts'){
       await reportsStore.deleteReportPost(id)
-<<<<<<< HEAD
       toast.success('Thành công')
     }
     else if(activeTab.value == 'comments'){
@@ -347,29 +209,11 @@ const handleDelete = async (id) =>{
     console.log(error.message);
     
     toast.error(error?.response?.data?.message || 'Failed to resolve report')
-=======
-    } else if(activeTab.value == 'comments'){
-      await reportsStore.deleteReportComment(id)
-    } else if(activeTab.value == 'users'){
-      await reportsStore.deleteReportUser(id)
-    }
-    toast.success('Thành công')
-    // Giảm count khi xử lý xong
-    if(reportStats.value[activeTab.value] > 0) reportStats.value[activeTab.value]--
-  } catch (error) {
-    toast.error(error?.response?.data?.message || 'Failed to resolve report')
-    console.log(error)
->>>>>>> oldrepo/adminFrontOnly
   }
 }
 
 const handleResolve = async (report) => {
   if (!confirm('Bạn muốn gỡ bỏ nội dung này khỏi trang người dùng ?')) return
-<<<<<<< HEAD
-  console.log("resolve: ",report);
-  
-=======
->>>>>>> oldrepo/adminFrontOnly
   try {
     if (activeTab.value === 'posts') {
       await reportsStore.resolvePostReport(report.evidence_post.id)
@@ -381,44 +225,14 @@ const handleResolve = async (report) => {
       await reportsStore.resolveUserReport(report.id)
       await reportsStore.deleteReportUser(report.report_id)
     }
-<<<<<<< HEAD
-
-    toast.success('Report resolved successfully')
-=======
     toast.success('Report resolved successfully')
     // Giảm count khi xử lý xong
     if(reportStats.value[activeTab.value] > 0) reportStats.value[activeTab.value]--
->>>>>>> oldrepo/adminFrontOnly
   } catch (error) {
     toast.error(error?.response?.data?.message || 'Failed to resolve report')
   }
 }
 
-<<<<<<< HEAD
-// cho page default = 1 để onMounted không cần truyền tham số
-const fetchReports = (page = 1, query) => {
-  const params = { page }
-  if (query) params.user = query   // hoặc params.search = query
-
-  if (activeTab.value === 'posts') {
-    reportsStore.fetchPostReports(params)
-  } else if (activeTab.value === 'comments') {
-    reportsStore.fetchCommentReports(params)
-  } else {
-    reportsStore.fetchUserReports(params)
-  }
-}
-
-
-watch(activeTab, () => {
-  fetchReports(1)
-})
-
-onMounted(() => {
-  fetchReports()
-})
-</script>
-=======
 const fetchReports = async (page = 1, query) => {
   const params = { page }
   if (query) params.user = query
@@ -528,4 +342,3 @@ onMounted(async () => {
     })
 })
 </script>
->>>>>>> oldrepo/adminFrontOnly
