@@ -239,7 +239,7 @@ function calculateFloatingBarPosition() {
   // Đợi một chút để đảm bảo DOM đã render
   nextTick(() => {
     // Lấy container chính (main.w-9/12.m-auto)
-    const mainContainer = document.querySelector('main.w-9/12')
+    const mainContainer = document.querySelector('main[class~="w-9/12"]')
     if (!mainContainer) {
       // Fallback nếu không tìm thấy main container
       floatingBarStyle.value = {
