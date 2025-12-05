@@ -1,12 +1,12 @@
 <template>
   <div>
     <div class="flex justify-between items-center mb-6">
-      <h1 class="text-2xl font-bold text-gray-900">Categories</h1>
+      <h1 class="text-2xl font-bold text-gray-900">Danh mục</h1>
       <button
         @click="openCreateModal"
         class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
       >
-        Create Category
+        Tạo danh mục mới
       </button>
     </div>
 
@@ -110,10 +110,10 @@ const categoriesStore = useCategoriesStore()
 const toast = useToast()
 
 const columns = [
-  { key: 'name', label: 'Name' },
+  { key: 'name', label: 'Tên danh mục' },
   { key: 'slug', label: 'Slug' },
-  { key: 'description', label: 'Description' },
-  { key: 'actions', label: 'Actions' },
+  { key: 'description', label: 'Mô tả' },
+  { key: 'actions', label: 'Xử lý' },
 ]
 
 const showCreateModal = ref(false)

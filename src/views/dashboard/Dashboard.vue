@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1 class="text-2xl font-bold text-gray-900 mb-6">Dashboard</h1>
+    <h1 class="text-2xl font-bold text-gray-900 mb-6">Trang chính</h1>
 
     <!-- Stats Cards -->
     <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-8">
@@ -37,12 +37,12 @@
     <!-- Recent Reports -->
     <div class="bg-white rounded-lg shadow mb-6">
       <div class="px-6 py-4 border-b border-gray-200">
-        <h2 class="text-lg font-semibold text-gray-900">Recent Reports</h2>
+        <h2 class="text-lg font-semibold text-gray-900">Báo cáo gần đây </h2>
       </div>
       <div class="p-6">
         <LoadingSpinner v-if="loadingReports" />
         <div v-else-if="reports.length === 0" class="text-center text-gray-500 py-8">
-          No reports found
+          Không có báo cáo nào
         </div>
         <div v-else class="space-y-4">
           <div
@@ -53,7 +53,7 @@
             <div class="flex-1">
               <p class="text-sm font-medium text-gray-900">{{ report.reason }}</p>
               <p class="text-xs text-gray-500 mt-1">
-                Reported by {{ report.reporter?.name }} • {{ formatDate(report.created_at) }}
+                Báo cáo bởi {{ report.reporter?.name }} • {{ formatDate(report.created_at) }}
               </p>
             </div>
             <Badge :label="report.type || 'Post'" variant="warning" />
@@ -64,7 +64,7 @@
             to="/admin/reports"
             class="text-sm text-blue-600 hover:text-blue-800"
           >
-            View all reports →
+            Xem tất cả →
           </router-link>
         </div>
       </div>
@@ -78,7 +78,7 @@
       <div class="p-6">
         <LoadingSpinner v-if="loadingPosts" />
         <div v-else-if="posts.length === 0" class="text-center text-gray-500 py-8">
-          No posts found
+          Không có post nào
         </div>
         <div v-else class="space-y-4">
           <div
@@ -105,7 +105,7 @@
             to="/admin/posts"
             class="text-sm text-blue-600 hover:text-blue-800"
           >
-            View all posts →
+            Xem tất cả →
           </router-link>
         </div>
       </div>

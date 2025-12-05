@@ -13,14 +13,14 @@
         :class="activeTab === 'posts' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'"
         class="px-4 py-2 rounded-lg"
       >
-        Post Reports
+        Báo cáo bài viết 
       </button>
       <button
         @click="activeTab = 'comments'"
         :class="activeTab === 'comments' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'"
         class="px-4 py-2 rounded-lg"
       >
-        Comment Reports
+        Báo cáo bình luận 
       </button>
       <button
         v-if="user?.role == 'admin' || user?.role == 'superadmin'"
@@ -28,7 +28,7 @@
         :class="activeTab === 'users' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'"
         class="px-4 py-2 rounded-lg"
       >
-        User Reports
+        Báo cáo người dùng
       </button>
     </div>
 
@@ -132,10 +132,10 @@ const activeTab = ref('posts')
 
 const columns = computed(() => {
   const base = [
-    { key: 'reason', label: 'Reason' },
-    { key: 'reporter.name', label: 'Reported By' },
-    { key: 'reported_at', label: 'Created' },
-    { key: 'actions', label: 'Actions' },
+    { key: 'reason', label: 'Lí do' },
+    { key: 'reporter.name', label: 'Báo cáo bởi ' },
+    { key: 'reported_at', label: 'Ngày tạo' },
+    { key: 'actions', label: 'Xử lý' },
   ];
 
   if (activeTab.value === 'posts') {

@@ -3,13 +3,13 @@
     <!-- Bên trái: summary, ẩn trên mobile -->
     <div class="hidden sm:block">
       <p class="text-sm text-gray-700">
-        Showing
+        Đang hiện từ bản ghi
         <span class="font-medium">{{ from }}</span>
-        to
+        đến
         <span class="font-medium">{{ to }}</span>
-        of
+        trên tổng
         <span class="font-medium">{{ total }}</span>
-        results
+        bản ghi
       </p>
     </div>
 

@@ -1,12 +1,12 @@
 <template>
   <div>
     <div class="flex justify-between items-center mb-6">
-      <h1 class="text-2xl font-bold text-gray-900">Users</h1>
+      <h1 class="text-2xl font-bold text-gray-900">Tài khoản chưa bị khóa</h1>
       <router-link
         to="/admin/users/locked"
         class="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700"
       >
-        View Locked Users
+        Xem các tài khoản đã khóa
       </router-link>
     </div>
     <button
@@ -53,7 +53,7 @@
           Khóa tài khoản
         </button>
         <button
-          v-if="row.role !== 'superadmin'"
+          v-if="row.role !== 'superadmin' && CurrentAcc?.role == 'superadmin' "
           @click="handleGivePermit(row)"
           class="ml-2 text-green-600 hover:text-green-800"
         >
@@ -82,14 +82,14 @@
         <p>Bạn muốn khóa tài khoản này có tên <strong>{{ selectedUser?.name }}</strong>?</p>
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-2">
-            Duration (days) - Leave empty for permanent ban
+            Chọn số ngày khóa tài khoản  - Để trống nếu muốn khóa tài khoản trong 10 năm
           </label>
           <input
             v-model.number="banDuration"
             type="number"
             min="1"
             class="w-full px-4 py-2 border border-gray-300 rounded-lg"
-            placeholder="Permanent ban"
+            placeholder="Khóa 10 năm"
           />
         </div>
       </div>
@@ -134,16 +134,19 @@ import Pagination from '@/components/common/Pagination.vue'
 import FullLoading from '../../components/common/fullScreenLoading.vue'
 import Modal from '@/components/common/Modal.vue'
 import Badge from '@/components/common/Badge.vue'
+import {useAuthStore} from '../../stores/auth'
 import { UserIcon } from '@heroicons/vue/24/outline'
 const search = ref('')
 const searchQuery = ref()
 const usersStore = useUsersStore()
+const auth = useAuthStore()
+const CurrentAcc = ref(auth.user)
 const toast = useToast()
 const isSearch = ref(false)
 const columns = [
   { key: 'avatar', label: 'Avatar' },
-  { key: 'name', label: 'Name' },
-  {key: 'actions', label: 'Actions'}
+  { key: 'name', label: 'Tên' },
+  {key: 'actions', label: 'Xử lý'}
 ]
 
 const banModalOpen = ref(false)

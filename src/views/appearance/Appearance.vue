@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1 class="text-2xl font-bold text-gray-900 mb-6">Appearance Settings</h1>
+    <h1 class="text-2xl font-bold text-gray-900 mb-6">Cài đặt giao diện web</h1>
 
     <div class="bg-white rounded-lg shadow p-6">
       <div class="space-y-6">
@@ -14,7 +14,7 @@
 
         <!-- LOGO -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Site Logo</label>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Logo trang web</label>
 
           <div class="flex items-center space-x-4">
             <div class="flex-1">
@@ -30,11 +30,11 @@
                   for="logo-upload"
                   class="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm cursor-pointer transition-colors"
                 >
-                  Choose Image
+                  Chọn ảnh 
                 </label>
               </div>
               <p class="mt-1 text-sm text-gray-500">
-                Upload a logo for your site (png, jpg, svg - Max 2MB)
+                Tải ảnh logo cho trang web (png, jpg, svg - Max 2MB)
               </p>
             </div>
 
@@ -66,11 +66,11 @@
                   for="background-upload"
                   class="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm cursor-pointer transition-colors"
                 >
-                  Choose Image
+                  Chọn ảnh 
                 </label>
               </div>
               <p class="mt-1 text-sm text-gray-500">
-                Upload a banner / background image (png, jpg, svg - Max 2MB)
+                Tải ảnh banner / background image (png, jpg, svg - Max 2MB)
               </p>
             </div>
 
@@ -87,21 +87,11 @@
           </div>
         </div>
 
-        <!-- PRIMARY COLOR (hiện chỉ lưu local, chưa có API backend) -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Primary Color</label>
-          <input
-            v-model="primaryColor"
-            type="color"
-            class="h-10 w-20 border border-gray-300 rounded"
-          />
-        </div>
-
         <!-- FOOTER CONTENT -->
         <div class="space-y-4">
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">
-              Footer Description
+              Mô tả ở Footer 
             </label>
             <textarea
               rows="3"
@@ -134,7 +124,7 @@
                 class="text-sm text-blue-600 hover:underline"
                 @click="addFooterLink"
               >
-                + Add link
+                + Thêm liên kết
               </button>
             </div>
 
@@ -171,7 +161,7 @@
           <div>
             <div class="flex items-center justify-between mb-2">
               <label class="block text-sm font-medium text-gray-700">
-                Footer Socials
+                Liên kết mạng xã hội ở footer
               </label>
               <button
                 type="button"
@@ -188,12 +178,6 @@
                 :key="index"
                 class="flex space-x-2"
               >
-                <!-- <input
-                  v-model="social.platform"
-                  type="text"
-                  class="w-32 px-3 py-2 border border-gray-300 rounded-lg text-sm"
-                  placeholder="Platform (facebook, youtube...)"
-                /> -->
                 <label for="social-select">Mạng xã hội</label>
                   <select id="social-select" v-model="social.platform" name="social" class="border px-3 py-2 rounded">
                     <option value="">-- Chọn mạng xã hội --</option>
@@ -239,8 +223,8 @@
             :disabled="isSaving"
             @click="handleSave"
           >
-            <span v-if="isSaving">Saving...</span>
-            <span v-else>Save Changes</span>
+            <span v-if="isSaving">Đang lưu...</span>
+            <span v-else>Lưu thay đổi</span>
           </button>
         </div>
       </div>

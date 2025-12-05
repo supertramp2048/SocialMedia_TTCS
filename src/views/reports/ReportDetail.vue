@@ -110,6 +110,10 @@
     <p class="text-sm font-semibold text-gray-900 mb-2">
       Thông tin người dùng
     </p>
+    <label>
+      avatar 
+      <img :src="userReported.avatar" class="w-[100px] h-[100px] rounded-full" alt="">
+    </label>
     <p class="text-sm text-gray-700">
       <span class="font-medium">Tên:</span>
       {{ userHistory.user_info.name }}
@@ -285,16 +289,17 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from 'vue'
+import { computed, ref, watch, onMounted } from 'vue'
 import { useReportsStore } from '@/stores/reports'
 import { useToast } from 'vue-toastification'
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
 import api from '../../api/apiClient'
-
+const userReported = ref()
 const props = defineProps({
   show: Boolean,
   report: Object
 })
+
 
 
 const showFormBan = ref(false)
@@ -383,6 +388,11 @@ watch(
     if(current?.reported_user?.id){
       const id = current.reported_user.id
       await getAnUserReportedHistory(id)
+      if(report.value.reported_user){
+      const res = await api.get(`/api/profiles/${userHistory.value?.user_info.id}`)
+      userReported.value = res.data.data
+      console.log("user daay ",userReported.value);
+  }
     }
   },
   {
@@ -471,4 +481,5 @@ const handleResolve = async () => {
     loading.value = false
   }
 }
+
 </script>
