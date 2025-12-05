@@ -459,13 +459,11 @@ onMounted(() => document.addEventListener('click', handleClickOutside))
 onUnmounted(() => document.removeEventListener('click', handleClickOutside))
 
 onMounted(() => {
-  loadNotifications()
-
   if (auth.user) {
+    loadNotifications()
     subscribeNotificationChannel(auth.user.id)
-  }
-
-  loadNotifications()
+    loadNotifications()
+  }  
 })
 
 onMounted(async () => {

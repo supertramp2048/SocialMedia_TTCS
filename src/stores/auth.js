@@ -47,6 +47,13 @@ export const useAuthStore = defineStore('auth', {
             Cookies.remove('token')
             localStorage.removeItem('user')
         },
+        resetAuth(){
+            this.user = null,
+            this.token = null,
+            resetAllStores()
+            Cookies.remove('token')
+            localStorage.removeItem('user')
+        },
         // async fetchUser(){
         //     try {
         //         const res = await api.get('/api/user')

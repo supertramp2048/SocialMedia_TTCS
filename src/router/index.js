@@ -109,7 +109,7 @@ router.beforeEach((to, from, next) => {
   if (to.meta.requiresAuth) {
     // Không có token -> đá về login
     if (!token) {
-      auth.logout() // dọn localStorage, cookie, state
+      auth.resetAuth() // dọn localStorage, cookie, state
       return next()
     }
 
