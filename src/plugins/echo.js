@@ -1,6 +1,6 @@
 import Echo from 'laravel-echo'
 import Pusher from 'pusher-js'
-import apiClient from '@/api/apiClient'
+import apiClient from '../api/apiClient'
 
 // Make Pusher available globally
 window.Pusher = Pusher
