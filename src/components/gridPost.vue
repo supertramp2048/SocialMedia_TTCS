@@ -34,6 +34,16 @@
           </button>
 
           <button
+            v-if="props.pageLimit != null && auth.user != null"
+            type="button"
+            class="px-3 py-2 text-sm text-gray-700 hover:text-sky-700 hover:bg-sky-50 rounded-md transition-colors"
+            @click="updatePagination('following')"
+            :class="{ 'bg-sky-300': sortSetting === 'following' }"
+          >
+            Tác giả đang theo dõi
+          </button>
+
+          <button
             v-if="props.pageLimit != null"
             type="button"
             class="px-3 py-2 text-sm text-gray-700 hover:text-sky-700 hover:bg-sky-50 rounded-md transition-colors"
@@ -102,7 +112,8 @@ import SmallUserDiv from '../components/smallUserDiv.vue'
 import { ref, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import Pagination from '../components/pagination.vue'
-
+import {useAuthStore} from '../stores/auth.js'
+const auth = useAuthStore()
 const route = useRoute()
 const router = useRouter()
 
@@ -115,15 +126,29 @@ const props = defineProps({
 const sortSetting = computed({
   get() {
     // Mặc định là 'hot' nếu không có sort param
-    return route.query.sort === 'newest' ? 'newest' : 'hot'
+    if(route.query.feed === 'following'){
+      return 'following'
+    }
+    if (route.query.sort === 'newest') {
+      return 'newest'
+    }
+
+    // Mặc định: hot
+    return 'hot'
   },
   set(val) {
     const q = { ...route.query }
     // Tuỳ chọn: xóa param 'sort' khi set về 'hot' để URL sạch hơn
     if (val === 'hot') {
+      delete q.feed
       delete q.sort
-    } else {
+    } else if(val == 'newest') {
+      delete q.feed
       q.sort = val
+    }
+    else if(val == 'following'){
+      delete q.sort
+      q.feed = val
     }
     router.replace({ query: q })
   }
@@ -142,8 +167,9 @@ watch(
   },
   { immediate: true }
 )
-
 function updatePagination(sort) {
+  console.log("sort ",sort);
+  
   sortSetting.value = sort
 }
 </script>

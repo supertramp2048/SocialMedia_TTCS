@@ -155,16 +155,47 @@ function prevPage() {
 }
 
 // Đọc params từ URL → gán vào state
-watch(() => route.query, (q) => {
-  const page = q.page ? Number(q.page) : 1
-  const cat = (q.category === undefined || q.category === '') ? null : Number(q.category)
-  const sort = (typeof q.sort === 'string' && q.sort !== '') ? q.sort : 'hot'
-  sortSetting.value= sort
-  objPagination.value.page = Number.isNaN(page) ? 1 : page
-  inputPage.value = objPagination.value.page
-  objPagination.value.category = Number.isNaN(cat) ? null : cat
-  objPagination.value.sort = sort
-}, { immediate: true })
+watch(
+  () => route.query,
+  (q) => {
+    const page = q.page ? Number(q.page) : 1
+    const cat =
+      q.category === undefined || q.category === ''
+        ? null
+        : Number(q.category)
+
+    // 🔹 Quy ước: sortMode = 'hot' | 'newest' | 'following'
+    let sortMode
+
+    if (q.feed != null && q.feed !== '') {
+      // Có feed → đang ở mode 'following'
+      sortMode = q.feed // thường là 'following'
+
+      // Cập nhật objPagination cho feed
+      objPagination.value.feed = sortMode
+      delete objPagination.value.sort
+    } else {
+      // Không có feed → dùng sort (hot / newest)
+      sortMode =
+        typeof q.sort === 'string' && q.sort !== ''
+          ? q.sort
+          : 'hot'
+
+      objPagination.value.sort = sortMode
+      delete objPagination.value.feed
+    }
+
+    // 🔹 Đồng bộ về sortSetting (để button active đúng)
+    sortSetting.value = sortMode
+
+    // 🔹 Các phần còn lại giữ nguyên
+    objPagination.value.page = Number.isNaN(page) ? 1 : page
+    inputPage.value = objPagination.value.page
+    objPagination.value.category = Number.isNaN(cat) ? null : cat
+  },
+  { immediate: true }
+)
+
 
 // Watch A: chỉ khi đổi category → fetchExtras + fetchPosts (và reset page = 1)
 watch(() => objPagination.value.category, async (newCat, oldCat) => {

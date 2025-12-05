@@ -8,8 +8,8 @@
             <!-- Logo + Nav -->
             <div class="flex items-center gap-3 sm:gap-6 md:gap-8">
               <router-link to="/" class="flex items-center gap-1.5 sm:gap-2">
-                <img :src="settingVar?.logoURL" class="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12" alt="">
-                <span class="text-base sm:text-lg md:text-xl font-bold text-gray-900">spiderum</span>
+                <img :src="settingVar?.logoURL" class="w-8 h-8 sm:w-10 sm:h-10 md:w-16 md:h-16" alt="">
+                <span class="text-base sm:text-lg md:text-xl font-bold text-gray-900">La Plume</span>
               </router-link>
             </div>
 

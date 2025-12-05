@@ -1,6 +1,6 @@
 <template>
     <section class="relative  from-sky-50 via-blue-50 to-sky-100 overflow-hidden">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24"
+      <div class="max-w-7xl min-h-[500px] mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24"
       :style="{
         backgroundImage: `url(${setting.backGroundURL})`,
         backgroundSize: 'cover',
@@ -8,7 +8,7 @@
         backgroundRepeat: 'no-repeat'
       }"
       >
-        <Spline></Spline>
+        <!-- <Spline></Spline> -->
         <div class="grid lg:grid-cols-2 gap-8 items-center">
           <!-- Left Content -->
           <div class="space-y-6 absolute right-1/2 bottom-5 text-center lg:text-left">

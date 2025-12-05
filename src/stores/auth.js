@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import api from "../../API/axios"
+import {resetAllStores } from '../helper/resetStore'
 import Cookies from "js-cookie";
 export const useAuthStore = defineStore('auth', {
     state:() => ({
@@ -42,6 +43,7 @@ export const useAuthStore = defineStore('auth', {
             }
             this.user = null,
             this.token = null,
+            resetAllStores()
             Cookies.remove('token')
             localStorage.removeItem('user')
         },

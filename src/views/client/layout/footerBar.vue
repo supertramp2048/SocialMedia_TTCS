@@ -5,7 +5,7 @@
       <!-- Mô tả -->
       <div>
         <h3 class="text-lg font-semibold text-white mb-3">
-          Spiderum Clone
+          La Plume
         </h3>
         <p class="text-sm leading-relaxed">
           {{ footer?.description }}

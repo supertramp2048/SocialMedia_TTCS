@@ -16,6 +16,11 @@ import router from './router'
 import echo from './realtime/echo'
 import { useCategoryStore } from '@/stores/categories'
 const app = createApp(App)
+// pinia 
+
+export const pinia = createPinia()
+app.use(pinia)
+
 
 app.use(createPinia())
 
