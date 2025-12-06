@@ -14,7 +14,7 @@
           <section>
             <div class="flex items-center justify-between mb-3 sm:mb-4 md:mb-6">
               <h2 class="text-sm sm:text-base md:text-xl lg:text-2xl font-bold text-gray-900 uppercase tracking-wide">
-                Mới nhất trên Spiderum
+                Mới nhất trên La Plume
               </h2>
             </div>
             <div v-if="loadingExtras" class="grid gap-4 sm:gap-6">
