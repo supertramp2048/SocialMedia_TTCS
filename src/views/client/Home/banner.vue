@@ -12,7 +12,7 @@
         <div class="grid lg:grid-cols-2 gap-8 items-center">
           <!-- Left Content -->
           <div class="space-y-6 absolute right-1/2 bottom-5 text-center lg:text-left">
-            <router-link 
+            <router-link
             v-if="auth.user == null"
             to="/dang-ky" class="px-8 py-3 bg-white shadow-2xl text-gray-900 rounded-full font-medium hover:bg-gray-50 transition-colors shadow-md">
                   Đăng ký
