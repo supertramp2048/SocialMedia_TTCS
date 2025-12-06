@@ -95,7 +95,7 @@
 
     <!-- Newsletter Section -->
     <section class="bg-sky-50 rounded-lg p-6 text-center">
-      <div v-if="auth.user.email_verified_at == null">
+      <div v-if="auth?.user?.email_verified_at == null">
       <div   
        class="mb-4">
         <svg viewBox="0 0 100 100" class="w-24 h-24 mx-auto">
