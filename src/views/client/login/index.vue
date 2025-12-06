@@ -228,8 +228,8 @@ function handlePopupMessage(event) {
         // 1. Lưu Token
         //localStorage.setItem('auth_token', token);
         auth.user = user; // Cập nhật Pinia Store
-        console.log('Đăng nhập thành công:', token);
-        console.log("user ", user);
+        //console.log('Đăng nhập thành công:', token);
+        //console.log("user ", user);
         Cookies.set('token',token,{
                     expires: 7,            // thời hạn 7 ngày
                     secure: false,          // true nếu chạy HTTPS

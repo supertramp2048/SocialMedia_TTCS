@@ -28,6 +28,8 @@ export const useAdsStore = defineStore('ads', {
             sidebarLeftAds: this.sidebarLeftAds,
             sidebarRightAds: this.sidebarRightAds
         }
+        console.log("all ads ",this.allAds);
+        
         } catch (error) {
             console.log(error);
         }

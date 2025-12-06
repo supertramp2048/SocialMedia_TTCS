@@ -221,7 +221,7 @@
     </header>
 
     <!-- Category bar -->
-    <div class="sticky z-[60] bg-white border-b border-gray-200 top-14 sm:top-16">
+    <div class="sticky lg:static z-[60] bg-white border-b border-gray-200 top-14 sm:top-16">
       <div class="max-w-7xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8">
         <div class="flex items-center justify-between h-10 sm:h-12">
           <nav class="flex items-center gap-0.5 sm:gap-1 md:gap-2 lg:gap-3">
@@ -294,6 +294,7 @@
     <!-- Main -->
     <main class="min-h-screen">
       <slot
+        :allCateGories="safeCategories"
         :ads="adsStore?.allAds"
         :setting="settingVar"
       />
@@ -347,11 +348,11 @@ function logout() {
 }
 
 async function verifyUserEmail() {
-  console.log("da bam ");
+  //console.log("da bam ");
   
   const res = await auth.verifyUserEmail()
   if(res.status == 200 ){
-    console.log("ress",res);
+    //console.log("ress",res);
     toast.info(`Chúng tôi đã gửi một email xác nhận tới tài khoản ${auth.user.email} `)
   }
 }
@@ -361,15 +362,15 @@ const safeCategories = computed(() => categoriesStore?.categories?.data ?? [])
 const MAX_VISIBLE = 3
 const visibleCategories = computed(() => safeCategories.value.slice(0, MAX_VISIBLE))
 const overflowCategories = computed(() => safeCategories.value.slice(MAX_VISIBLE))
-console.log('safeCategories', safeCategories.value)
-console.log('overflowCategories', overflowCategories.value)
+//console.log('safeCategories', safeCategories.value)
+//console.log('overflowCategories', overflowCategories.value)
 
 const showMoreMenu = ref(false)
 const moreMenuRef = ref(null)
 
-function toggleMore() { showMoreMenu.value = !showMoreMenu.value
-
-  console.log('showMoreMenu =', showMoreMenu.value)
+function toggleMore() { 
+  showMoreMenu.value = !showMoreMenu.value
+  //console.log('showMoreMenu =', showMoreMenu.value)
  }
 function closeMore() { showMoreMenu.value = false }
 function goProfilePage(id, name) {
@@ -474,10 +475,10 @@ onMounted(async () => {
     footer: settingStore.footer,
   }
   settingVar.value = obj
-  console.log("setting variable", settingVar.value);
+  //console.log("setting variable", settingVar.value);
   
   await adsStore.getAllAds()
-  console.log("allAds ",adsStore.allAds);
+  //console.log("allAds ",adsStore.allAds);
 })
 
 async function toggleNotificationMenu() {
@@ -524,7 +525,7 @@ async function handleNotificationClick(item) {
         }
         break
       default:
-        console.log('Unknown notification type')
+        //console.log('Unknown notification type')
     }
   } catch (err) {
     console.error('Failed to handle notification click:', err)
@@ -544,7 +545,7 @@ function subscribeNotificationChannel(userId) {
 
   events.forEach(eventName => {
     channel.listen(eventName, (payload) => {
-      console.log(` New notification [${eventName}]:`, payload);
+      //console.log(` New notification [${eventName}]:`, payload);
 
       notifications.value.unshift({
         id: crypto.randomUUID(),

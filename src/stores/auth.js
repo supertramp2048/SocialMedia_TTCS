@@ -41,11 +41,14 @@ export const useAuthStore = defineStore('auth', {
             } catch (error) {
                 alert(error.message)
             }
-            this.user = null,
-            this.token = null,
-            resetAllStores()
-            Cookies.remove('token')
-            localStorage.removeItem('user')
+            finally {
+                this.user = null,
+                this.token = null,
+                resetAllStores()
+                Cookies.remove('token')
+                localStorage.removeItem('user')
+            }
+            
         },
         resetAuth(){
             this.user = null,
