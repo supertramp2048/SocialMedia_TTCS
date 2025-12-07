@@ -6,7 +6,7 @@
         to="/admin/users"
         class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
       >
-        Create Staff
+        Tạo nhân viên mới
       </router-link>
     </div>
 
