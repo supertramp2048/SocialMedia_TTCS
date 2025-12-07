@@ -8,7 +8,6 @@
         backgroundRepeat: 'no-repeat'
       }"
       >
-        <!-- <Spline></Spline> -->
         <div class="grid lg:grid-cols-2 gap-8 items-center">
           <!-- Left Content -->
           <div class="space-y-6 absolute right-1/2 bottom-5 text-center lg:text-left">

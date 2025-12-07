@@ -2,19 +2,19 @@
   <Layout v-slot="{ ads, setting }">
     <!-- Hero Section -->
     <Banner :setting="setting"></Banner>
-    
+
     <!-- Main Content -->
     <div class="w-full mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 md:py-8 lg:py-12 max-w-7xl">
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
-        
+
         <!-- Left Column - Main Content -->
         <div class="lg:col-span-2 space-y-4 sm:space-y-6 lg:space-y-8">
-          
+
           <!-- Featured Posts Section -->
           <section>
             <div class="flex items-center justify-between mb-3 sm:mb-4 md:mb-6">
               <h2 class="text-sm sm:text-base md:text-xl lg:text-2xl font-bold text-gray-900 uppercase tracking-wide">
-                Mới nhất trên Spiderum
+                Mới nhất trên La Plume
               </h2>
             </div>
             <div v-if="loadingExtras" class="grid gap-4 sm:gap-6">
@@ -27,7 +27,7 @@
           <div class="my-4 sm:my-6 lg:my-8">
             <BannerAds :ads="ads"></BannerAds>
           </div>
-          
+
           <!-- Latest Articles Grid -->
           <section>
             <div class="flex items-center justify-between mb-3 sm:mb-4 md:mb-6">
@@ -35,7 +35,7 @@
                 Nổi bật trong tuần
               </h2>
             </div>
-            
+
             <!-- so post noi bat -->
             <div v-if="loadingExtras" class="grid gap-3 sm:gap-4 md:gap-6 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
               <SkeletonCard v-for="n in 4" :key="'sk-featured-'+n" />
@@ -112,7 +112,7 @@ function updatePagination(patch) {
 // Hàm lấy bài viết
 async function fetchPosts() {
   console.log("fetch posts");
-  
+
   loadingPosts.value = true
   try {
     const res = await api.get(`${apiUrl}/api/posts`, { params: objPagination.value })
@@ -230,7 +230,7 @@ watch(
 // --- Bài mới & nổi bật ---
 async function fetchExtras() {
   console.log("fetchExtras");
-  
+
   loadingExtras.value = true
   try {
     const res1 = await api.get(`${apiUrl}/api/posts`, { params: { limit: 1, sort: 'newest', category: objPagination.value.category } })

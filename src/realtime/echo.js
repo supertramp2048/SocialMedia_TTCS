@@ -7,7 +7,7 @@ window.Pusher = Pusher
 window.Pusher.logToConsole = true
 
 const echo = new Echo({
-  broadcaster: 'pusher',
+  broadcaster: 'pusher', 
   key: import.meta.env.VITE_PUSHER_APP_KEY,
   cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
   forceTLS: true, // Đổi thành false cho localhost

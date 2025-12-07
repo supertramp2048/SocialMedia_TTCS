@@ -107,7 +107,7 @@
         BẮN KHÔNG NẰM NỔI LỚI
       </p>
       <p class="text-xs text-gray-500 mb-4">
-        Thứ bạn theo giỏi lúc Spiderum và nhận dòng cập nhật khác, thông báo dựa của chúng tôi để không bỏ lỡ bởi!
+        Theo dõi La Plume và nhận dòng cập nhật khác, thông báo dựa của chúng tôi để không bỏ lỡ bởi!
       </p>
       <input
         type="email"
