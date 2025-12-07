@@ -3,7 +3,7 @@
     <div class="flex justify-between items-center mb-6">
       <h1 class="text-2xl font-bold text-gray-900">Staff Management</h1>
       <router-link
-        to="/admin/staff/create"
+        to="/admin/users"
         class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
       >
         Create Staff

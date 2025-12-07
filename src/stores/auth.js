@@ -34,18 +34,22 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function logout() {
-    try {
-      await authApi.logout()
-      token.value = null
-      user.value = null
-      Cookies.remove('adminToken')
-      localStorage.removeItem('user')
-    } catch (error) {
-      console.error('Logout error:', error)
-    } finally {
-      
-    }
+  const cleanup = () => {
+    token.value = null
+    user.value = null
+    Cookies.remove('adminToken')
+    localStorage.removeItem('user')
   }
+
+  try {
+    await authApi.logout() // gọi API logout (có thể fail)
+  } catch (error) {
+    console.error('Logout error:', error)
+  } finally {
+    cleanup()
+  }
+  }
+
 
   async function fetchCurrentUser() {
     try {

@@ -13,7 +13,7 @@
         class="px-4 py-2 rounded-lg relative transition-all duration-200"
         :class="activeTab === 'posts' ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'"
       >
-        Post Reports
+        Báo cáo bài viết
         <span 
           v-if="reportStats.posts > 0" 
           class="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] text-white ring-2 ring-white"
@@ -27,7 +27,7 @@
         class="px-4 py-2 rounded-lg relative transition-all duration-200"
         :class="activeTab === 'comments' ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'"
       >
-        Comment Reports
+        Báo cáo bình luận
         <span 
           v-if="reportStats.comments > 0" 
           class="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] text-white ring-2 ring-white"
@@ -42,7 +42,7 @@
         class="px-4 py-2 rounded-lg relative transition-all duration-200"
         :class="activeTab === 'users' ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'"
       >
-        User Reports
+        Báo cáo người dùng
         <span 
           v-if="reportStats.users > 0" 
           class="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] text-white ring-2 ring-white"
