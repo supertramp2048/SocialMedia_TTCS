@@ -1,5 +1,5 @@
 <template>
-  <Layout v-slot="{ ads, setting }">
+  <Layout v-slot="{ ads, setting, allCateGories }">
     <!-- Hero Section -->
     <Banner :setting="setting"></Banner>
 
@@ -60,7 +60,7 @@
         <!-- Right Sidebar -->
         <aside class="lg:col-span-1 hidden lg:block">
           <div class="sticky top-4">
-            <RightSider :ads="ads?.sidebarRightAds"></RightSider>
+            <RightSider :ads="ads" :allCateGories="allCateGories"></RightSider>
           </div>
         </aside>
       </div>
@@ -111,8 +111,13 @@ function updatePagination(patch) {
 
 // Hàm lấy bài viết
 async function fetchPosts() {
+<<<<<<< HEAD
   console.log("fetch posts");
 
+=======
+  //console.log("fetch posts");
+  
+>>>>>>> origin/main
   loadingPosts.value = true
   try {
     const res = await api.get(`${apiUrl}/api/posts`, { params: objPagination.value })

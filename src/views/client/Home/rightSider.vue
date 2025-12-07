@@ -71,22 +71,33 @@
     <!-- Popular Links Section -->
     <section class="bg-gray-50 rounded-lg p-6">
       <h3 class="text-lg font-bold text-gray-900 mb-4">Liên kết - Thảo luận</h3>
-      <div class="space-y-3 text-sm">
-        <a href="#" class="block text-gray-700 hover:text-sky-600">
-          Relocation - Tìm hiểu quá trình và hương vị của
-        </a>
-        <a href="#" class="block text-gray-700 hover:text-sky-600">
-          Thật sự tôi đã từng phải thưa thường sử một năm mà chỉ có mỗi món thịt muôi
-        </a>
-        <a href="#" class="block text-gray-700 hover:text-sky-600">
-          VẬN RỘI SCHEDULING
-        </a>
+      <div class="space-y-3 text-sm flex flex-wrap">
+        <router-link
+                type="button"
+                class="px-2 border m-2 border-sky-700 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm text-gray-700 hover:text-sky-700 hover:bg-sky-50 rounded-md transition-colors whitespace-nowrap flex-shrink-0"
+                :class="{'bg-sky-300': chossenCate == null}"
+                :to="{ path: '/', query: { page:1 } }"
+              >
+                Tất cả
+        </router-link>
+        <router-link
+                v-for="(category, idx) in props.allCateGories"
+                :key="category.id ?? idx"
+                type="button"
+                class="px-2 border m-2 border-sky-700 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm text-gray-700 hover:text-sky-700 hover:bg-sky-50 rounded-md transition-colors whitespace-nowrap flex-shrink-0"
+                :class="{'bg-sky-300': chossenCate == category.id}"
+                :to="{ path: '/', query: { page:1, category:category.id, slug: category.slug, sort: 'hot' } }"
+              >
+                {{ category.name }}
+        </router-link>
       </div>
     </section>
 
     <!-- Newsletter Section -->
     <section class="bg-sky-50 rounded-lg p-6 text-center">
-      <div class="mb-4">
+      <div v-if="auth?.user?.email_verified_at == null">
+      <div
+       class="mb-4">
         <svg viewBox="0 0 100 100" class="w-24 h-24 mx-auto">
           <circle cx="50" cy="50" r="40" fill="#0EA5E9" />
           <ellipse cx="40" cy="45" rx="6" ry="8" fill="white" />
@@ -102,50 +113,27 @@
           />
         </svg>
       </div>
-      <h3 class="text-lg font-bold text-gray-900 mb-2">CÁC BÀI VIẾT MỚI BẬT</h3>
+      <h3 class="text-lg font-bold text-gray-900 mb-2">Bạn chưa xác thực tài khoản email</h3>
       <p class="text-sm text-gray-600 mb-4">
-        BẮN KHÔNG NẰM NỔI LỚI
+        Xác thực tài khoản Email để có thể đăng bài viết và nhắn tin với mọi người bạn nhé ;))
       </p>
-      <p class="text-xs text-gray-500 mb-4">
-        Theo dõi La Plume và nhận dòng cập nhật khác, thông báo dựa của chúng tôi để không bỏ lỡ bởi!
-      </p>
-      <input
-        type="email"
-        placeholder="Nhập email của bạn..."
-        class="w-full px-4 py-2 mb-3 rounded-lg border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
-      />
-      <button
-        class="w-full px-4 py-2 bg-sky-500 text-white text-sm font-medium rounded-lg hover:bg-sky-600 transition-colors"
-      >
-        ĐĂNG KÝ
+      <button @click="verifyUserEmail" :disabled="auth.loading" class="w-full disabled:cursor-not-allowed text-left text-white px-4 sm:px-5 py-2 bg-sky-400 hover:bg-sky-500 rounded-2xl flex items-center gap-2">
+        <span v-if="auth.loading == false">Xác thực Email bạn đã đăng ký tại đây</span>
+        <span class="flex leading-4 justify-between" v-else-if="auth.loading == true">Đang gửi email <MoonLoader class="ml-1" v-if="auth.loading" color="#f7f7ef" size="14px"></MoonLoader>  </span>
       </button>
-    </section>
-
-    <!-- App Download -->
-    <section class="text-center">
-      <router-link>
+      </div>
+      <div
+       v-else
+       class="w-full h-full">
+        <router-link>
         <img
-          class="rounded-lg p-6 mb-4 w-full h-[200px] overflow-hidden bg-cover bg-center"
-          :src="currentAd?.image_url"
+          class="rounded-lg p-6 mb-4 w-full h-full overflow-hidden bg-cover bg-center"
+          :src="currentLongAd?.image_url"
         />
       </router-link>
-      <div class="flex gap-3 justify-center">
-        <a href="#" class="inline-block">
-          <img
-            src="https://developer.apple.com/app-store/marketing/guidelines/images/badge-example-alternate.svg"
-            alt="Download on App Store"
-            class="h-10"
-          />
-        </a>
-        <a href="#" class="inline-block">
-          <img
-            src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png"
-            alt="Get it on Google Play"
-            class="h-10"
-          />
-        </a>
       </div>
     </section>
+
   </div>
 </template>
 
@@ -153,15 +141,41 @@
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useFollowStore } from '../../../stores/followAccount.js'
 import { useAuthStore } from '../../../stores/auth.js'
-
+import { useRoute } from 'vue-router'
+import { useToast } from 'vue-toastification'
+import { MoonLoader } from "vue3-spinner"
+const toast = useToast()
+const route = useRoute()
 const follow = useFollowStore()
 const auth = useAuthStore()
+
+const chossenCate = ref(null)
+
+async function verifyUserEmail() {
+  //console.log("da bam ");
+
+  const res = await auth.verifyUserEmail()
+  if(res.status == 200 ){
+    //console.log("ress",res);
+    toast.info(`Chúng tôi đã gửi một email xác nhận tới tài khoản ${auth.user.email} `)
+  }
+}
+
+watch(
+  () => route.query,
+  (q) => {
+    chossenCate.value =
+      q.category === undefined || q.category === '' ? null : Number(q.category)
+  },
+  { immediate: true }
+)
 
 const props = defineProps({
   ads: {
     type: Object,
     default: () => ({})
-  }
+  },
+  allCateGories: { type: Array, required: true }
 })
 
 const followingBox = ref(null)
@@ -180,7 +194,7 @@ const hasMoreFollowing = computed(() => {
 const isFirstLoading = computed(() => follow.loading && !follow.loadedFollowing)
 
 // format ngày join
-function formatDate (isoString) {
+function formatDate(isoString) {
   if (!isoString) return ''
   const d = new Date(isoString)
   if (Number.isNaN(d.getTime())) return ''
@@ -188,7 +202,7 @@ function formatDate (isoString) {
 }
 
 // scroll gần cuối thì load thêm
-function handleScroll (e) {
+function handleScroll(e) {
   const el = e.target
   const threshold = 40 // px
 
@@ -203,16 +217,24 @@ function handleScroll (e) {
   }
 }
 
-// --- Ads rotation logic của anh (giữ nguyên) ---
+// --- Ads rotation logic ---
 const currentAd = ref(null) // URL
+const currentLongAd = ref(null) // ads dài bên trên
+
 let index = 0
 let timer = null
 
-function getInfeedAds () {
-  return props.ads || []
+let longIndex = 0
+let LongTimer = null
+
+function getInfeedAds() {
+  return props.ads?.sidebarRightAds || []
+}
+function getInfeedLongAds() {
+  return props.ads?.sidebarLeftAds || []
 }
 
-function setCurrentFromIndex () {
+function setCurrentFromIndex() {
   const list = getInfeedAds()
   if (!list.length) {
     currentAd.value = null
@@ -223,7 +245,18 @@ function setCurrentFromIndex () {
   currentAd.value = ad
 }
 
-function startRotate () {
+function setLongCurrentFromIndex() {
+  const list = getInfeedLongAds()
+  if (!list.length) {
+    currentLongAd.value = null
+    return
+  }
+  longIndex = longIndex % list.length
+  const ad = list[longIndex]
+  currentLongAd.value = ad
+}
+
+function startRotate() {
   const list = getInfeedAds()
   if (!list.length || timer) return
 
@@ -237,8 +270,22 @@ function startRotate () {
   }, 4000)
 }
 
+function startRotateLong() {
+  const list = getInfeedLongAds()
+  if (!list.length || LongTimer) return
+
+  setLongCurrentFromIndex()
+
+  LongTimer = setInterval(() => {
+    const arr = getInfeedLongAds()
+    if (!arr.length) return
+    longIndex = (longIndex + 1) % arr.length
+    setLongCurrentFromIndex()
+  }, 4000)
+}
+
 watch(
-  () => props.ads,
+  () => props.ads?.sidebarRightAds,
   (newVal) => {
     if (newVal?.length) {
       index = 0
@@ -246,6 +293,20 @@ watch(
       if (!timer) startRotate()
     } else {
       currentAd.value = null
+    }
+  },
+  { immediate: true }
+)
+
+watch(
+  () => props.ads?.sidebarLeftAds,
+  (newVal) => {
+    if (newVal?.length) {
+      longIndex = 0
+      setLongCurrentFromIndex()
+      if (!LongTimer) startRotateLong()
+    } else {
+      currentLongAd.value = null
     }
   },
   { immediate: true }
@@ -261,12 +322,17 @@ onMounted(async () => {
   }
 
   startRotate()
+  startRotateLong()
 })
 
 onUnmounted(() => {
   if (timer) {
     clearInterval(timer)
     timer = null
+  }
+  if (LongTimer) {
+    clearInterval(LongTimer)
+    LongTimer = null
   }
 })
 </script>

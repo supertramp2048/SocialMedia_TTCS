@@ -9,6 +9,7 @@ export const useAuthStore = defineStore('auth', {
         token: Cookies.get('token') || null
     }),
     actions:{
+
         async resetUserInLocal() {
             const res2 = await api.get('/api/user')
             const user2 = res2.data
@@ -39,14 +40,41 @@ export const useAuthStore = defineStore('auth', {
             try {
                 const res = await api.post('/api/logout')
             } catch (error) {
-                alert(error.message)
+                console.log(error.message)
             }
-            this.user = null,
-            this.token = null,
-            resetAllStores()
-            Cookies.remove('token')
-            localStorage.removeItem('user')
+            finally {
+                this.user = null,
+                this.token = null,
+                resetAllStores()
+                Cookies.remove('token')
+                localStorage.removeItem('user')
+            }
+            
         },
+        async deleteAcc(userPassword) {
+            this.loading = true
+            let res = null
+
+            try {
+                res = await api.delete('/api/profile/delete', {
+                data: { password: userPassword } // body gửi lên server
+                })
+
+                if (res.status === 200) {
+                await this.logout() // giả sử this.logout là action trong store hiện tại
+                }
+
+                return res
+            } catch (error) {
+                console.log(error)
+                // nếu muốn show lỗi ra UI:
+                // this.error = error.response?.data?.message || 'Có lỗi xảy ra'
+                //throw error // tuỳ anh có muốn throw ra ngoài hay không
+            } finally {
+                this.loading = false
+            }
+        },
+
         resetAuth(){
             this.user = null,
             this.token = null,

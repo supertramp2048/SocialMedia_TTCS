@@ -36,21 +36,7 @@
                             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
                             <path d="M2 2h12v2H2V2Zm0 5h12v2H2V7Zm0 5h12v2H2v-2Z" fill="#969696"/>
                             </svg>
-                            <span>Bài viết ({{ AuthUser?.data?.posts_count }})</span>
-                        </button>
-
-                        <button class="flex items-center gap-2 px-4 py-3 text-gray-600 hover:text-gray-900">
-                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                            <path d="M2 2h12v4H2V2Zm0 6h12v6H2V8Z" fill="#909399"/>
-                            </svg>
-                            <span>Series</span>
-                        </button>
-
-                        <button class="flex items-center gap-2 px-4 py-3 text-gray-600 hover:text-gray-900">
-                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                            <path d="M2 3h12v2H2V3Zm0 4h12v2H2V7Zm0 4h12v2H2v-2Z" fill="#909399"/>
-                            </svg>
-                            <span>Bình luận</span>
+                            <span>Bài viết của bạn ({{ AuthUser?.data?.posts_count }})</span>
                         </button>
                         </nav>
                     </div>

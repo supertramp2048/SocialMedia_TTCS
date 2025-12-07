@@ -15,12 +15,18 @@
             class="block w-full text-left text-slate-500 hover:text-slate-700">
             Đổi mật khẩu
             </button>
+            <button 
+            @click="active = 'deleteAcc'"
+            class="block w-full text-left text-slate-500 hover:text-slate-700">
+            Xóa tài khoản
+            </button>
           </nav>
         </aside>
 
         <!-- Main -->
         <ChangeImgPage v-if="active == 'account'"></ChangeImgPage>
         <ChangePassword v-if="active == 'changePassword'"></ChangePassword>
+        <DeleteAcc v-if="active == 'deleteAcc'"></DeleteAcc>
       </div>
     </div>
   </Layout>
@@ -32,6 +38,7 @@
   import Layout from '../../client/layout/layout.vue'
   import ChangeImgPage from "../userSetting/changeImgPage.vue"
   import ChangePassword from "../userSetting/changePassword.vue"
+  import DeleteAcc from "../userSetting/deleteAcc.vue"
   import {ref} from "vue"
   const active = ref('account')
 </script>

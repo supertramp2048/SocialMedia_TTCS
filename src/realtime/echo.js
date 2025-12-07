@@ -18,8 +18,8 @@ const echo = new Echo({
   authorizer: (channel, options) => {
     return {
       authorize: (socketId, callback) => {
-        console.log(' Authorizing channel:', channel.name)
-        console.log(' Socket ID:', socketId)
+        //console.log(' Authorizing channel:', channel.name)
+        //console.log(' Socket ID:', socketId)
 
         // ✅ Dùng axios instance đã có interceptor set token
         api.post('/broadcasting/auth', {
@@ -27,7 +27,7 @@ const echo = new Echo({
           channel_name: channel.name
         })
         .then(response => {
-          console.log('✅ Authorization successful:', response.data)
+          //console.log(' Authorization successful:', response.data)
           callback(null, response.data)
         })
         .catch(error => {

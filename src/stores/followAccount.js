@@ -33,7 +33,7 @@ export const useFollowStore = defineStore('follow', {
           }
         })
 
-        console.log('Follower page 1:', res.data)
+        //console.log('Follower page 1:', res.data)
         this.follower = res.data
       } catch (error) {
         console.error('getFollower error:', error)
@@ -60,7 +60,7 @@ export const useFollowStore = defineStore('follow', {
           params: { page: nextPage }
         })
 
-        console.log('Follower page', nextPage, res.data)
+        //console.log('Follower page', nextPage, res.data)
 
         const currentData = Array.isArray(this.follower.data)
           ? this.follower.data
@@ -94,7 +94,7 @@ export const useFollowStore = defineStore('follow', {
           }
         })
 
-        console.log('Following page 1:', res.data)
+        //console.log('Following page 1:', res.data)
         this.following = res.data
       } catch (error) {
         console.error('getFollowing error:', error)
@@ -121,7 +121,7 @@ export const useFollowStore = defineStore('follow', {
           params: { page: nextPage }
         })
 
-        console.log('Following page', nextPage, res.data)
+        //console.log('Following page', nextPage, res.data)
 
         const currentData = Array.isArray(this.following.data)
           ? this.following.data
