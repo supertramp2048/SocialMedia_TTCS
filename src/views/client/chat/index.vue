@@ -11,7 +11,7 @@
                 <h2 class="text-lg font-semibold text-gray-900">Danh sách trò chuyện</h2>
                 <p class="text-xs text-gray-500 mt-1">Chọn cuộc trò chuyện để xem chi tiết</p>
               </div>
-              <div class="flex-1 overflow-y-auto divide-y divide-gray-100">
+              <div class="flex-1 overflow-y-scroll divide-y divide-gray-100">
                 <router-link
                 v-for="item in conversations" :key="item?.conversation_id"
                 :to="{path:'/nhan-tin', query:{id: item.user.id}}"
@@ -70,12 +70,12 @@
             </button>
           </div>
           <SkeletonChatList class="col-span-1 md:col-span-7" v-if="isLoadingChatHistory"></SkeletonChatList>
-          <ChatContainer v-else @newMessage='handleNewMessage' :chats="chatHistory" :others="otherUser"></ChatContainer>
+          <ChatContainer v-else @newMessage='handleNewMessage' @scrollTop="loadMoreMessage" :chats="chatHistory" :others="otherUser" :isLoadingMore="isLoadingMore"></ChatContainer>
         </div>
       </div>
 
       <!-- Mobile Sidebar Overlay -->
-      <div v-if="isSidebarOpen" class="fixed inset-0 z-40 md:hidden">
+      <div v-if="isSidebarOpen" class=" fixed inset-0 z-40 md:hidden">
         <div class="absolute inset-0 bg-black/40" @click="closeSidebar"></div>
 
         <div class="absolute inset-y-0 right-0 w-full max-w-sm bg-white shadow-xl border-l border-gray-200 flex flex-col">
@@ -95,7 +95,7 @@
           </div>
 
           <div
-          class="flex-1 overflow-y-auto divide-y divide-gray-100"
+          class="flex-1 sticky overflow-y-scroll divide-y divide-gray-100"
           >
             <router-link
             v-for="item in conversations" :key="item?.conversation_id"
@@ -133,13 +133,17 @@ import api from '../../../../API/axios'
 import Layout from '@/views/client/layout/layout.vue'
 import ChatContainer from './chatContainer.vue'
 import {useRoute, useRouter} from 'vue-router'
-
 const echo = inject('echo')
 const isLoadingChatHistory = ref(false)
 const isSidebarOpen = ref(false)
 const auth = useAuthStore()
 const route = useRoute()
 const otherId = ref(route.query.id)
+
+// obj phan trang 
+const objPaginationConver = ref()
+const objPaginationChat = ref()
+
 const toggleSidebar = () => {
   isSidebarOpen.value = !isSidebarOpen.value
 }
@@ -155,7 +159,9 @@ watch(()=>route.query.id, async (newVal)=>{
 
     const res3 = await api.get(`/realtime/messages/${otherId.value}`)
     //console.log("history ",res3.data);
-    const rawChatHistory = res3.data
+    const raw = res3.data
+    const rawChatHistory = raw.data
+    objPaginationChat.value = raw.meta
     rawChatHistory.forEach(item => {
       if (typeof item.image_url === 'string' && item.image_url.trim() !== '') {
         item.image_url = item.image_url.split(', ')
@@ -201,11 +207,11 @@ const subscribeToChannel = () => {
 
   chatChannel = echo.private(channelName)
     .subscribed(() => {
-      console.log(' Đã subscribe thành công channel:', channelName)
+      //console.log(' Đã subscribe thành công channel:', channelName)
     })
     // event nhan duoc tu pusher
     .listen('.MessageSent', (payload) => {
-      console.log(' Đã nhận event .MessageSent:', payload)
+      //console.log(' Đã nhận event .MessageSent:', payload)
 
       let imageArray = []
 
@@ -235,7 +241,7 @@ const subscribeToChannel = () => {
       // TODO: thêm logic cập nhật UI tin nhắn ở đây
     })
     .error((error) => {
-      console.error('❌ Lỗi khi subscribe channel:', error)
+      console.error('Lỗi khi subscribe channel:', error)
     })
 
   // Bật Pusher logging
@@ -261,10 +267,10 @@ const subscribeToChannelConversation = () => {
 
   conversationChannel = echo.private(channelName)
     .subscribed(() => {
-      console.log("Đã subscribe thành công channel: ", channelName)
+      //console.log("Đã subscribe thành công channel: ", channelName)
     })
     .listen('.ConversationChange', async (payload) => {
-      console.log("Nhận event .ConversationChange:", payload)
+      //console.log("Nhận event .ConversationChange:", payload)
 
       const exists = conversations.value.findIndex(c => c.conversation_id == payload.conversationId)
 
@@ -336,21 +342,63 @@ const markAsRead = (item) => {
 const otherUser = ref()
 const conversations = ref([])
 const chatHistory = ref([])
+const isLoadingMore = ref(false)         // Load more
+
+async function loadMoreMessage() {
+  // Chặn nếu đang load history ban đầu
+  if (isLoadingChatHistory.value) return
+  
+  // Chặn nếu đang load more
+  if (isLoadingMore.value) return
+  
+  // Chặn nếu hết trang
+  if (objPaginationChat.value.current_page >= objPaginationChat.value.last_page) return
+  
+  try {
+    isLoadingMore.value = true
+    objPaginationChat.value.current_page += 1
+    
+    const res = await api.get(`/realtime/messages/${otherId.value}`, {
+      params: { page: objPaginationChat.value.current_page }
+    })
+    
+    const rawChatHistory = res.data.data
+    rawChatHistory.forEach(item => {
+      if (typeof item.image_url === 'string' && item.image_url.trim() !== '') {
+        item.image_url = item.image_url.split(', ')
+      } else {
+        item.image_url = []
+      }
+    })
+    
+    chatHistory.value = [...rawChatHistory, ...chatHistory.value]
+  } catch (error) {
+    console.error('Lỗi load more messages:', error)
+  } finally {
+    isLoadingMore.value = false
+  }
+}
 onMounted(async () => {
   // gọi API conversation (không phụ thuộc Echo)
   try {
     isLoadingChatHistory.value = true
     const res = await api.get('/realtime/conversations')
     // console.log("conversation ",res.data );
-    conversations.value = res.data
+    const rawConver = res.data
+    objPaginationConver.value = rawConver.meta
+    conversations.value = rawConver.data
+    console.log("phan trang conver ",objPaginationConver.value);
     const res2 = await api.get(`/api/profiles/${otherId.value}`)
     otherUser.value = res2.data
-    console.log("other ", otherUser.value);
+    //console.log("other ", otherUser.value);
 
     const res3 = await api.get(`/realtime/messages/${otherId.value}`)
   //  console.log("history ",res3.data);
-
-  const rawChatHistory = res3.data
+  const raw = res3.data
+  const rawChatHistory = raw.data
+  objPaginationChat.value = raw.meta
+  console.log("meta chat ",objPaginationChat.value);
+  
   rawChatHistory.forEach(item => {
   if (typeof item.image_url === 'string' && item.image_url.trim() !== '') {
     item.image_url = item.image_url.split(', ')

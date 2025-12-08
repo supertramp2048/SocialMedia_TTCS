@@ -4,7 +4,7 @@
             <div class="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
                 <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
                     <h1 class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
-                        Create an account
+                        Tạo một tài khoản mới
                     </h1>
                     <form
                       @submit.prevent="createAccount()"
@@ -61,7 +61,7 @@
                                 <input id="terms" aria-describedby="terms" type="checkbox" class="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-primary-600 dark:ring-offset-gray-800" required="">
                             </div>
                             <div class="ml-3 text-sm">
-                                <label for="terms" class="font-light text-gray-500 dark:text-gray-300">I accept the <a class="font-medium text-primary-600 hover:underline dark:text-primary-500" href="#">Terms and Conditions</a></label>
+                                <label for="terms" class="font-light text-gray-500 dark:text-gray-300">Tôi đồng ý với  <a class="font-medium text-primary-600 hover:underline dark:text-primary-500" href="#">Điều khoản và điều kiện</a></label>
                             </div>
                         </div>
                         <button
@@ -69,16 +69,16 @@
                           :aria-busy="isLoading"
                           type="submit"
                           class="w-full relative flex items-center justify-center gap-2 text-white bg-sky-600 hover:bg-sky-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800 disabled:opacity-60 disabled:cursor-not-allowed disabled:pointer-events-none">
-                          <span v-if="!isLoading">Create an account</span>
+                          <span v-if="!isLoading">Tạo tài khoản</span>
                           <span v-else class="inline-flex items-center" aria-live="polite">
-                            <span class="mr-2">Đang tạo</span>
+                            <span class="mr-2">Đang tạo ...</span>
                             <span class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
                           </span>
                         </button>
                         <FastLogin></FastLogin>
                         <p class="text-sm font-light text-gray-500 dark:text-gray-400">
-                            Already have an account?
-                            <router-link to="/login" class="font-medium text-primary-600 hover:underline dark:text-primary-500">Login here</router-link>
+                            Đã có tài khoản ?
+                            <router-link to="/login" class="font-medium text-primary-600 hover:underline dark:text-primary-500">Đăng nhập</router-link>
                         </p>
                     </form>
                 </div>

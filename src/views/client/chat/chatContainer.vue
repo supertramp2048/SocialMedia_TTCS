@@ -16,6 +16,7 @@
 
         <!-- Danh sách tin nhắn -->
         <div class="p-[16px]">
+          <div class="flex items-center justify-center" v-if="props.isLoadingMore == true"><MoonLoader color="#2694b9" size="30px"></MoonLoader></div>
           <div 
             v-for="item in props.chats" 
             :key="`${item.id}-${item.created_at}`"
@@ -320,8 +321,12 @@ const showScrollBtn = ref(false)
 
 const handleScroll = () => {
   const el = chatContainer.value
+  console.log('scrollTop', el.scrollTop)
   if (!el) return
-
+  const atTop = el.scrollTop <= 50
+  if(atTop){
+    emit("scrollTop")
+  }
   const atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 50
   showScrollBtn.value = !atBottom
 }
@@ -344,10 +349,11 @@ const formatDate = (date) => {
 
 const props = defineProps({
   chats: { type: Array, default: () => [] },
-  others: { type: Object, default: () => ({}) }
+  others: { type: Object, default: () => ({}) },
+  isLoadingMore: {type: Boolean, default: false}
 })
 
-const emit = defineEmits(['newMessage'])
+const emit = defineEmits(['newMessage','scrollTop'])
 
 async function uploadImg(){
   const urls = []
@@ -456,12 +462,12 @@ watch(() => route.query.id, (newVal) => {
   otherId.value = newVal
 })
 
-watch(
-  () => props.chats?.length,
-  () => {
-    scrollToBottom()
-  }
-)
+// watch(
+//   () => props.chats?.length,
+//   () => {
+//     scrollToBottom()
+//   }
+// )
 
 const emojiWrapper = ref(null)
 const handleClickOutside = (event) => {

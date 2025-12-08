@@ -36,7 +36,7 @@
                             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
                             <path d="M2 2h12v2H2V2Zm0 5h12v2H2V7Zm0 5h12v2H2v-2Z" fill="#969696"/>
                             </svg>
-                            <span>Bài viết của bạn ({{ AuthUser?.data?.posts_count }})</span>
+                            <span>Bài viết ({{ AuthUser?.data?.posts_count }})</span>
                         </button>
                         </nav>
                     </div>

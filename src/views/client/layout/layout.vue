@@ -175,11 +175,6 @@
                             <i class="fa-solid fa-gear text-sm"></i> Tùy chỉnh tài khoản
                           </router-link>
                         </li>
-                        <li>
-                          <button class="w-full text-left px-4 sm:px-5 py-2 hover:bg-gray-100 flex items-center gap-2">
-                            <i class="fa-regular fa-envelope text-sm"></i> Liên hệ
-                          </button>
-                        </li>
                       </ul>
 
                       <div class="border-t border-gray-100">

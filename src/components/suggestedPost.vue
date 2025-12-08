@@ -151,10 +151,11 @@ watch(
 async function fetchSuggestedPosts (id) {
   try {
     const res = await api.get('/api/posts', {
-      params: { limit: 20, sort: 'hot', category: id }
+      params: { limit: 5, sort: 'hot', category: id }
     })
     // chuẩn hoá để luôn là []
     rawPosts.value = normalizeArray(res?.data)
+    rawPosts.value.splice()
   } catch (e) {
     console.error('Lỗi lấy bài gợi ý:', e)
     rawPosts.value = []

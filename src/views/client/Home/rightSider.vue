@@ -1,7 +1,7 @@
 <template>
   <div class="space-y-8 hidden xl:block">
     <!-- Following sidebar -->
-    <section class="bg-white rounded-lg p-6 border border-gray-200">
+    <section v-if="auth?.user != null" class="bg-white rounded-lg p-6 border border-gray-200">
       <h3 class="text-lg font-bold text-gray-900 mb-4">
         Tác giả bạn đang theo dõi
       </h3>
@@ -94,7 +94,7 @@
     </section>
 
     <!-- Newsletter Section -->
-    <section class="bg-sky-50 rounded-lg p-6 text-center">
+    <section v-if="auth?.user != null" class="bg-sky-50 rounded-lg p-6 text-center">
       <div v-if="auth?.user?.email_verified_at == null">
       <div   
        class="mb-4">
@@ -132,6 +132,15 @@
         />
       </router-link>
       </div>
+    </section>
+    <!-- \small ads  -->
+    <section class="text-center">
+      <router-link>
+        <img
+          class="rounded-lg p-6 mb-4 w-full h-[200px] overflow-hidden bg-cover bg-center"
+          :src="currentAd?.image_url"
+        />
+      </router-link>
     </section>
 
   </div>

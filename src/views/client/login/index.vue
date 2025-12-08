@@ -64,9 +64,9 @@
                    focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-indigo-600
                    disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            <span v-if="!loading">Sign in</span>
+            <span v-if="!loading">Đăng nhập</span>
             <span v-else class="inline-flex items-center" aria-live="polite">
-              <span class="mr-2">Signing in</span>
+              <span class="mr-2">Đang đăng nhập ...</span>
               <span class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
             </span>
           </button>
