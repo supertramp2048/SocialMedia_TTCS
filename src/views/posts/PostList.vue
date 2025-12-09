@@ -130,8 +130,9 @@ const deleteSearch = async() => {
   displayedPosts.value = res.data
   isSearch.value = false
 }
-const handlePageChange = (page) => {
-  postsStore.fetchAllPosts({ page })
+const handlePageChange = async (page) => {
+  await postsStore.fetchAllPosts({ page })
+  displayedPosts.value = postsStore.allPosts
 }
 
 const handleDelete = (post) => {
