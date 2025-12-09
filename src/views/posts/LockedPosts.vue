@@ -50,7 +50,7 @@ import Pagination from '@/components/common/Pagination.vue'
 import Badge from '@/components/common/Badge.vue'
 
 const postsStore = usePostsStore()
-
+const search = ref()
 const columns = [
   { key: 'title', label: 'Title' },
   { key: 'user.name', label: 'Author' },
@@ -59,11 +59,19 @@ const columns = [
 ]
 
 const handleSearch = (query) => {
+  search.value = query
   postsStore.fetchPosts({ q: query, status: 'removed_by_mod', page: 1 })
 }
 
 const handlePageChange = (page) => {
-  postsStore.fetchPosts({ status: 'removed_by_mod', page })
+  const objQuery = {
+    status:'removed_by_mod',
+    page: page,
+  }
+  if(search.value != null){
+    objQuery.q = search.value
+  }
+  postsStore.fetchPosts(objQuery)
 }
 
 onMounted(() => {

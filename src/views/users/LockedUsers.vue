@@ -119,15 +119,21 @@ function deleteSearch() {
   usersStore.fetchBannedUsers()
   isSearch.value=false
 }
-
 const handleSearch = (query) => {
-  console.log("query", query);
+  //console.log("query", query);
   isSearch.value= true
+  search.value = query
   usersStore.fetchBannedUsers({ user: query, page: 1 })
 }
 
 const handlePageChange = (page) => {
-  usersStore.fetchBannedUsers({ page })
+  const objQuery = {
+    page: page
+  }
+  if(search.value != null){
+    objQuery.user = search.value
+  }
+  usersStore.fetchBannedUsers(objQuery)
 }
 
 const handleUnban = (user) => {

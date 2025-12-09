@@ -101,6 +101,7 @@ const isSearch = ref(false)
 const displayedPosts = ref([])
 const postsStore = usePostsStore()
 const toast = useToast()
+const search = ref('')
 const activeTab = ref('notRemovedPost')
 const columns = [
   { key: 'title', label: 'Tiêu đề bài viết' },
@@ -118,12 +119,13 @@ const getStatusVariant = (status) => {
   return 'warning'
 }
 
-const handleSearch = async (query) => {  
+const handleSearch = async (query) => { 
+   
   const res = await postsStore.fetchAllPosts({page: 1, q: query })
   isSearch.value = true
   displayedPosts.value = res.data
 }
-const search = ref('')
+
 const deleteSearch = async() => {
   search.value = ''
   const res = await postsStore.fetchAllPosts()
@@ -131,7 +133,13 @@ const deleteSearch = async() => {
   isSearch.value = false
 }
 const handlePageChange = async (page) => {
-  await postsStore.fetchAllPosts({ page })
+  const objQuery = {
+    page: page,
+  }
+  if(search.value != null){
+    objQuery.q = search.value
+  }
+  await postsStore.fetchAllPosts(objQuery)
   displayedPosts.value = postsStore.allPosts
 }
 
