@@ -28,7 +28,7 @@
             type="button"
             class="px-3 py-2 text-sm text-gray-700 hover:text-sky-700 hover:bg-sky-50 rounded-md transition-colors"
             @click="updatePagination('newest')"
-            :class="{ 'bg-sky-300': sortSetting === 'newest' }"
+            :class="{ 'bg-sky-300': sortSetting == 'newest' }"
           >
             Mới nhất
           </button>
@@ -38,7 +38,7 @@
             type="button"
             class="px-3 py-2 text-sm text-gray-700 hover:text-sky-700 hover:bg-sky-50 rounded-md transition-colors"
             @click="updatePagination('hot')"
-            :class="{ 'bg-sky-300': sortSetting === 'hot' }"
+            :class="{ 'bg-sky-300': sortSetting == 'hot' }"
           >
             Thịnh hành
           </button>
@@ -138,6 +138,10 @@ const userChanged = ref(false)
 watch(() => route.query.user_id, (newVal) => {
       idUserNow.value = newVal
 })
+watch(() => route.query.sort, (newVal)=>{
+  sortSetting.value = newVal
+},
+{immediate:true})
 watch(displayMode, () => { userChanged.value = true })
 
 watch(

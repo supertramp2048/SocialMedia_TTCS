@@ -462,12 +462,19 @@ watch(() => route.query.id, (newVal) => {
   otherId.value = newVal
 })
 
-// watch(
-//   () => props.chats?.length,
-//   () => {
-//     scrollToBottom()
-//   }
-// )
+watch(
+  () => props.chats?.length,
+  () => {
+    const el = chatContainer.value
+      //console.log('scrollTop', el.scrollTop)
+      if (!el) return
+      const nearBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 100
+      if(nearBottom){
+        scrollToBottom()
+      }
+    
+  }
+)
 
 const emojiWrapper = ref(null)
 const handleClickOutside = (event) => {

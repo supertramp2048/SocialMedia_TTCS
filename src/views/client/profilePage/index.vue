@@ -47,7 +47,7 @@
 
                     <!-- Lưới bài viết -->
                     <section class="pb-10">
-                        <div v-if="!posts || !posts.data">
+                        <div v-if="!posts || !posts.data || isLoadingPost">
                           <SkeletonLoader variant="list" :rows="6" :avatar="true" class="mt-4" />
                         </div>
                         <div v-else-if="posts?.data?.length > 0" class=" gap-6 lg:gap-8">
@@ -96,6 +96,7 @@ let UserId = null
 const idReport = ref('')
 const typeOfReport = ref('')
 const isLoadingProfile = ref(true)
+const isLoadingPost = ref(false)
 function handleShowForm(value){
     showReportPostForm.value = value
     idReport.value = route.query.user_id
@@ -128,11 +129,19 @@ watch(
 watch(
   () => route.query,
   async (newQuery) => {
-    objPagination.value = newQuery
-    const res2 = await api.get(`/api/posts`, {
-    params: objPagination.value
-  })
-  posts.value = res2.data
+    try {
+      isLoadingPost.value = true
+      objPagination.value = newQuery
+        const res2 = await api.get(`/api/posts`, {
+        params: objPagination.value
+      })
+      posts.value = res2.data
+    } catch (error) {
+      
+    }
+    finally{
+      isLoadingPost.value = false
+    }
   },
   { immediate: true , deep: true} // gọi 1 lần khi load trang
 )

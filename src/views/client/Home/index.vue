@@ -20,7 +20,10 @@
             <div v-if="loadingExtras" class="grid gap-4 sm:gap-6">
               <SkeletonCard v-for="n in 1" :key="'sk-latest-'+n" />
             </div>
-            <GridPost v-else :posts="latestPost" :pageLimit="null"></GridPost>
+            <div v-else>
+              <BlankData v-if="latestPost?.data.length == 0"></BlankData>
+              <GridPost v-else :posts="latestPost" :pageLimit="null"></GridPost>
+            </div>
           </section>
 
           <!-- Banner Ad -->
@@ -41,7 +44,8 @@
               <SkeletonCard v-for="n in 4" :key="'sk-featured-'+n" />
             </div>
             <div v-else class="mb-4 sm:mb-6 lg:mb-8">
-              <Carousel :posts="featuredPosts?.data"></Carousel>
+              <BlankData v-if="featuredPosts?.data.length == 0"></BlankData>
+              <Carousel v-else :posts="featuredPosts?.data"></Carousel>
             </div>
 
             <!-- Banner Ad -->
@@ -53,7 +57,11 @@
             <div v-if="loadingPosts" class="grid gap-3 sm:gap-4 md:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
               <SkeletonCard v-for="n in objPagination.limit || 6" :key="'sk-grid-'+n" />
             </div>
-            <GridPost v-else :posts="posts" :pageLimit="totalPages"></GridPost>
+            <div v-else>
+              <BlankData v-if="posts?.data.length == 0"></BlankData>
+              <GridPost v-else :posts="posts" :pageLimit="totalPages"></GridPost>
+            </div>
+            
           </section>
         </div>
 
@@ -69,6 +77,7 @@
 </template>
 
 <script setup lang="js">
+import BlankData from "../../../components/blankData.vue"
 import Layout from '../layout/layout.vue'
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
