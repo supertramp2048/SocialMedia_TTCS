@@ -11,7 +11,7 @@
                 <h2 class="text-lg font-semibold text-gray-900">Danh sách trò chuyện</h2>
                 <p class="text-xs text-gray-500 mt-1">Chọn cuộc trò chuyện để xem chi tiết</p>
               </div>
-              <div class="flex-1 overflow-y-scroll divide-y divide-gray-100">
+              <div ref="desktopConver" @scroll="handleScrollConver" class="flex-1 overflow-y-scroll divide-y divide-gray-100">
                 <router-link
                 v-for="item in conversations" :key="item?.conversation_id"
                 :to="{path:'/nhan-tin', query:{id: item.user.id}}"
@@ -42,14 +42,14 @@
                     </div>
                     <div v-else>
                       <p
-                        v-if="Number(item.last_message.sender_id) !== Number(auth?.user?.id)"
+                        v-if="Number(item?.last_message?.sender_id) !== Number(auth?.user?.id)"
                         class="text-xs relative pr-4"
-                        :class="Number(item.last_message.id) !== Number(item.last_read_message_id)
+                        :class="Number(item?.last_message?.id) !== Number(item?.last_read_message_id)
                             ? 'font-bold text-gray-900'
                             : 'text-gray-500'"
                       >Đã gửi ảnh
                         <span
-                          v-if="Number(item.last_message.id) !== Number(item.last_read_message_id)"
+                          v-if="Number(item?.last_message?.id) !== Number(item?.last_read_message_id)"
                           class="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-2 ml-2 rounded-full bg-blue-500 inline-blocks"
                         ></span>
                       </p>
@@ -57,6 +57,7 @@
                     </div>
                   </div>
                 </router-link>
+                <div v-if="isLoadingConver" class="flex justify-center items-center"><MoonLoader color="#2694b9" size="30px"></MoonLoader></div>
               </div>
             </div>
           </div>
@@ -95,8 +96,10 @@
           </div>
 
           <div
+          ref="desktopConver" @scroll="handleScrollConver"
           class="flex-1 sticky overflow-y-scroll divide-y divide-gray-100"
           >
+          
             <router-link
             v-for="item in conversations" :key="item?.conversation_id"
             :to="{path:'/nhan-tin', query:{id: item.user.id}}"
@@ -119,6 +122,7 @@
                   </p>
               </div>
             </router-link>
+            <div v-if="isLoadingConver" class="flex justify-center items-center"><MoonLoader color="#2694b9" size="30px"></MoonLoader></div>
           </div>
         </div>
       </div>
@@ -133,12 +137,46 @@ import api from '../../../../API/axios'
 import Layout from '@/views/client/layout/layout.vue'
 import ChatContainer from './chatContainer.vue'
 import {useRoute, useRouter} from 'vue-router'
+import { MoonLoader } from "vue3-spinner"
 const echo = inject('echo')
 const isLoadingChatHistory = ref(false)
+const isLoadingConver = ref(false)
 const isSidebarOpen = ref(false)
 const auth = useAuthStore()
 const route = useRoute()
 const otherId = ref(route.query.id)
+const desktopConver = ref()
+async function handleScrollConver() {
+  const el = desktopConver.value
+  const atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 50
+  if(atBottom){
+    await getMoreConver()
+  }
+}
+async function getMoreConver() {
+  if(objPaginationConver.value.current_page >= objPaginationConver.value.last_page) return
+  if(isLoadingConver.value == true) return
+  objPaginationConver.value.current_page += 1
+  try {
+      isLoadingConver.value = true
+      const res = await api.get('/realtime/conversations',{
+      params:{
+        page: objPaginationConver.value.current_page
+      }
+    })
+      // console.log("conversation ",res.data );
+      const rawConver = res.data
+      conversations.value = [...conversations.value,...rawConver.data]
+      //console.log("mảng conver mới ",conversations.value);
+      
+  } catch (error) {
+    
+  }
+  finally{
+    isLoadingConver.value = false
+  }
+  
+}
 
 // obj phan trang 
 const objPaginationConver = ref()
@@ -397,7 +435,7 @@ onMounted(async () => {
   const raw = res3.data
   const rawChatHistory = raw.data
   objPaginationChat.value = raw.meta
-  console.log("meta chat ",objPaginationChat.value);
+  //console.log("meta chat ",objPaginationChat.value);
   
   rawChatHistory.forEach(item => {
   if (typeof item.image_url === 'string' && item.image_url.trim() !== '') {

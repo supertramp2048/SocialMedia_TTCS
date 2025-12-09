@@ -296,7 +296,7 @@ function getLimitedImages(imageUrls) {
 // Handler để cập nhật files từ FilePond
 function handleFilePondUpdate(fileItems) {
   files.value = fileItems
-  console.log('📸 Files updated:', fileItems.length, 'ảnh')
+  //console.log('📸 Files updated:', fileItems.length, 'ảnh')
 }
 
 function handleClickImgBtn(){
@@ -321,7 +321,7 @@ const showScrollBtn = ref(false)
 
 const handleScroll = () => {
   const el = chatContainer.value
-  console.log('scrollTop', el.scrollTop)
+  //console.log('scrollTop', el.scrollTop)
   if (!el) return
   const atTop = el.scrollTop <= 50
   if(atTop){
@@ -358,7 +358,7 @@ const emit = defineEmits(['newMessage','scrollTop'])
 async function uploadImg(){
   const urls = []
   
-  console.log('🚀 Bắt đầu upload', files.value.length, 'ảnh')
+  //console.log('🚀 Bắt đầu upload', files.value.length, 'ảnh')
   
   try {
     for(const item of files.value){
@@ -369,7 +369,7 @@ async function uploadImg(){
         continue
       }
       
-      console.log('📤 Đang upload:', actualFile.name, '|', (actualFile.size / 1024).toFixed(2), 'KB')
+      //console.log('📤 Đang upload:', actualFile.name, '|', (actualFile.size / 1024).toFixed(2), 'KB')
       
       const formData = new FormData()
       formData.append('file', actualFile)
@@ -380,11 +380,11 @@ async function uploadImg(){
         }      
       })
       
-      console.log('📥 Upload response:', res.data)
+      //console.log('📥 Upload response:', res.data)
       
       if(res.status === 200 && res.data.location) {
         urls.push(res.data.location)
-        console.log('✅ Upload thành công:', res.data.location)
+        //console.log('✅ Upload thành công:', res.data.location)
       } else {
         console.error('❌ Upload thất bại với status:', res.status)
         toast.error(`Không thể upload ảnh: ${actualFile.name}`)
@@ -397,7 +397,7 @@ async function uploadImg(){
     throw error
   }
   
-  console.log('✅ Hoàn thành upload. Total URLs:', urls.length)
+  //console.log('✅ Hoàn thành upload. Total URLs:', urls.length)
   return urls
 } 
 
@@ -407,22 +407,22 @@ async function sendMessage() {
     return
   }
   
-  console.log('📤 Bắt đầu gửi tin nhắn...')
-  console.log('Nội dung:', contentMessage.value)
-  console.log('Số ảnh:', files.value.length)
+  //console.log('📤 Bắt đầu gửi tin nhắn...')
+  //console.log('Nội dung:', contentMessage.value)
+  //console.log('Số ảnh:', files.value.length)
   
   try {
     loading.value = true
     
     let imageUrls = []
     if(files.value.length > 0) {
-      console.log('⏳ Đang upload ảnh...')
+      //console.log('⏳ Đang upload ảnh...')
       const rawImageUrls = await uploadImg()
       imageUrls = rawImageUrls.join(', ')
-      console.log('✅ Upload xong. URLs:', imageUrls)
+      //console.log('✅ Upload xong. URLs:', imageUrls)
     }
     
-    console.log('⏳ Đang gửi tin nhắn...')
+    //console.log('⏳ Đang gửi tin nhắn...')
     const res = await api.post('/realtime/sendmessage', {
       receiver_id: otherId.value,
       content: contentMessage.value,
@@ -432,7 +432,7 @@ async function sendMessage() {
     if (res.status !== 200) {
       toast.error('Đã có lỗi xảy ra khi gửi tin nhắn')
     } else {
-      console.log('✅ Gửi tin nhắn thành công')
+      //console.log('✅ Gửi tin nhắn thành công')
       emit('newMessage', res.data)
       
       contentMessage.value = ''
