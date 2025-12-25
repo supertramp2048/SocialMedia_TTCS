@@ -133,6 +133,17 @@
       </router-link>
       </div>
     </section>
+    <section v-else class="bg-sky-50 rounded-lg p-6 text-center">
+        <div
+       class="w-full h-full">
+        <router-link>
+        <img
+          class="rounded-lg p-6 mb-4 w-full h-full overflow-hidden bg-cover bg-center"
+          :src="currentLongAd?.image_url"
+        />
+      </router-link>
+      </div>
+    </section>
     <!-- \small ads  -->
     <section class="text-center">
       <router-link>
