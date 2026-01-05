@@ -87,8 +87,9 @@
 </template>
 
 <script setup lang="js">
-import { onMounted, onUnmounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { onMounted, onUnmounted, watch } from 'vue'
+
+import { useRoute, useRouter } from 'vue-router'
 import Layout from '../layout/layout.vue'
 import SkeletonLoader from '../../../components/ui/SkeletonLoader.vue'
 import SuggestedPost from '../../../components/suggestedPost.vue'
@@ -102,7 +103,7 @@ import { usePostComments } from '../../../composables/usePostComments'
 import { usePostReportMenu } from '../../../composables/usePostReportMenu'
 import { ref } from 'vue'
 const route = useRoute()
-
+const router = useRouter()
 // Composable: Post Detail
 const {
   post,
@@ -166,6 +167,18 @@ function handleScroll(){
     block: 'start'        // canh phần trên cùng
   })
 }
+watch(
+  () => route.query.id,
+  async (newId) => {
+    if (!newId) return
+
+    const postId = Number(newId)
+    if (isNaN(postId)) return
+
+    await getParentComments(postId)
+  },
+  { immediate: true }
+)
 
 // Initialize
 onMounted(async () => {
