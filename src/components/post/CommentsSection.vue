@@ -155,7 +155,7 @@
 
               <!-- form fix comment -->
               <form
-                v-if="FixIndex && FixIndex.includes(comment.id)"
+                v-if="fixIndex && fixIndex.includes(comment.id)"
                 class="border-b border-border-lighter pb-6 mb-6"
                 @submit.prevent="handleSendFixedComment(comment.id, comment.parent_id)"
               >
@@ -177,8 +177,14 @@
                   <button
                     type="submit"
                     class="text-sm text-text-primary px-2 py-1 font-bold hover:bg-sky-200 rounded-2xl "
+                    :disabled="isLoadingFixComment"
+                    :aria-busy="isLoadingFixComment"
                   >
-                    Gửi
+                    <span v-if="isLoadingFixComment" class="inline-flex items-center" aria-live="polite">
+                      <span class="mr-2">Đang sửa</span>
+                      <span class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"></span>
+                    </span>
+                    <span v-else>Gửi</span>
                   </button>
                 </div>
               </form>
@@ -276,6 +282,10 @@ const props = defineProps({
     type: Boolean,
     default: false
   },
+  isLoadingFixComment: {
+    type: Boolean,
+    default: false
+  },
   isLoadingMore: {
     type: Boolean,
     default: false
@@ -296,7 +306,7 @@ const props = defineProps({
     type: Array,
     default: () => []
   },
-  FixIndex: {
+  fixIndex: {
     type: Array,
     default: () => []
   },
@@ -381,10 +391,16 @@ function handleDeleteComment(commentId, parentId) {
 }
 
 function handleShowReplyForm(commentId) {
+  console.log("props ben comment section",props.showReply);
+  
   emit('show-reply-form', commentId)
 }
 
 function handleFixComment(commentId, content, parentId) {
+  //console.log("click fix comment- ", commentId, ": ", content, ": ", parentId );
+  console.log("props ben comment section",props.fixIndex);
+  console.log("cm id: ",commentId,"content: ", content,"parent :",parentId);
+  
   emit('fix-comment', commentId, content, parentId)
 }
 

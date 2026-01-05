@@ -62,6 +62,7 @@
             :open-menu-comment-id="openMenuCommentId"
             :comment-menu-refs="commentMenuRefs"
             :get-comment-menu-items="getCommentMenuItems"
+            :isLoading-fix-comment="isLoadingFixComment"
             @send-comment="sendComment"
             @send-reply-comment="sendReplyComment"
             @send-fixed-comment="sendFixedComment"
@@ -124,6 +125,7 @@ const {
   commentSubmitting,
   isLoadingComments,
   isLoadingMore,
+  isLoadingFixComment,
   content_comment,
   content_reply_comment,
   content_fixed_comment,

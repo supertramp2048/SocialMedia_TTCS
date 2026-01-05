@@ -29,7 +29,7 @@ export function usePostComments(post) {
   const commentSubmitting = ref(false)
   const isLoadingComments = ref(false)
   const isLoadingMore = ref(false)
-
+  const isLoadingFixComment = ref(false)
   // Form states
   const content_comment = ref('')
   const content_reply_comment = ref('')
@@ -183,6 +183,7 @@ export function usePostComments(post) {
     if (!content?.trim()) return
 
     try {
+      isLoadingFixComment.value = true
       const res = await api.patch(`${apiUrl}/api/comments/${id}`, { content })
 
       if (res.status === 200) {
@@ -224,6 +225,9 @@ export function usePostComments(post) {
       console.error(error)
       alert('Có lỗi xảy ra, vui lòng thử lại sau.')
     }
+    finally{
+      isLoadingFixComment.value = false
+    }
   }
 
   // Delete comment
@@ -263,6 +267,8 @@ export function usePostComments(post) {
 
   // UI helpers
   function showReplyForm(id) {
+    console.log(showReply);
+    
     const indexOfFix = FixIndex.value.indexOf(id)
     if (indexOfFix !== -1) {
       FixIndex.value.splice(indexOfFix, 1)
@@ -272,6 +278,9 @@ export function usePostComments(post) {
   }
 
   function fixComment(id, content, parent_id) {
+    console.log("id: ",id, "content: ",content, "parent_id: ",parent_id);
+    console.log(FixIndex);
+    
     content_fixed_comment.value = content
     const i = showReply.value.indexOf(id)
     if (i !== -1) showReply.value.splice(i, 1)
@@ -452,6 +461,7 @@ export function usePostComments(post) {
     reloadKey,
     commentSubmitting,
     isLoadingComments,
+    isLoadingFixComment,
     isLoadingMore,
     content_comment,
     content_reply_comment,
