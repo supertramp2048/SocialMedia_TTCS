@@ -71,10 +71,6 @@
 <script setup>
 import { ref } from 'vue'
 import {onMounted, watch} from 'vue'
-onMounted(() => {
-  console.log(props.data);
-  
-})
 const props = defineProps({
   columns: {
     type: Array,

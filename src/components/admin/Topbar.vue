@@ -7,16 +7,36 @@
 
       <div class="flex-1"></div>
 
-      <div class="flex items-center space-x-4">
+      <div class="flex items-center space-x-4" ref="notiRef">
         <!-- Notifications (if needed) -->
         <div class="relative">
-          <button class="p-2 text-gray-600 hover:text-gray-900">
+          <button @click="handleShowNotifi" class="p-2 text-gray-600 hover:text-gray-900">
             <BellIcon class="h-6 w-6" />
             <span
               v-if="unreadCount > 0"
-              class="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500"
-            ></span>
+              class="absolute left-1/2 top-0 text-sm text-amber-50 text-center rounded-full px-1 py-0 block bg-red-500"
+            > {{unreadCount}} </span>
           </button>
+          <div
+              v-if="showNotification"
+              class="absolute right-0 mt-2 w-64 bg-white shadow-lg rounded-lg border border-gray-200 z-50"
+            >
+              <div class="px-4 py-2 border-b font-medium text-gray-700">
+                Thông báo
+              </div>
+
+              <ul class="max-h-60 overflow-y-scroll">
+                <!-- Thông báo giả -->
+                <li v-for="item in notificationStore.arrNotification" :key="item.report_id" class="px-4 py-2 hover:bg-gray-50 border-b">
+                  <div class="text-sm font-semibold"> Báo cáo 
+                    <span v-if="item.evidence_comment"> bình luận</span>
+                    <span v-else-if="item.reported_user"> người dùng</span>
+                    <span v-if="item.evidence_post"> bài viết </span>
+                  </div>
+                  <div class="text-xs text-gray-500 overflow-x-clip">{{item.reason}}</div>
+                </li>
+              </ul>
+            </div>
         </div>
 
         <!-- User menu -->
@@ -67,24 +87,33 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useToast } from 'vue-toastification'
+import {useNotificationStore} from '../../stores/notification'
+import {useRoute, useRouter} from 'vue-router'
+
 import {
   Bars3Icon,
   BellIcon,
   UserIcon,
   ChevronDownIcon,
 } from '@heroicons/vue/24/outline'
-
+const route = useRoute()
+const notificationStore = useNotificationStore()
 const router = useRouter()
 const authStore = useAuthStore()
 const toast = useToast()
 
 const showMenu = ref(false)
+const notiRef = ref(null)
 const menuRef = ref(null)
-const unreadCount = ref(0)
+const unreadCount = computed(() => notificationStore.notificationCount)
+const showNotification = ref(false)
+
+function handleShowNotifi(){
+  showNotification.value = !showNotification.value
+}
 
 const toggleSidebar = () => {
   // Emit event to toggle sidebar (handled by parent or store)
@@ -107,8 +136,62 @@ const handleLogout = async () => {
 const handleClickOutside = (event) => {
   if (menuRef.value && !menuRef.value.contains(event.target)) {
     showMenu.value = false
+    
+  }
+  if(notiRef.value && !notiRef.value.contains(event.target)){
+    showNotification.value = false
   }
 }
+// giữ ref kênh để unsubscribe
+let channels = []
+
+// hàm subscribe kênh report
+function subscribeReportChannels() {
+  // unsubscribe trước khi subscribe mới
+  unsubscribeReportChannels()
+
+  const commentChannel = window.echo.private('reports.comment')
+  commentChannel.listen('CommentReportSent', (e) => {
+    notificationStore.addNotification(e)
+  })
+
+  const userChannel = window.echo.private('reports.user')
+  userChannel.listen('UserReportSent', (e) => {
+    notificationStore.addNotification(e)
+  })
+
+  const postChannel = window.echo.private('reports.post')
+  postChannel.listen('PostReportSent', (e) => {
+    notificationStore.addNotification(e)
+  })
+
+  // lưu kênh để unsubscribe sau này
+  channels = [commentChannel, userChannel, postChannel]
+}
+
+// hàm unsubscribe tất cả kênh hiện tại
+function unsubscribeReportChannels() {
+  channels.forEach((ch) => {
+    window.echo.leave(ch.name) // hoặc ch.unsubscribe() tùy API Echo/Pusher
+  })
+  channels = []
+}
+
+// watch route để subscribe/unsubscribe
+watch(() => route.fullPath, (newPath) => {
+  if (newPath === '/admin/reports') {
+    console.log('Đang ở route /admin/reports, subscribe kênh')
+    subscribeReportChannels()
+  } else {
+    console.log('Rời route report, unsubscribe kênh')
+    unsubscribeReportChannels()
+  }
+}, { immediate: true })
+
+// cleanup khi component unmount
+onUnmounted(() => {
+  unsubscribeReportChannels()
+})
 
 onMounted(() => {
   document.addEventListener('click', handleClickOutside)

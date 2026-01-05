@@ -308,7 +308,7 @@ const getRoleVariant = (role) => {
 onMounted(async () => {
   // Fetch dashboard data
   await dashBoard.getDashboardIndex()
-  console.log('Dashboard data:', dashBoard.dashboardData)
+  //console.log('Dashboard data:', dashBoard.dashboardData)
 
   // Fetch recent reports
   loadingReports.value = true

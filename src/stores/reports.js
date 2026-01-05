@@ -20,7 +20,7 @@ export const useReportsStore = defineStore('reports', () => {
     try {
       const response = await reportsApi.getPostReports(params)
       postReports.value = response.data
-      //console.log("post report ",postReports.value);
+      console.log("post report ",postReports.value);
       
       pagination.value = {
         current_page: response.meta.current_page,

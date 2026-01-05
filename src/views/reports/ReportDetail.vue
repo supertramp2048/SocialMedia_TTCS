@@ -65,7 +65,9 @@
                 <h4 class="font-medium text-gray-900">
                   {{ post?.data.title }}
                 </h4>
-
+                <div>
+                  <img :src="post?.data.thumbnail_url" alt="thumbnail_url">
+                </div>
                 <p class="text-xs text-gray-500 mt-1">
                   Tác giả: {{ post?.data.author?.name }} •
                   {{ formatDate(post?.data.created_at) }}
