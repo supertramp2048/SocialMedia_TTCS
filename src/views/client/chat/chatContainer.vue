@@ -296,7 +296,7 @@ function getLimitedImages(imageUrls) {
 // Handler để cập nhật files từ FilePond
 function handleFilePondUpdate(fileItems) {
   files.value = fileItems
-  //console.log('📸 Files updated:', fileItems.length, 'ảnh')
+  //console.log(' Files updated:', fileItems.length, 'ảnh')
 }
 
 function handleClickImgBtn(){
@@ -328,6 +328,13 @@ const handleScroll = () => {
     emit("scrollTop")
   }
   const atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 50
+  if(!atBottom){
+    emit('notAtBottomNow', true)
+  }
+  else{
+    emit('notAtBottomNow', false)
+  }
+
   showScrollBtn.value = !atBottom
 }
 
@@ -353,7 +360,7 @@ const props = defineProps({
   isLoadingMore: {type: Boolean, default: false}
 })
 
-const emit = defineEmits(['newMessage','scrollTop'])
+const emit = defineEmits(['newMessage','scrollTop', 'notAtBottomNow','atBottomNow'])
 
 async function uploadImg(){
   const urls = []
