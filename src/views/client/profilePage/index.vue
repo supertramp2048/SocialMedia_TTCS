@@ -12,7 +12,7 @@
                 <!-- ảnh bìa của user  -->
                 <div class=" bg-cover bg-center bg-no-repeat w-full h-[200px] "
                     :style="{ backgroundImage: `url(${AuthUser?.data?.cover_photo_url})` }"
-                    > 
+                    >
                 </div>
                 <!-- end ------------>
                 <div class="relative lg:grid lg:grid-cols-[364px_minmax(0,1fr)] lg:gap-8">
@@ -78,7 +78,7 @@
     import GridPost from '../../../components/gridPostForProfilePage.vue'
     import {ref, onMounted, watch} from 'vue'
     import api from "../../../../API/axios"
-    import ReportModal from '../../../components/reportForm.vue' 
+    import ReportModal from '../../../components/reportForm.vue'
     import { useAuthStore } from '../../../stores/auth'
     import { useRoute, useRouter} from 'vue-router'
     import SkeletonLoader from '../../../components/ui/SkeletonLoader.vue'
@@ -124,7 +124,6 @@ watch(
   { immediate: true , deep: true} // gọi 1 lần khi load trang
 )
 
-
 watch(
   () => route.query,
   async (newQuery) => {
@@ -137,7 +136,6 @@ watch(
   { immediate: true , deep: true} // gọi 1 lần khi load trang
 )
 
-
 onMounted(async () => {
   UserId = route.query.user_id
   const res = await api.get(`/api/profiles/${UserId}`)
@@ -146,16 +144,15 @@ onMounted(async () => {
   console.log("auth", AuthUser.value);
   objPagination.value = route.query
   console.log("objPagination ",objPagination.value);
-  
+
   const res2 = await api.get(`/api/posts`, {
     params: objPagination.value
   })
   posts.value = res2.data
-  
+
   limitPage.value = Math.ceil(res2.data.meta?.total / objPagination.value.limit)
   console.log("postt",posts.value);
-  
-  
+
 })
 
 function updatePosts(newVal){

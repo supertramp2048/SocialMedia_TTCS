@@ -111,13 +111,8 @@ function updatePagination(patch) {
 
 // Hàm lấy bài viết
 async function fetchPosts() {
-<<<<<<< HEAD
-  console.log("fetch posts");
-
-=======
   //console.log("fetch posts");
-  
->>>>>>> origin/main
+
   loadingPosts.value = true
   try {
     const res = await api.get(`${apiUrl}/api/posts`, { params: objPagination.value })
@@ -129,34 +124,11 @@ async function fetchPosts() {
     loadingPosts.value = false
   }
 }
-function goPage() {
-  let p = Number(inputPage.value) || 1
-  p = Math.min(Math.max(1, p), totalPages.value)
-  objPagination.value.page = p
-  inputPage.value = p
-  // set URL (giữ lại các query khác nếu có)
-  const next = { ...route.query, page: p }
-  if (objPagination.value.category == null) {
-    delete next.category
-  } else {
-    next.category = objPagination.value.category
-    next.sort = objPagination.value.sort
-  }
-  router.replace({ query: next })
-}
 
 // Kiểm tra giới hạn trang
 function clampPage() {
   const p = Number(objPagination.value.page) || 1
   objPagination.value.page = Math.min(Math.max(1, p), totalPages.value)
-}
-
-// Nút phân trang
-function nextPage() {
-  if (objPagination.value.page < totalPages.value) objPagination.value.page++
-}
-function prevPage() {
-  if (objPagination.value.page > 1) objPagination.value.page--
 }
 
 // Đọc params từ URL → gán vào state
@@ -190,12 +162,8 @@ watch(
       delete objPagination.value.feed
     }
 
-    // 🔹 Đồng bộ về sortSetting (để button active đúng)
-    sortSetting.value = sortMode
-
     // 🔹 Các phần còn lại giữ nguyên
     objPagination.value.page = Number.isNaN(page) ? 1 : page
-    inputPage.value = objPagination.value.page
     objPagination.value.category = Number.isNaN(cat) ? null : cat
   },
   { immediate: true }

@@ -16,8 +16,8 @@
 
         <!-- Danh sách tin nhắn -->
         <div class="p-[16px]">
-          <div 
-            v-for="item in props.chats" 
+          <div
+            v-for="item in props.chats"
             :key="`${item.id}-${item.created_at}`"
             :class="auth.user.id != item.sender_id ? 'message other' : 'message user'"
           >
@@ -31,18 +31,18 @@
                 <span v-if="auth.user.id != item.sender_id">{{ props.others?.data?.name }}</span>
                 <span v-else>{{ auth.user.name }}</span>
               </div>
-              
+
               <!-- Nội dung text -->
               <div v-if="item.content">{{ item.content }}</div>
-              
+
               <!-- Block hiển thị ảnh -->
 
               <!-- Block hiển thị ảnh -->
               <div v-if="item.image_url && item.image_url.length > 0" class="mt-2">
                 <!-- 1 ảnh duy nhất -->
                 <div v-if="item.image_url.length === 1" class="rounded-xl overflow-hidden cursor-pointer">
-                  <img 
-                    :src="item.image_url[0]" 
+                  <img
+                    :src="item.image_url[0]"
                     class="w-full max-h-[280px] object-cover"
                     alt="Image"
                     @click="openViewer(item.image_url[0])"
@@ -51,10 +51,10 @@
 
                 <!-- 2 ảnh -->
                 <div v-else-if="item.image_url.length === 2" class="grid grid-cols-2 gap-1 rounded-xl overflow-hidden">
-                  <img 
-                    v-for="(url, idx) in item.image_url" 
+                  <img
+                    v-for="(url, idx) in item.image_url"
                     :key="idx"
-                    :src="url" 
+                    :src="url"
                     class="w-full h-[160px] object-cover cursor-pointer"
                     alt="Image"
                     @click="openViewer(url)"
@@ -63,20 +63,20 @@
 
                 <!-- 3 ảnh -->
                 <div v-else-if="item.image_url.length === 3" class="grid grid-cols-2 gap-1 rounded-xl overflow-hidden">
-                  <img 
-                    :src="item.image_url[0]" 
+                  <img
+                    :src="item.image_url[0]"
                     class="w-full h-[120px] object-cover cursor-pointer"
                     alt="Image"
                     @click="openViewer(item.image_url[0])"
                   />
-                  <img 
-                    :src="item.image_url[1]" 
+                  <img
+                    :src="item.image_url[1]"
                     class="w-full h-[120px] object-cover cursor-pointer"
                     alt="Image"
                     @click="openViewer(item.image_url[1])"
                   />
-                  <img 
-                    :src="item.image_url[2]" 
+                  <img
+                    :src="item.image_url[2]"
                     class="col-span-2 w-full h-[140px] object-cover cursor-pointer"
                     alt="Image"
                     @click="openViewer(item.image_url[2])"
@@ -85,22 +85,22 @@
 
                 <!-- 4+ ảnh (hiển thị tối đa 4, ảnh thứ 4 có overlay +N) -->
                 <div v-else class="grid grid-cols-2 gap-1 rounded-xl overflow-hidden">
-                  <img 
-                    v-for="(url, idx) in getLimitedImages(item.image_url).slice(0, 3)" 
+                  <img
+                    v-for="(url, idx) in getLimitedImages(item.image_url).slice(0, 3)"
                     :key="idx"
-                    :src="url" 
+                    :src="url"
                     class="w-full h-[120px] object-cover cursor-pointer"
                     alt="Image"
                     @click="openViewer(url)"
                   />
                   <!-- Ảnh thứ 4 với overlay - Click để mở gallery -->
                   <div class="relative w-full h-[120px] cursor-pointer" @click="openGallery(item.image_url, 3)">
-                    <img 
-                      :src="getLimitedImages(item.image_url)[3]" 
+                    <img
+                      :src="getLimitedImages(item.image_url)[3]"
                       class="w-full h-full object-cover"
                       alt="Image"
                     />
-                    <div 
+                    <div
                       v-if="item.image_url.length > 4"
                       class="absolute inset-0 bg-black bg-opacity-60 flex flex-col items-center justify-center hover:bg-opacity-70 transition-all"
                     >
@@ -117,10 +117,10 @@
 
               <div class="time">{{ formatDate(item.created_at) }}</div>
             </div>
-          </div>            
+          </div>
         </div>
       </div>
-      
+
       <!-- Ô nhập tin nhắn: sticky bottom, full width cột -->
       <div
           class="chat-input-container w-full max-w-full sticky bottom-0 "
@@ -140,10 +140,10 @@
                 v-if="isShowEmojiPicker"
                 class="absolute bottom-12 left-0 z-50"
               >
-                <Picker 
+                <Picker
                   :data="emojiIndex"
                   set="twitter"
-                  :perLine="8"           
+                  :perLine="8"
                   :emojiSize="24"
                   :showSearch="false"
                   :showPreview="false"
@@ -170,14 +170,14 @@
               <form @submit.prevent="sendMessage">
                 <input
                   v-model="contentMessage"
-                  ref='messageInput' 
-                  type="text" 
-                  placeholder="Nhập tin nhắn..." 
+                  ref='messageInput'
+                  type="text"
+                  placeholder="Nhập tin nhắn..."
                   :disabled="loading"
                 />
                 <button class="btnEffect flex justify-center items-center" type="submit" :disabled="loading || (!contentMessage.trim() && files.length === 0)">
                   <MoonLoader v-if="loading" color="#0ea5e9" size="14px" />
-                  <i v-else class="fa-solid fa-paper-plane"></i> 
+                  <i v-else class="fa-solid fa-paper-plane"></i>
                 </button>
               </form>
             </div>
@@ -189,7 +189,7 @@
             class="scroll-bottom-btn"
           >
             <i class="fa-solid fa-angles-down"></i>
-          </button>     
+          </button>
         </div>
 
         <FilePond
@@ -351,31 +351,31 @@ const emit = defineEmits(['newMessage'])
 
 async function uploadImg(){
   const urls = []
-  
+
   console.log('🚀 Bắt đầu upload', files.value.length, 'ảnh')
-  
+
   try {
     for(const item of files.value){
       const actualFile = item.file
-      
+
       if (!actualFile) {
         console.warn('⚠️ Không tìm thấy file object trong item:', item)
         continue
       }
-      
+
       console.log('📤 Đang upload:', actualFile.name, '|', (actualFile.size / 1024).toFixed(2), 'KB')
-      
+
       const formData = new FormData()
       formData.append('file', actualFile)
-      
+
       const res = await api.post('/api/image-upload', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
-        }      
+        }
       })
-      
+
       console.log('📥 Upload response:', res.data)
-      
+
       if(res.status === 200 && res.data.location) {
         urls.push(res.data.location)
         console.log('✅ Upload thành công:', res.data.location)
@@ -390,24 +390,24 @@ async function uploadImg(){
     toast.error('Có lỗi xảy ra khi upload ảnh')
     throw error
   }
-  
+
   console.log('✅ Hoàn thành upload. Total URLs:', urls.length)
   return urls
-} 
+}
 
 async function sendMessage() {
   if (!contentMessage.value.trim() && files.value.length === 0) {
     toast.warning('Vui lòng nhập tin nhắn hoặc chọn ảnh')
     return
   }
-  
+
   console.log('📤 Bắt đầu gửi tin nhắn...')
   console.log('Nội dung:', contentMessage.value)
   console.log('Số ảnh:', files.value.length)
-  
+
   try {
     loading.value = true
-    
+
     let imageUrls = []
     if(files.value.length > 0) {
       console.log('⏳ Đang upload ảnh...')
@@ -415,7 +415,7 @@ async function sendMessage() {
       imageUrls = rawImageUrls.join(', ')
       console.log('✅ Upload xong. URLs:', imageUrls)
     }
-    
+
     console.log('⏳ Đang gửi tin nhắn...')
     const res = await api.post('/realtime/sendmessage', {
       receiver_id: otherId.value,
@@ -428,14 +428,14 @@ async function sendMessage() {
     } else {
       console.log('✅ Gửi tin nhắn thành công')
       emit('newMessage', res.data)
-      
+
       contentMessage.value = ''
       files.value = []
-      
+
       if (pond.value) {
         pond.value.removeFiles()
       }
-      
+
       isShowingImgInput.value = false
       scrollToBottom()
     }

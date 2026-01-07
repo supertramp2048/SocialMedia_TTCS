@@ -65,7 +65,7 @@
                   >
                     <div
                       v-if="showNotificationMenu"
-                      class="fixed sm:absolute left-0 right-0 sm:left-auto sm:right-0 top-14 sm:top-auto sm:mt-3 w-full sm:w-80 md:w-96 bg-white rounded-none sm:rounded-xl shadow-2xl ring-1 ring-black ring-opacity-5 overflow-hidden z-50 origin-top-right"
+                      class="fixed sm:absolute left-0 right-0 sm:left-auto sm:right-0 top-14 sm:top-full sm:mt-2 w-full sm:w-80 md:w-96 bg-white rounded-none sm:rounded-xl shadow-2xl ring-1 ring-black ring-opacity-5 overflow-hidden z-50 origin-top-right"
                     >
                       <div class="px-3 sm:px-4 py-2.5 sm:py-3 border-b border-gray-100 bg-white">
                         <h3 class="font-bold text-sm sm:text-base text-gray-800">Thông báo</h3>

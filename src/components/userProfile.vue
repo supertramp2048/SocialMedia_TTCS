@@ -18,7 +18,7 @@
       <div class="flex items-center justify-between mt-3 mb-3">
         <h1 class="text-lg font-bold text-gray-700">{{user?.name}}</h1>
         <router-link
-        :to="{path:'/nhan-tin', query:{id:user?.id}}" 
+        :to="{path:'/nhan-tin', query:{id:user?.id}}"
          v-if=" auth?.user?.id != user?.id "
          class="p-1" aria-label="Share">
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -30,10 +30,10 @@
         </router-link>
         <!-- more option -->
         <div class="relative" ref="menuRef">
-        <button 
+        <button
           v-if="auth?.user?.id != user?.id "
           @click.stop="showOption = !showOption "
-          
+
           class="p-1 ml-auto" aria-label="More options">
           <svg width="4" height="16" viewBox="0 0 4 16" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path
@@ -66,7 +66,7 @@
       <div v-if=" auth?.user?.id != user?.id ">
         <button
           @click="followHandler"
-          v-if="userData?.is_following == false" 
+          v-if="userData?.is_following == false"
           :disabled="isLoading"
           :aria-busy="isLoading"
           class="w-full relative flex items-center justify-center gap-2 py-2 bg-sky-400 text-white text-xl btnEffect rounded-md hover:bg-primary/10 transition-colors mb-6 disabled:opacity-60 disabled:cursor-not-allowed disabled:pointer-events-none"
@@ -80,7 +80,7 @@
 
         <button
           @click="followHandler"
-          v-else-if="userData?.is_following == true" 
+          v-else-if="userData?.is_following == true"
           :disabled="isLoading"
           :aria-busy="isLoading"
           class="w-full relative flex items-center justify-center gap-2 py-2 bg-sky-400 text-white text-xl btnEffect rounded-md hover:bg-primary/10 transition-colors mb-6 disabled:opacity-60 disabled:cursor-not-allowed disabled:pointer-events-none"
@@ -92,10 +92,10 @@
           </span>
         </button>
       </div>
-      
+
 
       <!-- Stats -->
-      <div class="grid grid-cols-3 gap-4 text-center">
+      <div class="grid grid-cols-2 gap-4 text-center">
         <div>
           <p class="text-base font-semibold text-gray-800">{{userData?.followers_count}}</p>
           <p class="text-sm text-gray-800">followers</p>
@@ -103,10 +103,6 @@
         <div>
           <p class="text-base font-semibold text-gray-800">{{userData?.following_count}}</p>
           <p class="text-sm text-gray-800">following</p>
-        </div>
-        <div>
-          <p class="text-base font-semibold text-gray-800">0</p>
-          <p class="text-sm text-gray-800">spiders</p>
         </div>
       </div>
     </div>
@@ -134,63 +130,63 @@ watch(() => props.user, (newVal) => {
 
 async function followHandler() {
   console.log("=== STARTING FOLLOW/UNFOLLOW REQUEST ===");
-  
+
   // Validation: Check if user ID exists
   if (!props.user?.id) {
     alert("Cannot follow: User ID is missing.");
     return;
   }
-  
+
   try {
     isLoading.value = true;
     console.log(`Sending request to: /api/users/${props.user.id}/follow`);
-    
+
     const res = await api.post(`/api/users/${props.user.id}/follow`);
-    
+
     console.log("✅ Follow request successful:", res.data);
-    
+
     // Update user data on success
     userData.value.is_following = res.data.is_following;
     userData.value.followers_count = res.data.followers_count;
-    
+
     // Optional: Show success message
     const action = res.data.is_following ? "followed" : "unfollowed";
     console.log(`Successfully ${action} user`);
     // Uncomment if you want success alerts:
     // alert(`You have ${action} this user!`);
-    
+
   } catch (error) {
     console.error("❌ FOLLOW REQUEST FAILED:", error);
     console.log("Error response:", error.response);
     console.log("Error status:", error.response?.status);
     console.log("Error data:", error.response?.data);
-    
+
     // Variable to store the user-facing error message
     let errorMessage = '';
-    
+
     // CASE 1: Server responded with an error (error.response exists)
     if (error.response) {
       const status = error.response.status;
       const data = error.response.data;
-      
+
       switch (status) {
         case 401: // Unauthorized - Not logged in
           errorMessage = 'Bạn cẫn đăng nhập để sử dụng chức năng này .';
           // Optional: Redirect to login
           // router.push('/login');
           break;
-          
+
         case 403: // Forbidden - No permission
           errorMessage = "Bạn bị chặn.";
           break;
-          
+
         case 404: // User not found
           errorMessage = 'Người dùng này đã bị cấm';
           break;
-          
+
         case 422: // Validation error
           errorMessage = data?.message || 'Invalid data provided.';
-          
+
           // If server returns specific validation errors
           if (data?.errors) {
             const firstError = Object.values(data.errors)[0];
@@ -199,46 +195,46 @@ async function followHandler() {
             }
           }
           break;
-          
+
         case 429: // Too many requests
           errorMessage = 'Qúa nhiều yêu cầu vui lòng thử lại sau .';
           break;
-          
+
         case 500: // Internal server error
         case 502: // Bad gateway
         case 503: // Service unavailable
         case 504: // Gateway timeout
           errorMessage = 'Server error. Please try again later.';
           break;
-          
+
         default:
           // Generic server error with status code
-          errorMessage = data?.message || 
+          errorMessage = data?.message ||
                         `An error occurred (Status: ${status}). Please try again.`;
       }
-      
-    } 
+
+    }
     // CASE 2: Network error (no response from server)
     else if (error.request) {
       console.error("No response received from server:", error.request);
       errorMessage = 'Không thể kết nối với server, vui lòng kiểm tra internet';
-    } 
+    }
     // CASE 3: Request setup error (e.g., invalid URL, timeout configuration)
     else {
       console.error("Request setup error:", error.message);
       errorMessage = 'Đã có lỗi xảy ra, vui lòng thử lại sau';
     }
-    
+
     // ⚠️ CRITICAL: Always show the error to the user
     alert(errorMessage);
-    
+
     // Detailed error logging for debugging
     console.group("📋 Error Details");
     console.log("User message:", errorMessage);
     console.log("Full error object:", error);
     console.log("Error config:", error.config);
     console.groupEnd();
-    
+
   } finally {
     isLoading.value = false;
     console.log("=== FOLLOW REQUEST COMPLETED ===");
@@ -261,7 +257,7 @@ onBeforeUnmount(() => {
   document.removeEventListener('click', handleClickOutside)
 })
 
-const emit = defineEmits(['ShowForm']) 
+const emit = defineEmits(['ShowForm'])
 function toggle(){
   emit('ShowForm', true)
 }
