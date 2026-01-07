@@ -1,5 +1,5 @@
 <template>
-  <div class="max-w-[1200px] mx-auto px-4 mb-16">
+  <div v-if="postsForRender?.length > 0" class="max-w-[1200px] mx-auto px-4 mb-16">
     <h2 class="font-bold text-sm text-text-primary mb-4">Bài viết nổi bật khác</h2>
 
     <div class="relative">
@@ -105,13 +105,13 @@ import SmallUserDiv from "../components/smallUserDiv.vue"
 const props = defineProps({
   categoryId: { type: [Number, String], required: true },
   currentId: { type: [Number, String], default: null },
-  // card to hơn
-  minCardWidth: { type: Number, default: 320 }, // px, ~ w-80
-  gap: { type: Number, default: 24 } // px, ~ gap-6
+  minCardWidth: { type: Number, default: 320 }, 
+  gap: { type: Number, default: 24 } 
 })
 
 const rawPosts = ref([])       // dữ liệu thô từ API
 const postsForRender = computed(() => {
+  
   const arr = normalizeArray(rawPosts.value)
   if (props.currentId != null) {
     const cur = Number(props.currentId)
@@ -155,7 +155,7 @@ async function fetchSuggestedPosts (id) {
     })
     // chuẩn hoá để luôn là []
     rawPosts.value = normalizeArray(res?.data)
-    rawPosts.value.splice()
+    //rawPosts.value.splice()
   } catch (e) {
     console.error('Lỗi lấy bài gợi ý:', e)
     rawPosts.value = []

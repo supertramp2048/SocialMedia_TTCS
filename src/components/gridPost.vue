@@ -122,7 +122,7 @@ const props = defineProps({
   pageLimit: { type: Number, required: true }
 })
 
-// ✅ FIXED: Dùng computed với getter/setter để sync trực tiếp với route.query.sort
+//  FIXED: Dùng computed với getter/setter để sync trực tiếp với route.query.sort
 const sortSetting = computed({
   get() {
     // Mặc định là 'hot' nếu không có sort param

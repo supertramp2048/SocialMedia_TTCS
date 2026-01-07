@@ -39,7 +39,7 @@
           <!-- Related Articles Section -->
           <SuggestedPost 
             :categoryId="post?.data?.category?.id" 
-            :postId="post?.data?.id"
+            :currentId="post?.data?.id"
           />
 
           <!-- Comments Section -->

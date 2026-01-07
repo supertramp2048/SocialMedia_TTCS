@@ -108,15 +108,15 @@ import GridPost from '../../../components/gridPost.vue'
 const loadingPosts = ref(false)   // loading cho danh sách bài chính (grid)
 const loadingExtras = ref(false)  // loading cho latest/featured (extras)
 const sortSetting = ref('hot')
-function updatePagination(patch) {
-  const next = { ...route.query }
-    if (patch == null || patch === '')
-      delete next.category
-    else{
-      next.sort = patch
-    }
-  router.replace({ query: next })   // 👉 KHÔNG đụng objPagination ở đây
-}
+// function updatePagination(patch) {
+//   const next = { ...route.query }
+//     if (patch == null || patch === '')
+//       delete next.category
+//     else{
+//       next.sort = patch
+//     }
+//   router.replace({ query: next })   //  KHÔNG đụng objPagination ở đây
+// }
 
 // Hàm lấy bài viết
 async function fetchPosts() {
@@ -133,21 +133,6 @@ async function fetchPosts() {
     loadingPosts.value = false
   }
 }
-function goPage() {
-  let p = Number(inputPage.value) || 1
-  p = Math.min(Math.max(1, p), totalPages.value)
-  objPagination.value.page = p
-  inputPage.value = p
-  // set URL (giữ lại các query khác nếu có)
-  const next = { ...route.query, page: p }
-  if (objPagination.value.category == null) {
-    delete next.category
-  } else {
-    next.category = objPagination.value.category
-    next.sort = objPagination.value.sort
-  }
-  router.replace({ query: next })
-}
 
 // Kiểm tra giới hạn trang
 function clampPage() {
@@ -155,13 +140,6 @@ function clampPage() {
   objPagination.value.page = Math.min(Math.max(1, p), totalPages.value)
 }
 
-// Nút phân trang
-function nextPage() {
-  if (objPagination.value.page < totalPages.value) objPagination.value.page++
-}
-function prevPage() {
-  if (objPagination.value.page > 1) objPagination.value.page--
-}
 
 // Đọc params từ URL → gán vào state
 watch(
@@ -173,7 +151,7 @@ watch(
         ? null
         : Number(q.category)
 
-    // 🔹 Quy ước: sortMode = 'hot' | 'newest' | 'following'
+    //  Quy ước: sortMode = 'hot' | 'newest' | 'following'
     let sortMode
 
     if (q.feed != null && q.feed !== '') {
@@ -194,12 +172,8 @@ watch(
       delete objPagination.value.feed
     }
 
-    // 🔹 Đồng bộ về sortSetting (để button active đúng)
-    sortSetting.value = sortMode
-
-    // 🔹 Các phần còn lại giữ nguyên
+    // Các phần còn lại giữ nguyên
     objPagination.value.page = Number.isNaN(page) ? 1 : page
-    inputPage.value = objPagination.value.page
     objPagination.value.category = Number.isNaN(cat) ? null : cat
   },
   { immediate: true }
@@ -223,16 +197,16 @@ watch(() => objPagination.value.category, async (newCat, oldCat) => {
   router.replace({ query: next })
   // Thực thi fetch
   clampPage()
-  await fetchExtras()   // ✅ chỉ chạy ở đây và onMounted
+  await fetchExtras()   // chỉ chạy ở đây và onMounted
   await fetchPosts()
 }, { immediate: false })
 
 // Watch B: đổi page hoặc sort → chỉ fetchPosts (KHÔNG fetchExtras)
 watch(
-  [() => objPagination.value.page, () => objPagination.value.sort],
+  [() => objPagination.value.page, () => objPagination.value.sort, () => objPagination.value.feed],
   async ([p, s], [op, os]) => {
     if (p === op && s === os) return
-    await fetchPosts() // ❌ tuyệt đối không gọi fetchExtras() ở đây
+    await fetchPosts() 
   },
   { immediate: false }
 )

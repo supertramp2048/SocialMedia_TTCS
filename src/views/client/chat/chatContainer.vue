@@ -358,18 +358,18 @@ const emit = defineEmits(['newMessage','scrollTop'])
 async function uploadImg(){
   const urls = []
   
-  //console.log('🚀 Bắt đầu upload', files.value.length, 'ảnh')
+  //console.log(' Bắt đầu upload', files.value.length, 'ảnh')
   
   try {
     for(const item of files.value){
       const actualFile = item.file
       
       if (!actualFile) {
-        console.warn('⚠️ Không tìm thấy file object trong item:', item)
+        console.warn(' Không tìm thấy file object trong item:', item)
         continue
       }
       
-      //console.log('📤 Đang upload:', actualFile.name, '|', (actualFile.size / 1024).toFixed(2), 'KB')
+      //console.log(' Đang upload:', actualFile.name, '|', (actualFile.size / 1024).toFixed(2), 'KB')
       
       const formData = new FormData()
       formData.append('file', actualFile)
@@ -380,24 +380,24 @@ async function uploadImg(){
         }      
       })
       
-      //console.log('📥 Upload response:', res.data)
+      //console.log(' Upload response:', res.data)
       
       if(res.status === 200 && res.data.location) {
         urls.push(res.data.location)
-        //console.log('✅ Upload thành công:', res.data.location)
+        //console.log(' Upload thành công:', res.data.location)
       } else {
-        console.error('❌ Upload thất bại với status:', res.status)
+        console.error(' Upload thất bại với status:', res.status)
         toast.error(`Không thể upload ảnh: ${actualFile.name}`)
       }
     }
   } catch (error) {
-    console.error('❌ Lỗi khi upload ảnh:', error)
+    console.error(' Lỗi khi upload ảnh:', error)
     console.error('Error details:', error.response?.data || error.message)
     toast.error('Có lỗi xảy ra khi upload ảnh')
     throw error
   }
   
-  //console.log('✅ Hoàn thành upload. Total URLs:', urls.length)
+  //console.log('Hoàn thành upload. Total URLs:', urls.length)
   return urls
 } 
 
@@ -407,7 +407,7 @@ async function sendMessage() {
     return
   }
   
-  //console.log('📤 Bắt đầu gửi tin nhắn...')
+  //console.log(' Bắt đầu gửi tin nhắn...')
   //console.log('Nội dung:', contentMessage.value)
   //console.log('Số ảnh:', files.value.length)
   
@@ -416,13 +416,13 @@ async function sendMessage() {
     
     let imageUrls = []
     if(files.value.length > 0) {
-      //console.log('⏳ Đang upload ảnh...')
+      //console.log(' Đang upload ảnh...')
       const rawImageUrls = await uploadImg()
       imageUrls = rawImageUrls.join(', ')
-      //console.log('✅ Upload xong. URLs:', imageUrls)
+      //console.log(' Upload xong. URLs:', imageUrls)
     }
     
-    //console.log('⏳ Đang gửi tin nhắn...')
+    //console.log(' Đang gửi tin nhắn...')
     const res = await api.post('/realtime/sendmessage', {
       receiver_id: otherId.value,
       content: contentMessage.value,
