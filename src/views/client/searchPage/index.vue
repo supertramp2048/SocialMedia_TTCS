@@ -75,7 +75,7 @@ import { useRoute } from 'vue-router'
 import api from "../../../../API/axios"
 import GridPost from '../../../components/gridPost.vue'
 import UserList from '../../../components/UserList.vue'
-
+import { useAuthStore } from '../../../stores/auth'
 // Refs
 const optionSearch = ref('posts')
 const route = useRoute()
@@ -84,8 +84,8 @@ const loading = ref(false)
 const searchResult = ref({ data: [], meta: { total: 0 } })
 const search_content = ref('')
 const page_limit = ref(1)
-
-// ✅ Hàm fetch dữ liệu dựa trên loại tìm kiếm
+const auth = useAuthStore()
+//  Hàm fetch dữ liệu dựa trên loại tìm kiếm
 async function fetchSearchResults() {
   // Kiểm tra query
   if (!route.query.q) {
@@ -106,10 +106,16 @@ async function fetchSearchResults() {
     const res = await api.get(endpoint, {
       params: route.query
     })
-
+    
     // Cập nhật kết quả
     searchResult.value = res.data
     
+    if(optionSearch.value == 'users'){
+     let rawDataUser = searchResult.value.data
+     rawDataUser = rawDataUser.filter(item => item.id !== auth?.user.id)
+     searchResult.value.data = rawDataUser
+     
+    }
     // Tính số trang (chỉ cho posts)
     if (optionSearch.value === 'posts' && res.data.meta) {
       const limit = parseInt(route.query.limit) || 10
@@ -119,10 +125,10 @@ async function fetchSearchResults() {
       const limit = parseInt(route.query.limit) || 10
       page_limit.value = Math.ceil(res.data.meta.total / limit)
     }
-    console.log('✅ Kết quả:', res)
+    //console.log(' Kết quả:', res)
 
   } catch (error) {
-    console.error('❌ Lỗi khi tìm kiếm:', error)
+    console.error(' Lỗi khi tìm kiếm:', error)
     
     // Reset kết quả nếu lỗi
     searchResult.value = { data: [], meta: { total: 0 } }
@@ -136,7 +142,7 @@ async function fetchSearchResults() {
   }
 }
 
-// ✅ Watch để refetch khi đổi tab hoặc query thay đổi
+//  Watch để refetch khi đổi tab hoặc query thay đổi
 watch(
   [optionSearch, () => route.query],
   async ([newOption, newQuery]) => {
