@@ -37,7 +37,7 @@
                         type="submit"
                         :disabled="loading"
                         :aria-busy="loading"
-                        class="w-full relative flex items-center justify-center gap-2 text-white btnEffect bg-gray-300 hover:bg-primary-700 focus:ring-4 
+                        class="w-full relative flex items-center justify-center gap-2 text-white btnEffect bg-sky-400 hover:bg-primary-700 focus:ring-4 
                                 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm 
                                 px-5 py-2.5 text-center disabled:opacity-60 disabled:cursor-not-allowed disabled:pointer-events-none">
                         <span v-if="!loading">Reset password</span>
