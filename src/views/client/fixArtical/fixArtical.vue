@@ -330,9 +330,32 @@ const editorInit = {
   suffix: '.min',
   skin_url: '/tinymce/skins/ui/oxide',
   content_css: '/tinymce/skins/content/default/content.min.css',
-  height: 460,
+  height: 600,
   menubar: false,
   paste_data_images: true,
+  
+  // Định nghĩa formats cho font-size và font-family
+  formats: {
+    fontsize_12px: { inline: 'span', styles: { 'font-size': '12px' } },
+    fontsize_14px: { inline: 'span', styles: { 'font-size': '14px' } },
+    fontsize_16px: { inline: 'span', styles: { 'font-size': '16px' } },
+    fontsize_18px: { inline: 'span', styles: { 'font-size': '18px' } },
+    fontsize_24px: { inline: 'span', styles: { 'font-size': '24px' } },
+    fontsize_32px: { inline: 'span', styles: { 'font-size': '32px' } },
+    fontsize_48px: { inline: 'span', styles: { 'font-size': '48px' } },
+    
+    fontfamily_arial: { inline: 'span', styles: { 'font-family': 'Arial, sans-serif' } },
+    fontfamily_times: { inline: 'span', styles: { 'font-family': 'Times New Roman, serif' } },
+    fontfamily_courier: { inline: 'span', styles: { 'font-family': 'Courier New, monospace' } },
+    fontfamily_verdana: { inline: 'span', styles: { 'font-family': 'Verdana, sans-serif' } },
+    fontfamily_georgia: { inline: 'span', styles: { 'font-family': 'Georgia, serif' } },
+  },
+  
+  // Cho phép inline styles (font-size, font-family) không bị strip
+  extended_valid_elements: 'span[style|class]',
+  valid_styles: {
+    '*': 'font-size,font-family,color,text-align,text-decoration,font-weight,font-style,background-color'
+  },
   
   plugins: [
     'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
@@ -340,8 +363,9 @@ const editorInit = {
     'insertdatetime', 'media', 'table', 'help', 'wordcount'
   ],
   
+  // Thêm custom buttons vào toolbar
   toolbar:
-    'undo redo | blocks | bold italic underline forecolor backcolor | ' +
+    'undo redo | blocks | customFontSize customFontFamily | bold italic underline forecolor backcolor | ' +
     'alignleft aligncenter alignright alignjustify | ' +
     'bullist numlist outdent indent | link image | removeformat | code',
   
@@ -349,6 +373,44 @@ const editorInit = {
   branding: false,
   automatic_uploads: false,
   file_picker_types: 'image',
+  
+  // Setup custom dropdowns
+  setup: (editor) => {
+    // Custom Font Size Dropdown
+    editor.ui.registry.addMenuButton('customFontSize', {
+      text: 'Cỡ chữ',
+      tooltip: 'Chọn cỡ chữ',
+      fetch: (callback) => {
+        const items = [
+          { type: 'menuitem', text: '12px', onAction: () => editor.formatter.apply('fontsize_12px') },
+          { type: 'menuitem', text: '14px', onAction: () => editor.formatter.apply('fontsize_14px') },
+          { type: 'menuitem', text: '16px', onAction: () => editor.formatter.apply('fontsize_16px') },
+          { type: 'menuitem', text: '18px', onAction: () => editor.formatter.apply('fontsize_18px') },
+          { type: 'menuitem', text: '24px', onAction: () => editor.formatter.apply('fontsize_24px') },
+          { type: 'menuitem', text: '32px', onAction: () => editor.formatter.apply('fontsize_32px') },
+          { type: 'menuitem', text: '48px', onAction: () => editor.formatter.apply('fontsize_48px') },
+        ];
+        callback(items);
+      }
+    });
+
+    // Custom Font Family Dropdown
+    editor.ui.registry.addMenuButton('customFontFamily', {
+      text: 'Font chữ',
+      tooltip: 'Chọn font chữ',
+      fetch: (callback) => {
+        const items = [
+          { type: 'menuitem', text: 'Arial', onAction: () => editor.formatter.apply('fontfamily_arial') },
+          { type: 'menuitem', text: 'Times New Roman', onAction: () => editor.formatter.apply('fontfamily_times') },
+          { type: 'menuitem', text: 'Courier New', onAction: () => editor.formatter.apply('fontfamily_courier') },
+          { type: 'menuitem', text: 'Verdana', onAction: () => editor.formatter.apply('fontfamily_verdana') },
+          { type: 'menuitem', text: 'Georgia', onAction: () => editor.formatter.apply('fontfamily_georgia') },
+        ];
+        callback(items);
+      }
+    });
+  },
+  
   file_picker_callback: async (cb, _value, meta) => {
     if (meta.filetype !== 'image') return
     const input = document.createElement('input')

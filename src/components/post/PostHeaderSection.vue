@@ -25,7 +25,7 @@
       <UserDiv :user="post.data?.author" :date="post.data?.created_at"></UserDiv>
 
       <!-- Article Body -->
-      <article class="prose prose-sm sm:prose lg:prose-lg w-full max-w-none mt-6" v-html="post.data?.content_html">
+      <article class="post-content w-full max-w-none mt-6" v-html="post.data?.content_html">
       </article>
     </div>
   </div>
@@ -65,13 +65,15 @@ function startRotate() {
     setCurrentFromIndex()
   }, 4000)
 }
-defineProps({
+const props =  defineProps({
   post: {
     type: Object,
     required: true
   }
 })
 onMounted(async () => {
+  console.log("HTML ",props.post.data?.content_html);
+  
   try {
     await adsStore.getAllAds()
   } catch (error) {
