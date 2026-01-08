@@ -16,7 +16,7 @@
                 v-for="item in conversations" :key="item?.conversation_id"
                 :to="{path:'/nhan-tin', query:{id: item.user.id}}"
                 @click="markAsRead(item)"
-                class="flex items-center gap-3 px-4 py-3 hover:bg-sky-200 cursor-pointer"
+                class="flex items-center gap-3 px-4 py-3 transition duration-300  hover:-translate-y-0.5 hover:shadow-xl cursor-pointer"
                 :class="otherId == item.user.id ? 'bg-sky-500':''"
                 >
                   <img
@@ -34,7 +34,7 @@
                       >
                         {{item?.last_message?.content}}
                       <span
-                        v-if="Number(item.last_message.id) !== Number(item.last_read_message_id)"
+                        v-if="Number(item.last_message.id) !== Number(item.last_read_message_id) && Number(item.last_message.sender_id) !== Number(route.query.id) "
                         class="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-2 ml-2 rounded-full bg-blue-500 inline-block"
                       ></span>
                       </p>
@@ -104,7 +104,7 @@
             v-for="item in conversations" :key="item?.conversation_id"
             :to="{path:'/nhan-tin', query:{id: item.user.id}}"
             :class="otherId == item.user.id ? 'bg-sky-500':''"
-            class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 cursor-pointer" @click="closeSidebar(item)">
+            class="flex items-center gap-3 px-4 py-3 transition duration-300  hover:-translate-y-0.5 hover:shadow-xl cursor-pointer" @click="closeSidebar(item)">
               <img
               :src= "item.user.avatar"
               class="h-10 w-10 rounded-full bg-sky-100 flex items-center justify-center text-xs font-semibold text-sky-600"></img>
@@ -113,14 +113,37 @@
                   :class="Number(item.last_read_id) < Number(item.last_read_message_id)
                   ? 'font-bold text-gray-900'
                   : 'font-semibold text-gray-900'">{{item.user.name}}</p>
-                <p class="text-xs w-full truncate"
-                
-                  :class="Number(item.last_message.id) !== Number(item.last_read_message_id) && Number(item.last_message.sender_id) !== Number(route.query.id) 
-                  ? 'font-semibold text-gray-800'
-                  : 'text-gray-500'">
-                  <span v-if="item?.last_message?.content">{{item?.last_message?.content}}</span>
-                  <span v-else-if="!item?.last_message?.content && item?.image_url"> Đã gửi ảnh</span>
-                  </p>
+                <div v-if="item?.last_message?.content" class="block max-w-full">
+                      <p
+                        v-if="Number(item.last_message.sender_id) !== Number(auth?.user?.id) "
+                        class="text-xs pr-6 relative truncate w-full"
+                        :class="Number(item.last_message.id) !== Number(item.last_read_message_id) && Number(item.last_message.sender_id) !== Number(route.query.id) 
+                            ? 'font-bold text-gray-900'
+                            : 'text-gray-500'"
+                      >
+                        {{item?.last_message?.content}}
+                      <span
+                        v-if="Number(item.last_message.id) !== Number(item.last_read_message_id)"
+                        class="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-2 ml-2 rounded-full bg-blue-500 inline-block"
+                      ></span>
+                      </p>
+                      <p v-else class="text-xs text-gray-500 truncate w-full" >Bạn: {{item?.last_message?.content}}</p>
+                    </div>
+                    <div v-else>
+                      <p
+                        v-if="Number(item?.last_message?.sender_id) !== Number(auth?.user?.id)"
+                        class="text-xs relative pr-4"
+                        :class="Number(item?.last_message?.id) !== Number(item?.last_read_message_id)
+                            ? 'font-bold text-gray-900'
+                            : 'text-gray-500'"
+                      >Đã gửi ảnh
+                        <span
+                          v-if="Number(item?.last_message?.id) !== Number(item?.last_read_message_id) && Number(item.last_message.sender_id) !== Number(route.query.id) "
+                          class="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-2 ml-2 rounded-full bg-blue-500 inline-blocks"
+                        ></span>
+                      </p>
+                      <p v-else class="text-xs text-gray-500" >Bạn: Đã gửi ảnh</p>
+                    </div>
               </div>
             </router-link>
             <div v-if="isLoadingConver" class="flex justify-center items-center"><MoonLoader color="#2694b9" size="30px"></MoonLoader></div>
