@@ -52,10 +52,10 @@ const handleSubmit = async () => {
         const res = await auth.deleteAcc(userPass.value)
         if(res.status == 200){
             router.push("/")
-            toast.success("xóa tài khoản thành công")
+            toast.success("Xóa tài khoản thành công")
         }
     } catch (error) {
-        alert('that bai')
+        alert('Thất bại')
     }
 }
 </script>

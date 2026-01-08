@@ -68,8 +68,11 @@
             if(res.status == 200){
                 alert("Mật khẩu đã được cập nhật thành công.")
             }
+            else if(res.status == 422 ){
+            alert("Mật khẩu mới không được giống mật khẩu cũ")
+            }
         } catch (error) {
-            alert("Mật khẩu hiện tại không chính xác hoặc mật khẩu xác thực và mật khẩu mới không giống")
+            alert("Đổi mật khẩu thất bại")
         }
         finally {
             loading.value = false
