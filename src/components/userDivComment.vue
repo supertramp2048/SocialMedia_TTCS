@@ -57,7 +57,7 @@ function goProfilePage() {
     query: {
       user_id: props.user.id,
       page: 1,
-      limit: 2,
+      limit: 10,
       sort: 'hot'
     }
   })
