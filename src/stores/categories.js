@@ -10,11 +10,14 @@ export const useCategoryStore = defineStore('categories', {
   actions: {
     async ensureLoaded() {
       if (this.loaded) return
-      const res = await api.get(`${apiUrl}/api/categories`)
-      this.categories = res.data
-      // console.log(res.data);
-      
-      this.loaded = true
+      try {
+        const res = await api.get(`${apiUrl}/api/categories`)
+        this.categories = res.data
+        this.loaded = true
+      } catch (error) {
+        console.log(error);
+        
+      }
     }
   }
 })

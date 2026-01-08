@@ -328,13 +328,6 @@ const handleScroll = () => {
     emit("scrollTop")
   }
   const atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 50
-  if(!atBottom){
-    emit('notAtBottomNow', true)
-  }
-  else{
-    emit('notAtBottomNow', false)
-  }
-
   showScrollBtn.value = !atBottom
 }
 
@@ -360,7 +353,7 @@ const props = defineProps({
   isLoadingMore: {type: Boolean, default: false}
 })
 
-const emit = defineEmits(['newMessage','scrollTop', 'notAtBottomNow','atBottomNow'])
+const emit = defineEmits(['newMessage','scrollTop', 'notAtBottomNow'])
 
 async function uploadImg(){
   const urls = []

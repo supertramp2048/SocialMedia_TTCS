@@ -1,13 +1,9 @@
 <template>
     <section class="bg-gray-50 col-span-12 md:col-span-9">
         <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
-            <a href="#" class="flex items-center mb-6 text-2xl font-semibold text-gray-900">
-                <img class="w-8 h-8 mr-2" src="https://flowbite.s3.amazonaws.com/blocks/marketing-ui/logo.svg" alt="logo">
-                Flowbite    
-            </a>
             <div class="w-full p-6 bg-white rounded-lg shadow border md:mt-0 sm:max-w-md sm:p-8">
                 <h2 class="mb-1 text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl">
-                    Change Password
+                    Nhập mật khẩu mới của bạn
                 </h2>
                 <form 
                     @submit.prevent="sendFormChangePassword"
@@ -16,7 +12,7 @@
                 >
                     <div>
                         <label for="password" class="block mb-2 text-sm font-medium text-gray-900">
-                            New Password
+                            Mật khẩu mới 
                         </label>
                         <input 
                             v-model="form.password"
@@ -32,7 +28,7 @@
                     </div>
                     <div>
                         <label for="password_confirmation" class="block mb-2 text-sm font-medium text-gray-900">
-                            Confirm password
+                            Xác nhận mật khẩu  
                         </label>
                         <input 
                             v-model="form.password_confirmation"
@@ -50,7 +46,7 @@
                         type="submit"
                         :disabled="loading"
                         :aria-busy="loading"
-                        class="w-full relative flex items-center justify-center gap-2 text-white btnEffect bg-gray-300 hover:bg-primary-700 focus:ring-4 
+                        class="w-full relative flex items-center justify-center gap-2 text-white btnEffect bg-sky-500 hover:bg-primary-700 focus:ring-4 
                                focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm 
                                px-5 py-2.5 text-center disabled:opacity-60 disabled:cursor-not-allowed disabled:pointer-events-none"
                     >

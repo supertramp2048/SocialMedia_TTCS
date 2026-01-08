@@ -95,18 +95,14 @@
       
 
       <!-- Stats -->
-      <div class="grid grid-cols-3 gap-4 text-center">
+      <div class="grid grid-cols-2 gap-4 text-center">
         <div>
           <p class="text-base font-semibold text-gray-800">{{userData?.followers_count}}</p>
-          <p class="text-sm text-gray-800">followers</p>
+          <p class="text-sm text-gray-800">Người theo dõi</p>
         </div>
         <div>
           <p class="text-base font-semibold text-gray-800">{{userData?.following_count}}</p>
-          <p class="text-sm text-gray-800">following</p>
-        </div>
-        <div>
-          <p class="text-base font-semibold text-gray-800">0</p>
-          <p class="text-sm text-gray-800">spiders</p>
+          <p class="text-sm text-gray-800">Người đang theo dõi</p>
         </div>
       </div>
     </div>
