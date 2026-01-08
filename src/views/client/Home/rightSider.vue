@@ -68,8 +68,7 @@
       </div>
     </section>
 
-    <!-- Popular Links Section -->
-    <section class="bg-gray-50 rounded-lg p-6">
+    <section class="bg-gray-50 rounded-lg p-6 max-h-[300px] max-w-[400px] overflow-y-auto">
       <h3 class="text-lg font-bold text-gray-900 mb-4">Liên kết - Thảo luận</h3>
       <div class="space-y-3 text-sm flex flex-wrap">
         <router-link
