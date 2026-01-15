@@ -1,5 +1,4 @@
 @import "tailwindcss";
-<<<<<<< HEAD
 
 @layer components{
       /* 1) Cho ảnh hiển thị block để margin auto có tác dụng */
@@ -22,13 +21,6 @@
         margin-right: auto;
       }
 
-=======
-@tailwind base;
-@tailwind components;
-
-
-@layer components{
->>>>>>> longke
     .chat-input-container {
         position: sticky;
         bottom:0;

@@ -39,11 +39,7 @@
           <!-- Related Articles Section -->
           <SuggestedPost 
             :categoryId="post?.data?.category?.id" 
-<<<<<<< HEAD
             :currentId="post?.data?.id"
-=======
-            :postId="post?.data?.id"
->>>>>>> longke
           />
 
           <!-- Comments Section -->

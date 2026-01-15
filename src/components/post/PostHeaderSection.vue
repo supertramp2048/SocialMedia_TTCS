@@ -25,11 +25,7 @@
       <UserDiv :user="post.data?.author" :date="post.data?.created_at"></UserDiv>
 
       <!-- Article Body -->
-<<<<<<< HEAD
       <article class="post-content w-full max-w-none mt-6" v-html="post.data?.content_html">
-=======
-      <article class="prose prose-sm sm:prose lg:prose-lg w-full max-w-none mt-6" v-html="post.data?.content_html">
->>>>>>> longke
       </article>
     </div>
   </div>
@@ -69,22 +65,15 @@ function startRotate() {
     setCurrentFromIndex()
   }, 4000)
 }
-<<<<<<< HEAD
 const props =  defineProps({
-=======
-defineProps({
->>>>>>> longke
   post: {
     type: Object,
     required: true
   }
 })
 onMounted(async () => {
-<<<<<<< HEAD
-  console.log("HTML ",props.post.data?.content_html);
+  //console.log("HTML ",props.post.data?.content_html);
   
-=======
->>>>>>> longke
   try {
     await adsStore.getAllAds()
   } catch (error) {

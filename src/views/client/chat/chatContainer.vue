@@ -400,7 +400,9 @@ const formatDate = (date) => {
 const props = defineProps({
   chats: { type: Array, default: () => [] },
   others: { type: Object, default: () => ({}) },
-  isLoadingMore: {type: Boolean, default: false}
+  isLoadingMore: {type: Boolean, default: false},
+  isOnline: {type: Boolean, default: false},
+  isTyping: { type: Boolean, default: false }
 })
 
 const emit = defineEmits(['newMessage','scrollTop', 'notAtBottomNow'])
