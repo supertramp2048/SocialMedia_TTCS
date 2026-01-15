@@ -35,7 +35,14 @@ export function usePresence() {
                 console.error('Presence Error:', err);
             });
     };
+    const leavePresence = (echo) => {
+        if (!echo ) return
 
+        echo.leave('online')      // ← cái này trigger leaving()
+        state.users.clear()
+        state.isReady = false
+        //hasJoined = false
+    }
     // Hàm check nhanh dùng trong template
     const checkUserOnline = (userId) => {
         // Ép kiểu Number để chắc chắn so sánh đúng
@@ -45,6 +52,7 @@ export function usePresence() {
     return {
         onlineUsers: state.users,
         initPresence,
+        leavePresence,
         checkUserOnline
     };
 }

@@ -155,7 +155,7 @@ import ChatContainer from './chatContainer.vue'
 import {useRoute, useRouter} from 'vue-router'
 import { MoonLoader } from "vue3-spinner"
 import { usePresence } from '@/composables/usePresence';
-const { initPresence, checkUserOnline } = usePresence();
+const { initPresence, checkUserOnline, leavePresence } = usePresence();
 const isOtherUserTyping = ref(false);
 const echo = inject('echo')
 const isLoadingChatHistory = ref(false)
@@ -461,16 +461,18 @@ onMounted(async () => {
   const rawChatHistory = raw.data
   objPaginationChat.value = raw.meta
   //console.log("meta chat ",objPaginationChat.value);
-
+  if (echo) {
+            initPresence(echo);
+        }
   rawChatHistory.forEach(item => {
   if (typeof item.image_url === 'string' && item.image_url.trim() !== '') {
     item.image_url = item.image_url.split(', ')
   } else {
     item.image_url = []   // không có ảnh thì gán mảng rỗng
   }
-  if (echo) {
-            initPresence(echo);
-        }
+  // if (echo) {
+  //           initPresence(echo);
+  //       }
   })
   chatHistory.value = rawChatHistory
   // thử subscribe ngay nếu user đã có sẵn
@@ -508,6 +510,8 @@ onBeforeUnmount(() => {
     echo.leave(channelName)
     const channelConversationName = `conversation.change.${auth.user.id}`
     echo.leave(channelConversationName)
+    leavePresence(echo)
+   // echo.leave('online')
     //  console.log('Đã rời khỏi channel:', channelName)
   }
   chatChannel = null
