@@ -1,5 +1,5 @@
 <template>
-  <div class="max-w-[1200px] mx-auto px-4 mb-16">
+  <div class="max-w-[875px] mx-auto px-4 mb-16">
     <h2 class="font-bold text-sm text-text-primary mb-4">Bài viết nổi bật khác</h2>
 
     <div class="relative">
@@ -23,15 +23,15 @@
         @keydown.right.prevent="goNext"
       >
         <div ref="track" class="flex gap-6 p-8 min-w-max">
-          <!-- CARD TO HƠN -->
+          <!-- CHỈ CẦN CHỈNH KHỐI CARD -->
           <router-link
             v-for="post in postsForRender"
             :key="post.id"
             :to="{ path: '/bai-dang/', query: { id: post.id } }"
-            class="carousel-card w-80 p-1 flex-shrink-0 snap-start
-                   rounded border border-border-lighter bg-white
-                   hover:shadow transition-shadow
-                   flex flex-col h-full self-stretch"
+            class="w-64 p-1 flex-shrink-0 snap-start
+                  rounded border border-border-lighter bg-white
+                  hover:shadow transition-shadow
+                  flex flex-col h-full self-stretch"
           >
             <!-- Thumbnail đồng nhất -->
             <div class="w-full aspect-[16/10] overflow-hidden rounded mb-4">
@@ -49,11 +49,11 @@
                 {{ post.category?.name || 'Danh mục' }}
               </p>
 
-              <!-- Title: 3 dòng cố định chiều cao (cao hơn chút) -->
+              <!-- Title: 3 dòng cố định chiều cao -->
               <h3
                 class="text-base font-bold font-montserrat text-text-primary
-                       leading-6 line-clamp-3 mb-3
-                       min-h-[5.5rem]"
+                      leading-6 line-clamp-3 mb-3
+                      min-h-[4.5rem]"
               >
                 {{ post.title || 'Không có tiêu đề' }}
               </h3>
@@ -64,6 +64,7 @@
               </div>
             </div>
           </router-link>
+
         </div>
       </div>
 
@@ -96,7 +97,6 @@
 import { ref, computed, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import api from '../../API/axios'
 import SmallUserDiv from "../components/smallUserDiv.vue"
-
 /**
  * Props:
  * - categoryId: danh mục để lấy bài gợi ý
@@ -105,8 +105,8 @@ import SmallUserDiv from "../components/smallUserDiv.vue"
 const props = defineProps({
   categoryId: { type: [Number, String], required: true },
   currentId: { type: [Number, String], default: null },
-  // card to hơn
-  minCardWidth: { type: Number, default: 320 }, // px, ~ w-80
+  // Số card hiển thị 1 trang (gợi ý: 1 mobile, 2 tablet, 3 desktop — sẽ auto tính)
+  minCardWidth: { type: Number, default: 256 }, // px, ~ w-64
   gap: { type: Number, default: 24 } // px, ~ gap-6
 })
 
@@ -151,11 +151,10 @@ watch(
 async function fetchSuggestedPosts (id) {
   try {
     const res = await api.get('/api/posts', {
-      params: { limit: 5, sort: 'hot', category: id }
+      params: { limit: 20, sort: 'hot', category: id }
     })
     // chuẩn hoá để luôn là []
     rawPosts.value = normalizeArray(res?.data)
-    rawPosts.value.splice()
   } catch (e) {
     console.error('Lỗi lấy bài gợi ý:', e)
     rawPosts.value = []
@@ -197,12 +196,9 @@ function measure () {
   const tr = track.value
   if (!vp || !tr) return
 
-  // Lấy card đầu theo class carousel-card (card to hơn)
-  const firstCard = tr.querySelector('.carousel-card')
-  const cardW = firstCard
-    ? firstCard.getBoundingClientRect().width
-    : props.minCardWidth
-
+  // Lấy card đầu để đo width (w-64 = 256px). Cộng thêm gap.
+  const firstCard = tr.querySelector('.w-64')
+  const cardW = firstCard ? firstCard.getBoundingClientRect().width : props.minCardWidth
   const vpW = vp.getBoundingClientRect().width
   const perView = Math.max(1, Math.floor((vpW + props.gap) / (cardW + props.gap)))
   cardsPerView.value = perView
@@ -225,12 +221,10 @@ function goPrev () {
   if (isAtStart.value) return
   goToPage(currentPage.value - 1)
 }
-
 function goNext () {
   if (isAtEnd.value) return
   goToPage(currentPage.value + 1)
 }
-
 function goToPage (pageIdx) {
   const vp = viewport.value
   if (!vp) return

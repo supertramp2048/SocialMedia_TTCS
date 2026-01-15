@@ -44,6 +44,6 @@ function sendSearchForm () {
   const q = (search_content.value || '').trim()
   if (!q) return
   // đổi URL mà không reload trang
-  router.push({ path: '/tim-kiem', query: { page: 1, limit:10, q } })
+  router.push({ path: '/tim-kiem', query: { page: 1, limit:5, q } })
 }
 </script>

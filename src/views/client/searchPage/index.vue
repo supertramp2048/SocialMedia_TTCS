@@ -55,7 +55,6 @@
           <UserList 
             v-if="searchResult?.data?.length > 0"
             :users="searchResult.data"
-            :pageLimit="page_limit"
           />
           <div v-else class="py-12">
             <p class="text-center text-gray-500 italic text-lg">
@@ -102,6 +101,8 @@ async function fetchSearchResults() {
       ? `/api/posts` 
       : `/api/users/search`
 
+    console.log(`🔍 Đang tìm kiếm ${optionSearch.value}:`, search_content.value)
+
     // Gọi API với query params
     const res = await api.get(endpoint, {
       params: route.query
@@ -115,11 +116,12 @@ async function fetchSearchResults() {
       const limit = parseInt(route.query.limit) || 10
       page_limit.value = Math.ceil(res.data.meta.total / limit)
     }
-    else if (optionSearch.value === 'users' && res.data.meta) {
-      const limit = parseInt(route.query.limit) || 10
-      page_limit.value = Math.ceil(res.data.meta.total / limit)
-    }
-    console.log('✅ Kết quả:', res)
+
+    console.log('✅ Kết quả:', {
+      type: optionSearch.value,
+      count: res.data.data?.length || 0,
+      total: res.data.meta?.total
+    })
 
   } catch (error) {
     console.error('❌ Lỗi khi tìm kiếm:', error)
@@ -140,6 +142,10 @@ async function fetchSearchResults() {
 watch(
   [optionSearch, () => route.query],
   async ([newOption, newQuery]) => {
+    console.log('🔄 Thay đổi phát hiện:', { 
+      option: newOption, 
+      query: newQuery?.q 
+    })
     
     // Chỉ fetch nếu có query search
     if (newQuery?.q) {

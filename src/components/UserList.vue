@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full mb-4">
+  <div class="w-full">
     <!-- Grid danh sách user -->
     <div 
       v-if="users && users.length > 0" 
@@ -86,13 +86,12 @@
       </p>
     </div>
   </div>
-  <Pagination :page_limit="props.pageLimit"></Pagination>
 </template>
 
 <script setup lang="js">
 import {useRoute, useRouter } from 'vue-router'
 import { defineProps } from 'vue'
-import Pagination from '../components/pagination.vue'
+
 const route = useRoute()
 const router = useRouter()
 
@@ -104,8 +103,7 @@ const props = defineProps({
       // Validate rằng mỗi user phải có ít nhất id
       return value.every(user => user && typeof user.id !== 'undefined')
     }
-  },
-  pageLimit: {type: Number, required: true}
+  }
 })
 
 function goProfilePage(id, name){
@@ -114,7 +112,7 @@ function goProfilePage(id, name){
             query: {
                 user_id: id,
                 page: 1,
-                limit: 10,
+                limit: 2,
                 sort: 'hot'
             }
         })

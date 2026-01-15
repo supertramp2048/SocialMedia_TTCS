@@ -1,15 +1,21 @@
 <template>
   <div class="flex min-h-screen flex-col justify-center px-6 py-12 lg:px-8 bg-white">
     <div class="sm:mx-auto sm:w-full sm:max-w-sm">
+      <img
+        src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=500"
+        alt="Your Company"
+        class="mx-auto h-10 w-auto"
+      />
       <h2 class="mt-10 text-center text-2xl font-bold tracking-tight text-gray-900">
-        Đăng nhập vào tài khoản của bạn
+        Sign in to your account
       </h2>
     </div>
 
     <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
       <form @submit.prevent="onSubmit" method="POST" class="space-y-6" novalidate>
+        <!-- Email -->
         <div>
-          <label for="email" class="block text-sm font-medium text-gray-900">Email </label>
+          <label for="email" class="block text-sm font-medium text-gray-900">Email address</label>
           <div class="mt-2">
             <input
               v-model.trim="email"
@@ -27,12 +33,13 @@
           </div>
         </div>
 
+        <!-- Password -->
         <div>
           <div class="flex items-center justify-between">
             <label for="password" class="block text-sm font-medium text-gray-900">Password</label>
             <div class="text-sm">
               <router-link to="/quen-mat-khau" class="font-semibold text-indigo-600 hover:text-indigo-500">
-                Quên mật khẩu?
+                Forgot password?
               </router-link>
             </div>
           </div>
@@ -52,76 +59,28 @@
           </div>
         </div>
 
+        <!-- Error message -->
         <p v-if="error" class="text-sm text-red-600" role="alert">{{ error }}</p>
 
+        <!-- Submit -->
         <div>
           <button
             type="submit"
             :disabled="loading"
-            :aria-busy="loading"
             class="flex w-full justify-center items-center gap-2 rounded-md bg-indigo-600 px-3 py-2
                    text-sm font-semibold text-white hover:bg-indigo-500
-                   focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-indigo-600
+                   focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600
                    disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            <span v-if="!loading">Đăng nhập</span>
-            <span v-else class="inline-flex items-center" aria-live="polite">
-              <span class="mr-2">Đang đăng nhập ...</span>
+            <span v-if="!loading">Sign in</span>
+            <span v-else class="inline-flex items-center">
+              <span class="mr-2">Signing in</span>
+              <!-- spinner thuần Tailwind -->
               <span class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
             </span>
           </button>
         </div>
       </form>
-
-      <div class="mt-6">
-        <div class="relative">
-          <div class="absolute inset-0 flex items-center">
-            <div class="w-full border-t border-gray-300"></div>
-          </div>
-          <div class="relative flex justify-center text-sm">
-            <span class="bg-white px-2 text-gray-500">Hoặc đăng nhập với</span>
-          </div>
-        </div>
-
-        <div class="mt-6 grid grid-cols-2 gap-3">
-          <button
-            @click="loginWithGoogle"
-            type="button"
-            class="flex w-full items-center justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#EA4335]"
-          >
-            <svg class="h-5 w-5 mr-2" viewBox="0 0 24 24" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
-                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-            </svg>
-            Google
-          </button>
-
-          <button
-          @click="loginWithGithub"
-          type="button"
-          class="flex w-full items-center justify-center rounded-md bg-black px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-gray-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
-        >
-          <svg class="h-5 w-5 mr-2 fill-current" role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303
-            3.438 9.8 8.205 11.387.6.113.82-.258.82-.577
-            0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.387-1.333-1.757-1.333-1.757-1.086-.744.084-.729.084-.729
-            1.205.084 1.84 1.237 1.84 1.237 1.067 1.835 2.8
-            1.304 3.487.997.108-.774.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93
-            0-1.31.468-2.38 1.236-3.22-.135-.303-.54-1.523.105-3.176
-            0 0 1.005-.322 3.3 1.23a11.48 11.48 0 0 1 3.003-.404
-            11.48 11.48 0 0 1 3.003.404c2.28-1.552 3.285-1.23
-            3.285-1.23.645 1.653.24 2.873.12 3.176.765.84
-            1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475
-            5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015
-            3.286 0 .315.21.69.825.57C20.565 22.092 24
-            17.592 24 12.297c0-6.627-5.373-12-12-12"/>
-          </svg>
-          GitHub
-        </button>
-        </div>
-      </div>
 
       <p class="mt-10 text-center text-sm text-gray-600">
         Bạn chưa có tài khoản?
@@ -134,12 +93,10 @@
 </template>
 
 <script setup>
-import { ref, onUnmounted } from 'vue'
+import { ref } from 'vue'
 import { useAuthStore } from '../../../stores/auth'
 import { useRouter } from 'vue-router'
 import { useToast } from 'vue-toastification'
-import Cookies from 'js-cookie'
-import api from '../../../../API/axios' // Giả sử bạn có import api client
 
 const auth = useAuthStore()
 const router = useRouter()
@@ -159,18 +116,11 @@ async function onSubmit () {
   loading.value = true
   error.value = ''
   try {
-      await auth.login(email.value, password.value)
-      if(auth.user){
-        toast.success('Đăng nhập thành công!')
-        if(auth.user.email_verified_at == null){
-          toast.info('Tài khoản của bạn chưa được xác thực')
-        }
-        router.push('/')
-      }
-      else{
-        toast.error('Đăng nhập thất bại. Vui lòng kiểm tra thông tin.')
-      }
+    await auth.login(email.value, password.value)
+    toast.success('Đăng nhập thành công!')
+    router.push('/')
   } catch (err) {
+    // tuỳ backend: lấy message từ response
     const msg = err?.response?.data?.message || 'Đăng nhập thất bại. Vui lòng kiểm tra thông tin.'
     error.value = msg
     toast.error(msg)
@@ -178,81 +128,4 @@ async function onSubmit () {
     loading.value = false
   }
 }
-
-// Hàm xử lý login Google
-// 1. Hàm mở Popup
-function loginWithGoogle() {
-    // URL Backend xử lý login Google
-    const url = `${import.meta.env.VITE_API_BASE}/api/login/google/redirect`;
-
-    // Cấu hình kích thước Popup giữa màn hình
-    const width = 500;
-    const height = 600;
-    const left = (window.screen.width - width) / 2;
-    const top = (window.screen.height - height) / 2;
-
-    // Mở cửa sổ
-    window.open(url, 'google_login', `width=${width},height=${height},top=${top},left=${left}`);
-
-    // Đăng ký lắng nghe tin nhắn từ Popup gửi về
-    window.addEventListener('message', handlePopupMessage);
-}
-
-function loginWithGithub() {
-    // URL Backend xử lý login Google
-    const url = `${import.meta.env.VITE_API_BASE}/api/login/github/redirect`;
-
-    // Cấu hình kích thước Popup giữa màn hình
-    const width = 500;
-    const height = 600;
-    const left = (window.screen.width - width) / 2;
-    const top = (window.screen.height - height) / 2;
-
-    // Mở cửa sổ
-    window.open(url, 'github_login', `width=${width},height=${height},top=${top},left=${left}`);
-
-    // Đăng ký lắng nghe tin nhắn từ Popup gửi về
-    window.addEventListener('message', handlePopupMessage);
-}
-
-// 2. Hàm xử lý khi nhận tin nhắn
-function handlePopupMessage(event) {
-    // (Tùy chọn) Kiểm tra nguồn gửi để bảo mật
-    // if (event.origin !== "http://127.0.0.1:8000") return;
-
-    const { status, token, user, message } = event.data;
-
-    if (status === 'success') {
-        // --- ĐĂNG NHẬP THÀNH CÔNG ---
-
-        // 1. Lưu Token
-        //localStorage.setItem('auth_token', token);
-        auth.user = user; // Cập nhật Pinia Store
-        //console.log('Đăng nhập thành công:', token);
-        //console.log("user ", user);
-        Cookies.set('token',token,{
-                    expires: 7,            // thời hạn 7 ngày
-                    secure: false,          // true nếu chạy HTTPS
-                    sameSite: 'lax'         // tránh lỗi CORS
-                })
-        localStorage.setItem('user', JSON.stringify(user))
-        // Lưu token trong 7 ngày
-        // 2. Thông báo
-        toast.success(`Xin chào, ${user.name}!`);
-
-        // 3. Chuyển hướng vào trang chủ (Home)
-        router.push('/');
-
-    } else if (status === 'error') {
-        toast.error(message || 'Đăng nhập thất bại');
-    }
-
-    // Dọn dẹp: Gỡ bỏ lắng nghe để tránh lỗi memory leak
-    window.removeEventListener('message', handlePopupMessage);
-}
-
-// Dọn dẹp khi component bị hủy (người dùng rời trang Login)
-onUnmounted(() => {
-    window.removeEventListener('message', handlePopupMessage);
-});
 </script>

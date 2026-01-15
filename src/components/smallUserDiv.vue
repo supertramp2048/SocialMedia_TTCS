@@ -30,7 +30,7 @@
             query: {
                 user_id: props.user.id,
                 page: 1,
-                limit: 10,
+                limit: 2,
                 sort: 'hot'
             }
         })

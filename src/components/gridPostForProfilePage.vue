@@ -28,7 +28,7 @@
             type="button"
             class="px-3 py-2 text-sm text-gray-700 hover:text-sky-700 hover:bg-sky-50 rounded-md transition-colors"
             @click="updatePagination('newest')"
-            :class="{ 'bg-sky-300': sortSetting == 'newest' }"
+            :class="{ 'bg-sky-300': sortSetting === 'newest' }"
           >
             Mới nhất
           </button>
@@ -38,7 +38,7 @@
             type="button"
             class="px-3 py-2 text-sm text-gray-700 hover:text-sky-700 hover:bg-sky-50 rounded-md transition-colors"
             @click="updatePagination('hot')"
-            :class="{ 'bg-sky-300': sortSetting == 'hot' }"
+            :class="{ 'bg-sky-300': sortSetting === 'hot' }"
           >
             Thịnh hành
           </button>
@@ -58,7 +58,7 @@
         class="group cursor-pointer"
         :class="displayMode === 'col' ? ['flex','flex-col','sm:flex-row'] : ''"
       >
-        <div v-if="auth?.user?.id == idUserNow">
+        <div>
           <button
           @click.prevent.stop="goToFixArticalPage(article.id)"
            class="border btnEffect border-transparent text-sky-500 bg-gray-200 rounded-xl px-2 py-1 m-1">Sửa</button>
@@ -118,15 +118,12 @@
 import SmallUserDiv from '../components/smallUserDiv.vue'
 import { ref, watch, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import {useAuthStore} from "../stores/auth.js"
 import Pagination from '../components/pagination.vue'
 import api from '../../API/axios.js'
 const emit = defineEmits(['update-posts'])
-const auth = useAuthStore()
 const sortSetting = ref('hot')
 const route = useRoute()
 const router = useRouter()
-const idUserNow = ref(route.query.user_id)
 const props = defineProps({
   posts: { type: Object, required: true },
   pageLimit: { type: Number, required: true }
@@ -135,13 +132,7 @@ const props = defineProps({
 
 const displayMode = ref('col')
 const userChanged = ref(false)
-watch(() => route.query.user_id, (newVal) => {
-      idUserNow.value = newVal
-})
-watch(() => route.query.sort, (newVal)=>{
-  sortSetting.value = newVal
-},
-{immediate:true})
+
 watch(displayMode, () => { userChanged.value = true })
 
 watch(

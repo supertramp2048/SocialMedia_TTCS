@@ -12,7 +12,7 @@ export const useCategoryStore = defineStore('categories', {
       if (this.loaded) return
       const res = await api.get(`${apiUrl}/api/categories`)
       this.categories = res.data
-      // console.log(res.data);
+      console.log(res.data);
       
       this.loaded = true
     }

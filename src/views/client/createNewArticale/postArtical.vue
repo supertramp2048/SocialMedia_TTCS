@@ -142,6 +142,10 @@
         <span v-if="!loading">Đăng bài viết</span>
         <span v-else>Đang đăng ({{ progress.current }}/{{ progress.total }})…</span>
       </button>
+
+      <button class="px-4 py-2 rounded border" @click="console.log(content)" type="button">
+        Log HTML
+      </button>
     </div>
   </div>
 </template>
@@ -151,7 +155,7 @@ import { ref, computed, onBeforeUnmount, onMounted } from 'vue'
 import Editor from '@tinymce/tinymce-vue'
 import api from '../../../../API/axios'
 import { useCategoryStore } from '../../../stores/categories'
-import { useRouter} from 'vue-router'
+
 /* ====== QUAN TRỌNG: Import TinyMCE ĐÚNG THỨ TỰ ====== */
 import tinymce from 'tinymce/tinymce'
 
@@ -163,42 +167,24 @@ import 'tinymce/icons/default'
 import 'tinymce/themes/silver'
 import 'tinymce/models/dom'
 
-// --- Import plugin (những plugin có sẵn trong node_modules/tinymce/plugins) ---
-import 'tinymce/plugins/accordion';
-import 'tinymce/plugins/advlist';
-import 'tinymce/plugins/anchor';
-import 'tinymce/plugins/autolink';
-import 'tinymce/plugins/autoresize';
-import 'tinymce/plugins/autosave';
-import 'tinymce/plugins/charmap';
-import 'tinymce/plugins/code';
-import 'tinymce/plugins/codesample';
-import 'tinymce/plugins/directionality';
-import 'tinymce/plugins/emoticons';
-import 'tinymce/plugins/fullscreen';
-import 'tinymce/plugins/help';
-import 'tinymce/plugins/image';
-import 'tinymce/plugins/importcss';
-import 'tinymce/plugins/insertdatetime';
-import 'tinymce/plugins/link';
-import 'tinymce/plugins/lists';
-import 'tinymce/plugins/media';
-import 'tinymce/plugins/nonbreaking';
-import 'tinymce/plugins/pagebreak';
-import 'tinymce/plugins/preview';
-import 'tinymce/plugins/quickbars';
-import 'tinymce/plugins/save';
-import 'tinymce/plugins/searchreplace';
-import 'tinymce/plugins/table';
-import 'tinymce/plugins/visualblocks';
-import 'tinymce/plugins/visualchars';
-import 'tinymce/plugins/wordcount';
-// --- end plugins ---
+import 'tinymce/plugins/advlist'
+import 'tinymce/plugins/autolink'
+import 'tinymce/plugins/lists'
+import 'tinymce/plugins/link'
+import 'tinymce/plugins/image'
+import 'tinymce/plugins/charmap'
+import 'tinymce/plugins/preview'
+import 'tinymce/plugins/anchor'
+import 'tinymce/plugins/searchreplace'
+import 'tinymce/plugins/visualblocks'
+import 'tinymce/plugins/code'
+import 'tinymce/plugins/fullscreen'
+import 'tinymce/plugins/insertdatetime'
+import 'tinymce/plugins/media'
+import 'tinymce/plugins/table'
+import 'tinymce/plugins/help'
+import 'tinymce/plugins/wordcount'
 
-import { useToast } from 'vue-toastification'
-
-const toast = useToast()
-const router = useRouter()
 const CLOUD_NAME = import.meta.env.VITE_CLOUD_NAME
 const UPLOAD_PRESET = import.meta.env.VITE_UPLOAD_PRESET
 
@@ -244,7 +230,7 @@ function isValidUrl(url) {
 // Xác nhận nhập URL
 function confirmUrlInput() {
   if (!isValidUrl(tempUrlInput.value)) {
-    toast.error("Vui lòng nhập URL hợp lệ")
+    alert('Vui lòng nhập URL hợp lệ (bắt đầu bằng http:// hoặc https://)')
     return
   }
   
@@ -276,14 +262,13 @@ function onCoverChange(e) {
   const f = e.target.files?.[0]
   if (!f) return
   if (!f.type.startsWith('image/')) {
-    toast.error('Chỉ chọn tệp ảnh.')
+    alert('Chỉ chọn tệp ảnh.')
     e.target.value = ''
     return
   }
   const MAX = 5 * 1024 * 1024
   if (f.size > MAX) {
-    toast.error('Ảnh quá lớn (>5MB).')
-    
+    alert('Ảnh quá lớn (>5MB).')
     e.target.value = ''
     return
   }
@@ -417,7 +402,8 @@ async function replaceInlineImagesWithCloudinary(html) {
 
 /* ====== Submit với logic ưu tiên thumbnailUrlManual ====== */
 async function postArticle() {
-  if (!selectedCategoryId.value) return toast.error('Vui lòng chọn danh mục.') 
+  if (!title.value) return alert('Vui lòng nhập tiêu đề.')
+  if (!selectedCategoryId.value) return alert('Vui lòng chọn danh mục.')
 
   try {
     loading.value = true
@@ -442,22 +428,13 @@ async function postArticle() {
       thumbnail_url: thumbnailUrl,
     }
 
-    const res = await api.post('/api/posts', payload)
-
-    toast.success('Đăng bài thành công!')
-    router.push({
-      path:'/bai-dang',
-      query: {
-      id: res.data.data.id
-    } 
-   })
-    
+    await api.post('/api/posts', payload)
+    alert('Đăng bài thành công!')
   } catch (error) {
     console.log('status:', error?.response?.status)
     console.log('data:', error?.response?.data)
     console.log('errors:', error?.response?.data?.errors)
-    toast.error('Đăng thất bại: '+ (error?.response?.data?.message || error?.message || 'Validation error'))
-
+    alert('Đăng thất bại: ' + (error?.response?.data?.message || error?.message || 'Validation error'))
   } finally {
     loading.value = false
   }

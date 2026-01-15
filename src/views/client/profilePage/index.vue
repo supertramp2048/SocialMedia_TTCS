@@ -2,13 +2,7 @@
     <Layout>
         <div class="min-h-screen bg-white">
                 <!-- Khung chính -->
-                <SkeletonLoader
-                  v-if="isLoadingProfile"
-                  variant="detail"
-                  :minHeight="420"
-                  class="w-full max-w-[1280px] mx-auto my-6 px-4 sm:px-6 lg:px-8"
-                />
-                <div v-else class="max-w-[1280px]  mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="max-w-[1280px]  mx-auto px-4 sm:px-6 lg:px-8">
                 <!-- ảnh bìa của user  -->
                 <div class=" bg-cover bg-center bg-no-repeat w-full h-[200px] "
                     :style="{ backgroundImage: `url(${AuthUser?.data?.cover_photo_url})` }"
@@ -38,6 +32,20 @@
                             </svg>
                             <span>Bài viết ({{ AuthUser?.data?.posts_count }})</span>
                         </button>
+
+                        <button class="flex items-center gap-2 px-4 py-3 text-gray-600 hover:text-gray-900">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                            <path d="M2 2h12v4H2V2Zm0 6h12v6H2V8Z" fill="#909399"/>
+                            </svg>
+                            <span>Series</span>
+                        </button>
+
+                        <button class="flex items-center gap-2 px-4 py-3 text-gray-600 hover:text-gray-900">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                            <path d="M2 3h12v2H2V3Zm0 4h12v2H2V7Zm0 4h12v2H2v-2Z" fill="#909399"/>
+                            </svg>
+                            <span>Bình luận</span>
+                        </button>
                         </nav>
                     </div>
 
@@ -47,10 +55,7 @@
 
                     <!-- Lưới bài viết -->
                     <section class="pb-10">
-                        <div v-if="!posts || !posts.data || isLoadingPost">
-                          <SkeletonLoader variant="list" :rows="6" :avatar="true" class="mt-4" />
-                        </div>
-                        <div v-else-if="posts?.data?.length > 0" class=" gap-6 lg:gap-8">
+                        <div v-if="posts?.data?.length > 0" class=" gap-6 lg:gap-8">
                         <GridPost
                             :posts="posts"
                             :pageLimit="limitPage"
@@ -81,7 +86,6 @@
     import ReportModal from '../../../components/reportForm.vue' 
     import { useAuthStore } from '../../../stores/auth'
     import { useRoute, useRouter} from 'vue-router'
-    import SkeletonLoader from '../../../components/ui/SkeletonLoader.vue'
     // Demo data — thay bằng API thật của bạn
 const showReportPostForm = ref(false)
 const posts = ref([])
@@ -95,8 +99,6 @@ const sort = ref('hot')
 let UserId = null
 const idReport = ref('')
 const typeOfReport = ref('')
-const isLoadingProfile = ref(true)
-const isLoadingPost = ref(false)
 function handleShowForm(value){
     showReportPostForm.value = value
     idReport.value = route.query.user_id
@@ -120,7 +122,6 @@ watch(
     UserId = route.query.user_id
     const res = await api.get(`/api/profiles/${UserId}`)
     AuthUser.value = res?.data
-    isLoadingProfile.value = !Boolean(AuthUser.value?.data)
   },
   { immediate: true , deep: true} // gọi 1 lần khi load trang
 )
@@ -129,19 +130,11 @@ watch(
 watch(
   () => route.query,
   async (newQuery) => {
-    try {
-      isLoadingPost.value = true
-      objPagination.value = newQuery
-        const res2 = await api.get(`/api/posts`, {
-        params: objPagination.value
-      })
-      posts.value = res2.data
-    } catch (error) {
-      
-    }
-    finally{
-      isLoadingPost.value = false
-    }
+    objPagination.value = newQuery
+    const res2 = await api.get(`/api/posts`, {
+    params: objPagination.value
+  })
+  posts.value = res2.data
   },
   { immediate: true , deep: true} // gọi 1 lần khi load trang
 )
@@ -151,7 +144,6 @@ onMounted(async () => {
   UserId = route.query.user_id
   const res = await api.get(`/api/profiles/${UserId}`)
   AuthUser.value = res?.data
-  isLoadingProfile.value = !Boolean(AuthUser.value?.data)
   console.log("auth", AuthUser.value);
   objPagination.value = route.query
   console.log("objPagination ",objPagination.value);
