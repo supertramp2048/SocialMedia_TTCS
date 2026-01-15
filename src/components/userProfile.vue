@@ -156,7 +156,7 @@ async function followHandler() {
     // alert(`You have ${action} this user!`);
     
   } catch (error) {
-    console.error("❌ FOLLOW REQUEST FAILED:", error);
+    console.error(" FOLLOW REQUEST FAILED:", error);
     console.log("Error response:", error.response);
     console.log("Error status:", error.response?.status);
     console.log("Error data:", error.response?.data);
@@ -225,7 +225,7 @@ async function followHandler() {
       errorMessage = 'Đã có lỗi xảy ra, vui lòng thử lại sau';
     }
     
-    // ⚠️ CRITICAL: Always show the error to the user
+    //  CRITICAL: Always show the error to the user
     alert(errorMessage);
     
     // Detailed error logging for debugging

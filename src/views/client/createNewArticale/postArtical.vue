@@ -197,7 +197,6 @@ import 'tinymce/plugins/wordcount';
 
 import { useToast } from 'vue-toastification'
 
-
 const toast = useToast()
 const router = useRouter()
 const CLOUD_NAME = import.meta.env.VITE_CLOUD_NAME

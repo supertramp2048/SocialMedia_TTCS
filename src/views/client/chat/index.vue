@@ -11,11 +11,16 @@
                 <h2 class="text-lg font-semibold text-gray-900">Danh sách trò chuyện</h2>
                 <p class="text-xs text-gray-500 mt-1">Chọn cuộc trò chuyện để xem chi tiết</p>
               </div>
+<<<<<<< HEAD
               <div ref="desktopConver" @scroll="handleScrollConver" class="flex-1 max-w-[500px] w-full overflow-y-scroll divide-y divide-gray-100">
+=======
+              <div ref="desktopConver" @scroll="handleScrollConver" class="flex-1 overflow-y-scroll divide-y divide-gray-100">
+>>>>>>> longke
                 <router-link
                 v-for="item in conversations" :key="item?.conversation_id"
                 :to="{path:'/nhan-tin', query:{id: item.user.id}}"
                 @click="markAsRead(item)"
+<<<<<<< HEAD
                 class="flex items-center gap-3 px-4 py-3 transition duration-300  hover:-translate-y-0.5 hover:shadow-xl cursor-pointer"
                 :class="otherId == item.user.id ? 'bg-sky-500':''"
                 >
@@ -29,16 +34,47 @@
                         v-if="Number(item.last_message.sender_id) !== Number(auth?.user?.id) "
                         class="text-xs pr-6 relative truncate w-full"
                         :class="Number(item.last_message.id) !== Number(item.last_read_message_id) && Number(item.last_message.sender_id) !== Number(route.query.id) 
+=======
+                class="flex items-center gap-3 px-4 py-3 hover:bg-sky-200 cursor-pointer"
+                :class="otherId == item.user.id ? 'bg-sky-500':''"
+                >
+                  <div class="relative">
+                      <img
+                        :src="item.user.avatar"
+                        class="h-10 w-10 rounded-full bg-sky-100 flex items-center justify-center text-xs font-semibold text-sky-600 object-cover"
+                        referrerpolicy="no-referrer"
+                      >
+                      <span
+                          v-if="checkUserOnline(item.user.id)"
+                          class="absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full ring-2 ring-white bg-green-500"
+                      ></span>
+                  </div>
+                  <div class="flex-1">
+                    <p class="text-sm font-semibold text-gray-900">{{item.user.name}}</p>
+                    <div v-if="item?.last_message?.content">
+                      <p
+                        v-if="Number(item.last_message.sender_id) !== Number(auth?.user?.id)"
+                        class="text-xs pr-4 relative"
+                        :class="Number(item.last_message.id) !== Number(item.last_read_message_id)
+>>>>>>> longke
                             ? 'font-bold text-gray-900'
                             : 'text-gray-500'"
                       >
                         {{item?.last_message?.content}}
                       <span
+<<<<<<< HEAD
                         v-if="Number(item.last_message.id) !== Number(item.last_read_message_id) && Number(item.last_message.sender_id) !== Number(route.query.id) "
                         class="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-2 ml-2 rounded-full bg-blue-500 inline-block"
                       ></span>
                       </p>
                       <p v-else class="text-xs text-gray-500 truncate w-full" >Bạn: {{item?.last_message?.content}}</p>
+=======
+                        v-if="Number(item.last_message.id) !== Number(item.last_read_message_id)"
+                        class="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-2 ml-2 rounded-full bg-blue-500 inline-block"
+                      ></span>
+                      </p>
+                      <p v-else class="text-xs text-gray-500" >Bạn: {{item?.last_message?.content}}</p>
+>>>>>>> longke
                     </div>
                     <div v-else>
                       <p
@@ -71,15 +107,25 @@
             </button>
           </div>
           <SkeletonChatList class="col-span-1 md:col-span-7" v-if="isLoadingChatHistory"></SkeletonChatList>
+<<<<<<< HEAD
           <ChatContainer v-else @newMessage='handleNewMessage' @scrollTop="loadMoreMessage" :chats="chatHistory" :others="otherUser" :isLoadingMore="isLoadingMore"></ChatContainer>
+=======
+          <ChatContainer v-else @newMessage='handleNewMessage' @scrollTop="loadMoreMessage" :chats="chatHistory" :others="otherUser" :isLoadingMore="isLoadingMore" :is-online="checkUserOnline(otherId)" :is-typing="isOtherUserTyping"></ChatContainer>
+>>>>>>> longke
         </div>
       </div>
 
       <!-- Mobile Sidebar Overlay -->
       <div v-if="isSidebarOpen" class=" fixed inset-0 z-40 md:hidden">
+<<<<<<< HEAD
         <div class="absolute inset-0 bg-black/40" @click="closeSidebar(null)"></div>
 
         <div class="absolute top-[100px] inset-y-0 right-0 w-full max-w-sm bg-white shadow-xl border-l border-gray-200 flex flex-col">
+=======
+        <div class="absolute inset-0 bg-black/40" @click="closeSidebar"></div>
+
+        <div class="absolute inset-y-0 right-0 w-full max-w-sm bg-white shadow-xl border-l border-gray-200 flex flex-col">
+>>>>>>> longke
           <div class="px-4 py-4 border-b border-gray-100 flex items-center justify-between">
             <div>
               <h2 class="text-lg font-semibold text-gray-900">Danh sách trò chuyện</h2>
@@ -88,7 +134,11 @@
             <button
               type="button"
               class="p-2 rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+<<<<<<< HEAD
               @click="closeSidebar(null)"
+=======
+              @click="closeSidebar"
+>>>>>>> longke
               aria-label="Đóng danh sách"
             >
               <span aria-hidden="true">&times;</span>
@@ -97,22 +147,45 @@
 
           <div
           ref="desktopConver" @scroll="handleScrollConver"
+<<<<<<< HEAD
           class="flex-1 overflow-y-scroll divide-y divide-gray-100"
           >
           
+=======
+          class="flex-1 sticky overflow-y-scroll divide-y divide-gray-100"
+          >
+
+>>>>>>> longke
             <router-link
             v-for="item in conversations" :key="item?.conversation_id"
             :to="{path:'/nhan-tin', query:{id: item.user.id}}"
             :class="otherId == item.user.id ? 'bg-sky-500':''"
+<<<<<<< HEAD
             class="flex items-center gap-3 px-4 py-3 transition duration-300  hover:-translate-y-0.5 hover:shadow-xl cursor-pointer" @click="closeSidebar(item)">
               <img
               :src= "item.user.avatar"
               class="h-10 w-10 rounded-full bg-sky-100 flex items-center justify-center text-xs font-semibold text-sky-600"></img>
               <div class="flex-1 min-w-0">
+=======
+            class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 cursor-pointer" @click="closeSidebar">
+              <div class="relative">
+                  <img
+                    :src="item.user.avatar"
+                    class="h-10 w-10 rounded-full bg-sky-100 flex items-center justify-center text-xs font-semibold text-sky-600 object-cover"
+                    referrerpolicy="no-referrer"
+                  >
+                  <span
+                      v-if="checkUserOnline(item.user.id)"
+                      class="absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full ring-2 ring-white bg-green-500"
+                  ></span>
+              </div>
+              <div class="flex-1">
+>>>>>>> longke
                 <p  class="text-sm"
                   :class="Number(item.last_read_id) < Number(item.last_read_message_id)
                   ? 'font-bold text-gray-900'
                   : 'font-semibold text-gray-900'">{{item.user.name}}</p>
+<<<<<<< HEAD
                 <div v-if="item?.last_message?.content" class="block max-w-full">
                       <p
                         v-if="Number(item.last_message.sender_id) !== Number(auth?.user?.id) "
@@ -144,6 +217,15 @@
                       </p>
                       <p v-else class="text-xs text-gray-500" >Bạn: Đã gửi ảnh</p>
                     </div>
+=======
+                <p class="text-xs"
+                  :class="Number(item.last_read_id) !== Number(item.last_read_message_id)
+                  ? 'font-semibold text-gray-800'
+                  : 'text-gray-500'">
+                  <span v-if="item?.last_message?.content">{{item?.last_message?.content}}</span>
+                  <span v-else-if="!item?.last_message?.content && item?.image_url"> Đã gửi ảnh</span>
+                  </p>
+>>>>>>> longke
               </div>
             </router-link>
             <div v-if="isLoadingConver" class="flex justify-center items-center"><MoonLoader color="#2694b9" size="30px"></MoonLoader></div>
@@ -162,6 +244,12 @@ import Layout from '@/views/client/layout/layout.vue'
 import ChatContainer from './chatContainer.vue'
 import {useRoute, useRouter} from 'vue-router'
 import { MoonLoader } from "vue3-spinner"
+<<<<<<< HEAD
+=======
+import { usePresence } from '@/composables/usePresence';
+const { initPresence, checkUserOnline } = usePresence();
+const isOtherUserTyping = ref(false);
+>>>>>>> longke
 const echo = inject('echo')
 const isLoadingChatHistory = ref(false)
 const isLoadingConver = ref(false)
@@ -170,7 +258,10 @@ const auth = useAuthStore()
 const route = useRoute()
 const otherId = ref(route.query.id)
 const desktopConver = ref()
+<<<<<<< HEAD
 
+=======
+>>>>>>> longke
 async function handleScrollConver() {
   const el = desktopConver.value
   const atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 50
@@ -193,28 +284,46 @@ async function getMoreConver() {
       const rawConver = res.data
       conversations.value = [...conversations.value,...rawConver.data]
       //console.log("mảng conver mới ",conversations.value);
+<<<<<<< HEAD
       
   } catch (error) {
     
+=======
+
+  } catch (error) {
+
+>>>>>>> longke
   }
   finally{
     isLoadingConver.value = false
   }
+<<<<<<< HEAD
   
 }
 
 // obj phan trang 
+=======
+
+}
+
+// obj phan trang
+>>>>>>> longke
 const objPaginationConver = ref()
 const objPaginationChat = ref()
 
 const toggleSidebar = () => {
   isSidebarOpen.value = !isSidebarOpen.value
 }
+<<<<<<< HEAD
 function closeSidebar(item){
   isSidebarOpen.value = false
   if(item != null){
     markAsRead(item)
   }
+=======
+const closeSidebar = () => {
+  isSidebarOpen.value = false
+>>>>>>> longke
 }
 watch(()=>route.query.id, async (newVal)=>{
   otherId.value= newVal
@@ -249,6 +358,7 @@ let chatChannel = null
     obj.image_url = convertedArray
     chatHistory.value.push(obj)
   }
+<<<<<<< HEAD
   async function markAsReadNow(senderId,messageId){
     console.log("sender id ", senderId);
     const obj = {
@@ -257,6 +367,8 @@ let chatChannel = null
     }
     await api.post(`/realtime/updateReadMessageForReceiver`, obj)
   }
+=======
+>>>>>>> longke
 // HÀM ĐĂNG KÝ CHANNEL – tách riêng cho dễ gọi lại
 const subscribeToChannel = () => {
   if (!echo) {
@@ -280,9 +392,21 @@ const subscribeToChannel = () => {
   }
 
   chatChannel = echo.private(channelName)
+<<<<<<< HEAD
     .subscribed( () => {
       //console.log(' Đã subscribe thành công channel:', channelName)
     })
+=======
+    .subscribed(() => {
+      //console.log(' Đã subscribe thành công channel:', channelName)
+    })
+    .listen('.typing', (e) => {
+        // Chỉ hiện "Đang gõ" nếu sender_id trùng với người mình đang chat (otherId)
+        if (String(e.sender_id) === String(otherId.value)) {
+            isOtherUserTyping.value = e.typing;
+        }
+    })
+>>>>>>> longke
     // event nhan duoc tu pusher
     .listen('.MessageSent', (payload) => {
       //console.log(' Đã nhận event .MessageSent:', payload)
@@ -310,7 +434,10 @@ const subscribeToChannel = () => {
       }
       //console.log("obj message ", newMessage);
       if(payload.SenderId == otherId.value){
+<<<<<<< HEAD
         markAsReadNow(payload.SenderId,payload.MessageId)
+=======
+>>>>>>> longke
         chatHistory.value.push(newMessage)
       }
       // TODO: thêm logic cập nhật UI tin nhắn ở đây
@@ -422,6 +549,7 @@ const isLoadingMore = ref(false)         // Load more
 async function loadMoreMessage() {
   // Chặn nếu đang load history ban đầu
   if (isLoadingChatHistory.value) return
+<<<<<<< HEAD
   
   // Chặn nếu đang load more
   if (isLoadingMore.value) return
@@ -437,6 +565,23 @@ async function loadMoreMessage() {
       params: { page: objPaginationChat.value.current_page }
     })
     
+=======
+
+  // Chặn nếu đang load more
+  if (isLoadingMore.value) return
+
+  // Chặn nếu hết trang
+  if (objPaginationChat.value.current_page >= objPaginationChat.value.last_page) return
+
+  try {
+    isLoadingMore.value = true
+    objPaginationChat.value.current_page += 1
+
+    const res = await api.get(`/realtime/messages/${otherId.value}`, {
+      params: { page: objPaginationChat.value.current_page }
+    })
+
+>>>>>>> longke
     const rawChatHistory = res.data.data
     rawChatHistory.forEach(item => {
       if (typeof item.image_url === 'string' && item.image_url.trim() !== '') {
@@ -445,7 +590,11 @@ async function loadMoreMessage() {
         item.image_url = []
       }
     })
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> longke
     chatHistory.value = [...rawChatHistory, ...chatHistory.value]
   } catch (error) {
     console.error('Lỗi load more messages:', error)
@@ -462,7 +611,11 @@ onMounted(async () => {
     const rawConver = res.data
     objPaginationConver.value = rawConver.meta
     conversations.value = rawConver.data
+<<<<<<< HEAD
     //console.log("phan trang conver ",objPaginationConver.value);
+=======
+    console.log("phan trang conver ",objPaginationConver.value);
+>>>>>>> longke
     const res2 = await api.get(`/api/profiles/${otherId.value}`)
     otherUser.value = res2.data
     //console.log("other ", otherUser.value);
@@ -473,20 +626,33 @@ onMounted(async () => {
   const rawChatHistory = raw.data
   objPaginationChat.value = raw.meta
   //console.log("meta chat ",objPaginationChat.value);
+<<<<<<< HEAD
   
+=======
+
+>>>>>>> longke
   rawChatHistory.forEach(item => {
   if (typeof item.image_url === 'string' && item.image_url.trim() !== '') {
     item.image_url = item.image_url.split(', ')
   } else {
     item.image_url = []   // không có ảnh thì gán mảng rỗng
   }
+<<<<<<< HEAD
+=======
+  if (echo) {
+            initPresence(echo);
+        }
+>>>>>>> longke
   })
   chatHistory.value = rawChatHistory
   // thử subscribe ngay nếu user đã có sẵn
   // subscribeToChannel()
   // subscribeToChannelConversation()
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> longke
   } catch (error) {
     console.error('Lỗi load conversations:', error)
   }
@@ -500,9 +666,19 @@ watch(
     () => auth.user && auth.user.id,
     (newVal, oldVal) => {
       if (newVal && newVal !== oldVal) {
+<<<<<<< HEAD
         // console.log(' auth.user.id thay đổi, subscribe lại channel')
         subscribeToChannel()
         subscribeToChannelConversation()
+=======
+        // console.log('🔄 auth.user.id thay đổi, subscribe lại channel')
+        subscribeToChannel()
+        subscribeToChannelConversation()
+
+        if (echo) {
+            initPresence(echo);
+        }
+>>>>>>> longke
       }
     }
     ,{immediate: true}
@@ -519,3 +695,8 @@ onBeforeUnmount(() => {
   chatChannel = null
 })
 </script>
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> longke

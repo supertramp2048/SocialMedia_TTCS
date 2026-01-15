@@ -10,15 +10,41 @@
         @scroll="handleScroll"
       >
         <!-- Header nhỏ trong khung chat -->
-        <div class="headerChat">
-          <div class="text-lg font-bold text-black">{{props.others?.data?.name}}</div>
+        <div v-if="props.others.data" class="headerChat sticky top-0 z-10 bg-white/95 backdrop-blur-sm border-b border-gray-100 px-4 py-3 flex items-center gap-3">
+
+          <div class="relative">
+            <img
+              :src="props.others?.data?.avatar"
+              class="w-10 h-10 rounded-full object-cover border border-gray-100"
+              alt="Avatar"
+            />
+
+            <span
+              v-if="props.isOnline"
+              class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"
+            ></span>
+          </div>
+
+          <div class="flex flex-col justify-center">
+            <div class="text-base font-bold text-gray-900 leading-tight">
+              {{ props.others?.data?.name }}
+            </div>
+
+            <div v-if="props.isOnline" class="text-xs text-green-600 font-medium flex items-center gap-1 mt-0.5">
+              Đang hoạt động
+            </div>
+            <div v-else class="text-xs text-gray-400 mt-0.5">
+              Không hoạt động
+            </div>
+          </div>
+
         </div>
 
         <!-- Danh sách tin nhắn -->
         <div class="p-[16px]">
           <div class="flex items-center justify-center" v-if="props.isLoadingMore == true"><MoonLoader color="#2694b9" size="30px"></MoonLoader></div>
-          <div 
-            v-for="item in props.chats" 
+          <div
+            v-for="item in props.chats"
             :key="`${item.id}-${item.created_at}`"
             :class="auth.user.id != item.sender_id ? 'message other' : 'message user'"
           >
@@ -32,18 +58,18 @@
                 <span v-if="auth.user.id != item.sender_id">{{ props.others?.data?.name }}</span>
                 <span v-else>{{ auth.user.name }}</span>
               </div>
-              
+
               <!-- Nội dung text -->
               <div v-if="item.content">{{ item.content }}</div>
-              
+
               <!-- Block hiển thị ảnh -->
 
               <!-- Block hiển thị ảnh -->
               <div v-if="item.image_url && item.image_url.length > 0" class="mt-2">
                 <!-- 1 ảnh duy nhất -->
                 <div v-if="item.image_url.length === 1" class="rounded-xl overflow-hidden cursor-pointer">
-                  <img 
-                    :src="item.image_url[0]" 
+                  <img
+                    :src="item.image_url[0]"
                     class="w-full max-h-[280px] object-cover"
                     alt="Image"
                     @click="openViewer(item.image_url[0])"
@@ -52,10 +78,10 @@
 
                 <!-- 2 ảnh -->
                 <div v-else-if="item.image_url.length === 2" class="grid grid-cols-2 gap-1 rounded-xl overflow-hidden">
-                  <img 
-                    v-for="(url, idx) in item.image_url" 
+                  <img
+                    v-for="(url, idx) in item.image_url"
                     :key="idx"
-                    :src="url" 
+                    :src="url"
                     class="w-full h-[160px] object-cover cursor-pointer"
                     alt="Image"
                     @click="openViewer(url)"
@@ -64,20 +90,20 @@
 
                 <!-- 3 ảnh -->
                 <div v-else-if="item.image_url.length === 3" class="grid grid-cols-2 gap-1 rounded-xl overflow-hidden">
-                  <img 
-                    :src="item.image_url[0]" 
+                  <img
+                    :src="item.image_url[0]"
                     class="w-full h-[120px] object-cover cursor-pointer"
                     alt="Image"
                     @click="openViewer(item.image_url[0])"
                   />
-                  <img 
-                    :src="item.image_url[1]" 
+                  <img
+                    :src="item.image_url[1]"
                     class="w-full h-[120px] object-cover cursor-pointer"
                     alt="Image"
                     @click="openViewer(item.image_url[1])"
                   />
-                  <img 
-                    :src="item.image_url[2]" 
+                  <img
+                    :src="item.image_url[2]"
                     class="col-span-2 w-full h-[140px] object-cover cursor-pointer"
                     alt="Image"
                     @click="openViewer(item.image_url[2])"
@@ -86,22 +112,22 @@
 
                 <!-- 4+ ảnh (hiển thị tối đa 4, ảnh thứ 4 có overlay +N) -->
                 <div v-else class="grid grid-cols-2 gap-1 rounded-xl overflow-hidden">
-                  <img 
-                    v-for="(url, idx) in getLimitedImages(item.image_url).slice(0, 3)" 
+                  <img
+                    v-for="(url, idx) in getLimitedImages(item.image_url).slice(0, 3)"
                     :key="idx"
-                    :src="url" 
+                    :src="url"
                     class="w-full h-[120px] object-cover cursor-pointer"
                     alt="Image"
                     @click="openViewer(url)"
                   />
                   <!-- Ảnh thứ 4 với overlay - Click để mở gallery -->
                   <div class="relative w-full h-[120px] cursor-pointer" @click="openGallery(item.image_url, 3)">
-                    <img 
-                      :src="getLimitedImages(item.image_url)[3]" 
+                    <img
+                      :src="getLimitedImages(item.image_url)[3]"
                       class="w-full h-full object-cover"
                       alt="Image"
                     />
-                    <div 
+                    <div
                       v-if="item.image_url.length > 4"
                       class="absolute inset-0 bg-black bg-opacity-60 flex flex-col items-center justify-center hover:bg-opacity-70 transition-all"
                     >
@@ -118,14 +144,35 @@
 
               <div class="time">{{ formatDate(item.created_at) }}</div>
             </div>
-          </div>            
+          </div>
         </div>
       </div>
-      
+
       <!-- Ô nhập tin nhắn: sticky bottom, full width cột -->
       <div
           class="chat-input-container w-full max-w-full sticky bottom-0 "
         >
+        <transition
+            enter-active-class="transition ease-out duration-200"
+            enter-from-class="opacity-0 translate-y-2"
+            enter-to-class="opacity-100 translate-y-0"
+            leave-active-class="transition ease-in duration-150"
+            leave-from-class="opacity-100 translate-y-0"
+            leave-to-class="opacity-0 translate-y-2"
+          >
+            <div v-if="props.isTyping" class="absolute -top-8 left-4 flex items-center gap-2">
+              <div class="bg-white/90 backdrop-blur border border-gray-200 shadow-sm px-3 py-1.5 rounded-full flex items-center gap-2">
+                <div class="flex space-x-1">
+                  <div class="w-1.5 h-1.5 bg-sky-500 rounded-full animate-bounce"></div>
+                  <div class="w-1.5 h-1.5 bg-sky-500 rounded-full animate-bounce delay-75"></div>
+                  <div class="w-1.5 h-1.5 bg-sky-500 rounded-full animate-bounce delay-150"></div>
+                </div>
+                <span class="text-xs text-gray-500 font-medium">
+                  {{ props.others?.data?.name }} đang soạn tin...
+                </span>
+              </div>
+            </div>
+          </transition>
           <div class="flex items-center gap-2 w-full px-3">
             <!-- Emoji + Picker -->
             <div ref="emojiWrapper" class="relative">
@@ -141,10 +188,10 @@
                 v-if="isShowEmojiPicker"
                 class="absolute bottom-12 left-0 z-50"
               >
-                <Picker 
+                <Picker
                   :data="emojiIndex"
                   set="twitter"
-                  :perLine="8"           
+                  :perLine="8"
                   :emojiSize="24"
                   :showSearch="false"
                   :showPreview="false"
@@ -171,14 +218,17 @@
               <form @submit.prevent="sendMessage">
                 <input
                   v-model="contentMessage"
-                  ref='messageInput' 
-                  type="text" 
-                  placeholder="Nhập tin nhắn..." 
+                  ref='messageInput'
+                  type="text"
+                  placeholder="Nhập tin nhắn..."
                   :disabled="loading"
+                  @focus="handleFocus"
+                  @blur="handleBlur"
+                  @input="resetSafetyTimer"
                 />
                 <button class="btnEffect flex justify-center items-center" type="submit" :disabled="loading || (!contentMessage.trim() && files.length === 0)">
                   <MoonLoader v-if="loading" color="#0ea5e9" size="14px" />
-                  <i v-else class="fa-solid fa-paper-plane"></i> 
+                  <i v-else class="fa-solid fa-paper-plane"></i>
                 </button>
               </form>
             </div>
@@ -190,7 +240,7 @@
             class="scroll-bottom-btn"
           >
             <i class="fa-solid fa-angles-down"></i>
-          </button>     
+          </button>
         </div>
 
         <FilePond
@@ -296,7 +346,7 @@ function getLimitedImages(imageUrls) {
 // Handler để cập nhật files từ FilePond
 function handleFilePondUpdate(fileItems) {
   files.value = fileItems
-  //console.log(' Files updated:', fileItems.length, 'ảnh')
+  //console.log('Files updated:', fileItems.length, 'ảnh')
 }
 
 function handleClickImgBtn(){
@@ -396,10 +446,50 @@ async function uploadImg(){
     toast.error('Có lỗi xảy ra khi upload ảnh')
     throw error
   }
-  
-  //console.log('Hoàn thành upload. Total URLs:', urls.length)
+
+  //console.log(' Hoàn thành upload. Total URLs:', urls.length)
   return urls
-} 
+}
+
+// Logic xử lý Focus/Blur + Safety Timer
+let safetyTimer = null;
+
+const handleFocus = async () => {
+    // 1. Gọi API báo "Tôi đang gõ"
+    triggerTyping(true);
+
+    // 2. Đặt lịch tự tắt sau 30s
+    resetSafetyTimer();
+}
+
+const handleBlur = async () => {
+    // Hủy báo "Typing"
+    triggerTyping(false);
+
+    //Xóa timer
+    if (safetyTimer) clearTimeout(safetyTimer);
+}
+
+// Hàm reset timer mỗi khi người dùng gõ phím
+const resetSafetyTimer = () => {
+    if (safetyTimer) clearTimeout(safetyTimer);
+    safetyTimer = setTimeout(() => {
+        triggerTyping(false); // Tự động tắt sau 30s
+    }, 30000);
+}
+
+// Hàm gọi API trigger typing
+const triggerTyping = async (status) => {
+    try {
+        await api.post('realtime/chat/typing', {
+            receiver_id: props.others.data.id, // ID người nhận
+            typing: status
+        });
+        console.log('Gửi typing:', props.others.data.avatar, '->', status);
+    } catch (error) {
+        console.error('Lỗi gửi typing:', error);
+    }
+}
 
 async function sendMessage() {
   if (!contentMessage.value.trim() && files.value.length === 0) {
@@ -446,7 +536,7 @@ async function sendMessage() {
       scrollToBottom()
     }
   } catch (error) {
-    console.error('❌ Lỗi khi gửi tin nhắn:', error)
+    console.error(' Lỗi khi gửi tin nhắn:', error)
     toast.error('Không thể gửi tin nhắn')
   } finally {
     loading.value = false

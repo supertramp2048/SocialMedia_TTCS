@@ -18,7 +18,6 @@ export const useSettingStore = defineStore('setting', {
 
       this.loading = true
       try {
-        // Có thể gọi song song cho nhanh
         const [resLogo, resBg, resFooter] = await Promise.all([
           api.get('/api/settings/logo'),
           api.get('/api/settings/background'),

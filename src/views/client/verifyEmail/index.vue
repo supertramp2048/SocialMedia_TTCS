@@ -38,7 +38,7 @@
       <!-- Trạng thái: thành công -->
       <div v-else-if="status === 'success'">
         <p class="text-green-700 font-medium mb-2">
-          Email của bạn đã được xác thực thành công! 🎉
+          Email của bạn đã được xác thực thành công! 
         </p>
         <p class="text-gray-700 mb-4">
           Bạn có thể tiếp tục sử dụng tài khoản. Nếu trang không tự chuyển, hãy bấm nút bên dưới.
