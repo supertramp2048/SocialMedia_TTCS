@@ -155,6 +155,7 @@ import ChatContainer from './chatContainer.vue'
 import {useRoute, useRouter} from 'vue-router'
 import { MoonLoader } from "vue3-spinner"
 import { usePresence } from '@/composables/usePresence';
+import e from 'cors'
 const { initPresence, checkUserOnline } = usePresence();
 const isOtherUserTyping = ref(false);
 const echo = inject('echo')
@@ -508,6 +509,7 @@ onBeforeUnmount(() => {
     echo.leave(channelName)
     const channelConversationName = `conversation.change.${auth.user.id}`
     echo.leave(channelConversationName)
+    echo.leave('online')
     //  console.log('Đã rời khỏi channel:', channelName)
   }
   chatChannel = null

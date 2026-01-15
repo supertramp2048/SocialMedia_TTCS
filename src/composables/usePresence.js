@@ -15,7 +15,7 @@ export function usePresence() {
         if (!echoInstance) return;
         if (state.isReady) return; // Tránh subscribe nhiều lần
 
-        // 'online' là tên channel bạn đã định nghĩa ở Laravel routes/channels.php
+        // 'online' là tên channel đã định nghĩa ở Laravel routes/channels.php
         echoInstance.join('online')
             .here((users) => {
                 // users là mảng [] -> chuyển sang Map
