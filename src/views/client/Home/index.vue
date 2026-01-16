@@ -35,7 +35,7 @@
           <section>
             <div class="flex items-center justify-between mb-3 sm:mb-4 md:mb-6">
               <h2 class="text-sm sm:text-base md:text-xl lg:text-2xl font-bold text-gray-900 uppercase tracking-wide">
-                Nổi bật trong tuần
+                Bài viết nổi bật 
               </h2>
             </div>
             

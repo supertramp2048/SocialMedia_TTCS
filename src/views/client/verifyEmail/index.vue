@@ -98,14 +98,11 @@ const verifyEmail = async () => {
   }
 
   try {
-    // Gọi đúng endpoint verify của Laravel
-    // Backend: Route::get('/verify-email/{id}/{hash}', ...)->middleware(['auth:sanctum', 'signed'])
     await api.get(`/api/verify-email/${id}/${hash}${queryString}`)
 
     status.value = 'success'
     auth.resetUserInLocal()
     toast.success('Xác Minh thành công')
-    // Tuỳ anh: auto redirect sau vài giây
     setTimeout(() => {
       goAfterSuccess()
     }, 2000)
@@ -131,8 +128,7 @@ const verifyEmail = async () => {
 }
 
 const goAfterSuccess = () => {
-  // Anh có thể đổi thành route login hoặc dashboard tuỳ ý
-  router.push({ name: 'home' }) // hoặc { path: '/' }
+  router.push({ name: 'home' }) 
 }
 
 const retry = () => {

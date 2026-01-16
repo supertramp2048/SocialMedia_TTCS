@@ -30,13 +30,13 @@
                           class="absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full ring-2 ring-white bg-green-500"
                       ></span>
                   </div>
-                  <div class="flex-1">
+                  <div class="flex-1 min-w-0">
                     <p class="text-sm font-semibold text-gray-900">{{item.user.name}}</p>
-                    <div v-if="item?.last_message?.content">
+                    <div v-if="item?.last_message?.content" >
                       <p
                         v-if="Number(item.last_message.sender_id) !== Number(auth?.user?.id)"
-                        class="text-xs pr-4 relative"
-                        :class="Number(item.last_message.id) !== Number(item.last_read_message_id)
+                        class="text-xs pr-6 relative truncate w-full"
+                        :class="Number(item.last_message.id) !== Number(item.last_read_message_id) && Number(item.last_message.sender_id) !== Number(route.query.id) 
                             ? 'font-bold text-gray-900'
                             : 'text-gray-500'"
                       >
@@ -46,7 +46,7 @@
                         class="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-2 ml-2 rounded-full bg-blue-500 inline-block"
                       ></span>
                       </p>
-                      <p v-else class="text-xs text-gray-500" >Bạn: {{item?.last_message?.content}}</p>
+                      <p v-else class="text-xs text-gray-500 truncate w-full" >Bạn: {{item?.last_message?.content}}</p>
                     </div>
                     <div v-else>
                       <p
@@ -85,9 +85,9 @@
 
       <!-- Mobile Sidebar Overlay -->
       <div v-if="isSidebarOpen" class=" fixed inset-0 z-40 md:hidden">
-        <div class="absolute inset-0 bg-black/40" @click="closeSidebar"></div>
+        <div class="absolute inset-0 bg-black/40" @click="closeSidebar(null)"></div>
 
-        <div class="absolute inset-y-0 right-0 w-full max-w-sm bg-white shadow-xl border-l border-gray-200 flex flex-col">
+        <div class="absolute top-[100px] inset-y-0 right-0 w-full max-w-sm bg-white shadow-xl border-l border-gray-200 flex flex-col">
           <div class="px-4 py-4 border-b border-gray-100 flex items-center justify-between">
             <div>
               <h2 class="text-lg font-semibold text-gray-900">Danh sách trò chuyện</h2>
@@ -96,7 +96,7 @@
             <button
               type="button"
               class="p-2 rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-100"
-              @click="closeSidebar"
+              @click="closeSidebar(null)"
               aria-label="Đóng danh sách"
             >
               <span aria-hidden="true">&times;</span>
@@ -105,14 +105,14 @@
 
           <div
           ref="desktopConver" @scroll="handleScrollConver"
-          class="flex-1 sticky overflow-y-scroll divide-y divide-gray-100"
+          class="flex-1 max-w-[500px] w-full overflow-y-scroll divide-y divide-gray-100"
           >
 
             <router-link
             v-for="item in conversations" :key="item?.conversation_id"
             :to="{path:'/nhan-tin', query:{id: item.user.id}}"
             :class="otherId == item.user.id ? 'bg-sky-500':''"
-            class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 cursor-pointer" @click="closeSidebar">
+            class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 cursor-pointer" @click="closeSidebar(item)">
               <div class="relative">
                   <img
                     :src="item.user.avatar"
@@ -124,13 +124,13 @@
                       class="absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full ring-2 ring-white bg-green-500"
                   ></span>
               </div>
-              <div class="flex-1">
-                <p  class="text-sm"
-                  :class="Number(item.last_read_id) < Number(item.last_read_message_id)
+              <div class="flex-1 min-w-0">
+                <p  class="text-xs w-full truncate"
+                  :class="Number(item.last_message.id) !== Number(item.last_read_message_id) && Number(item.last_message.sender_id) !== Number(route.query.id)
                   ? 'font-bold text-gray-900'
                   : 'font-semibold text-gray-900'">{{item.user.name}}</p>
-                <p class="text-xs"
-                  :class="Number(item.last_read_id) !== Number(item.last_read_message_id)
+                <p class="text-xs w-full truncate"
+                  :class="Number(item.last_message.id) !== Number(item.last_read_message_id) && Number(item.last_message.sender_id) !== Number(route.query.id) 
                   ? 'font-semibold text-gray-800'
                   : 'text-gray-500'">
                   <span v-if="item?.last_message?.content">{{item?.last_message?.content}}</span>
@@ -204,8 +204,11 @@ const objPaginationChat = ref()
 const toggleSidebar = () => {
   isSidebarOpen.value = !isSidebarOpen.value
 }
-const closeSidebar = () => {
+function closeSidebar(item){
   isSidebarOpen.value = false
+  if(item != null){
+    markAsRead(item)
+  }
 }
 watch(()=>route.query.id, async (newVal)=>{
   otherId.value= newVal
@@ -299,6 +302,7 @@ const subscribeToChannel = () => {
       }
       //console.log("obj message ", newMessage);
       if(payload.SenderId == otherId.value){
+        markAsReadNow(payload.SenderId,payload.MessageId)
         chatHistory.value.push(newMessage)
       }
       // TODO: thêm logic cập nhật UI tin nhắn ở đây
@@ -401,7 +405,15 @@ const normalizeChatHistory = (raw) => {
 const markAsRead = (item) => {
   item.last_read_message_id = item.last_message.id
 }
-
+// Hàm mark as read khi đang trong đoạn chat
+async function markAsReadNow(senderId,messageId){
+    //console.log("sender id ", senderId);
+    const obj = {
+      senderId: senderId,
+      lastMessageId: messageId
+    }
+    await api.post(`/realtime/updateReadMessageForReceiver`, obj)
+  }
 const otherUser = ref()
 const conversations = ref([])
 const chatHistory = ref([])
@@ -470,14 +482,8 @@ onMounted(async () => {
   } else {
     item.image_url = []   // không có ảnh thì gán mảng rỗng
   }
-  // if (echo) {
-  //           initPresence(echo);
-  //       }
   })
   chatHistory.value = rawChatHistory
-  // thử subscribe ngay nếu user đã có sẵn
-  // subscribeToChannel()
-  // subscribeToChannelConversation()
 
   } catch (error) {
     console.error('Lỗi load conversations:', error)
@@ -486,13 +492,12 @@ onMounted(async () => {
     isLoadingChatHistory.value = false
   }
 })
-  // nếu auth.user được set bất đồng bộ (vd: sau khi refresh mới restore từ localStorage),
-  // watch để khi có user.id thì auto subscribe
+
 watch(
     () => auth.user && auth.user.id,
     (newVal, oldVal) => {
       if (newVal && newVal !== oldVal) {
-        // console.log('🔄 auth.user.id thay đổi, subscribe lại channel')
+        // console.log('auth.user.id thay đổi, subscribe lại channel')
         subscribeToChannel()
         subscribeToChannelConversation()
 
@@ -511,8 +516,6 @@ onBeforeUnmount(() => {
     const channelConversationName = `conversation.change.${auth.user.id}`
     echo.leave(channelConversationName)
     leavePresence(echo)
-   // echo.leave('online')
-    //  console.log('Đã rời khỏi channel:', channelName)
   }
   chatChannel = null
 })
